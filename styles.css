@@ -31,6 +31,15 @@
     --transition: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.dark {
+    --title-color: hsl(0, 0%, 100%);
+    --text-color: hsl(0, 0%, 92%);
+    --bg-color: hsl(var(--hue), 10%, 8%);
+    --container-color: hsl(var(--hue), 10%, 16%);
+    --border-color: hsl(var(--hue), 4%, 65%);
+    --shadow-color: hsla(var(--hue), 0%, 100%, 0.2);
+}
+
 /* ========== BASE STYLES ========== */
 body,
 button,
@@ -317,4 +326,202 @@ textarea {
     display: flex;
     align-items: center;
     column-gap: 4.25rem;
+}
+
+/* ========== About STYLING ========== */
+
+.about {
+    display: flex; /* Stack content vertically */
+    align-items: center; /* Center content */
+    justify-content: center;
+    gap: 5rem;
+    background: var(--snd-bf-color);
+    padding: 5rem 10%; 
+    min-height: 100vh;
+}
+
+.about-img img{
+    width: 25vw;
+    max-width: 250px;
+    border-radius: 2rem;
+    border: 10px solid var(--main-color);
+}
+
+.heading {
+    text-align: center;
+    font-family: "Montserrat Alternates", sans-serif;
+    font-size: 4.5rem;
+}
+
+.about-content h2{
+    text-align: left;
+    line-height: 1.2;
+    font-size: 3.5rem;
+}
+
+.about-content h3{
+    text-align: left;
+    font-size: 2.5rem;
+}
+
+.about-content p{
+    text-align: left;
+    font-size: 1.6rem;
+    margin: 2rem 0 3rem;
+}
+
+/* Education Section */
+.education{
+    padding: 8rem 15%;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+.education-content h3{
+    font-size: 2.5rem;
+    font-family: "Montserrat Alternates", sans-serif;
+    margin-bottom: 2rem;
+}
+
+.education-container {
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
+    margin-top: 3rem;
+}
+
+.timeline {
+    position: relative;
+    margin-top: 3rem;
+}
+
+.timeline-item{
+    position: relative;
+    padding-left: 5rem;
+    margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0.8rem;
+    width: 2px;
+    height: 100%;
+    background-color: var(--main-color);
+}
+
+.circle-dot{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--main-color);
+    background: var(--main-color);
+    border-radius: 50%;
+    transition: .5s;
+}
+
+.timeline-item:hover .circle-dot {
+    background: var(--bg-color);
+}
+
+/* STYLE SWITCHER */
+.style-switcher{
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 400px;
+    height: 100%;
+    background: var(--snd-bf-color);
+    padding: 5rem 3.5rem;
+    z-index: 1000;
+    border-radius: 0 1rem 1rem 0;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
+    transition: right 1s;
+}
+
+.style-switcher-title{
+    font-size: 2.5rem;
+    padding-bottom: 1.25rem;
+}
+
+.style-switcher-title,
+.style-switcher-item{
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.style-switcher-item{
+    padding-block: 1.25rem;
+}
+
+.style-switcher-subtitle{
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+}
+
+.style-switcher-colors{
+    display: flex;
+    column-gap: 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.style-switcher-color{
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: hsl(var(--hue), 60%, 40%);
+    position: relative;
+    cursor: pointer;
+}
+
+.style-switcher-color i{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    display: none;
+    transform: translate(-50%, -50%);
+}
+
+.active-color i{
+    display: block;
+}
+
+.style-switcher-themes,
+.style-switcher-theme{
+    display: flex;
+}
+
+.style-switcher-themes{
+    column-gap: 1.25rem;
+}
+
+.style-switcher-theme{
+    column-gap: .5rem;
+}
+
+.style-switcher-input{
+    accent-color: var(--main-color);
+}
+
+.style-switcher-label{
+    color: var(--text-color);
+}
+
+.style-switcher-close{
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.show-switcher{
+    right: 0;
 }
