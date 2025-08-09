@@ -130,8 +130,7 @@
       </div>
 
       <div class="about-content">
-        <h2 class="heading">About <span>Me</span></h2>
-        <h3>Aspirant Software Developer</h3>
+        <h3 class="section-title">About <span>Me</span></h3>
         <p>
           As a dedicated developer, I enjoy bringing ideas to life through
           technology. My expertise lies in building intuitive user interfaces,
@@ -145,9 +144,7 @@
 
     <!-- Education Section -->
     <section class="education section" id="education">
-      <h2 class="heading">
-        <i class="fa-solid fa-graduation-cap"></i> My <span>Education</span>
-      </h2>
+      <h3 class="section-title"><i class="fa-solid fa-graduation-cap"></i> My <span>Education</span></h3>
       <div class="education-container">
         <div class="timeline">
           <div class="timeline-item">
@@ -186,44 +183,78 @@
 
     <!-- Skills Section -->
     <section class="skills section" id="skills">
-      <h2 class="heading">My <span>Skills</span></h2>
-      <div class="skills-container">
-        <div class="skill-box" data-skill="web">
-          <i class="fa-solid fa-code"></i>
-          <h3>Web Development</h3>
-          <p>
-            Proficient in HTML, CSS, JavaScript. I create dynamic and responsive
-            websites that deliver great user experiences.
-          </p>
-          <a href="#" class="btn read-more">Read more</a>
+      <h2 class="section-title" data-title="My Skills">Professional Skills</h2>
+      <div class="skills-container container grid">
+        <div class="skills-item">
+          <div class="skills-header">
+            <h3 class="skills-name">PHP</h3>
+            <span class="skills-value">85 <b>%</b></span>
+            </div>
+            <p class="skills-description">
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores tenetur rem, delectus, optio inventore veniam maxime voluptatem commodi i
+            </p>
+            <div class="skills-bar">
+              <span class="skills-percentage" style="width: 85%;"></span>
+            </div>
         </div>
 
-        <div class="skill-box" data-skill="app">
-          <i class="fa-brands fa-android"></i>
-          <h3>App Development</h3>
-          <p>
-            Experienced in developing Android applications using Java, Kotlin,
-            and Dart, ensuring seamless performance, beautiful design, and
-            intuitive navigation.
-          </p>
-          <a href="#" class="btn read-more">Read more</a>
+        <div class="skills-item">
+          <div class="skills-header">
+            <h3 class="skills-name">PHP</h3>
+            <span class="skills-value">85 <b>%</b></span>
+            </div>
+            <p class="skills-description">
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores tenetur rem, delectus, optio inventore veniam maxime voluptatem commodi i
+            </p>
+            <div class="skills-bar">
+              <span class="skills-percentage" style="width: 85%;"></span>
+            </div>
         </div>
 
-        <div class="skill-box" data-skill="uiux">
-          <i class="fa-solid fa-palette"></i>
-          <h3>UI/UX Designing</h3>
-          <p>
-            I design intuitive and aesthetically pleasing interfaces using tools
-            like Figma, Adobe XD, and Sketch.
-          </p>
-          <a href="#" class="btn read-more">Read more</a>
+        <div class="skills-item">
+          <div class="skills-header">
+            <h3 class="skills-name">JavaScript</h3>
+            <span class="skills-value">95 <b>%</b></span>
+            </div>
+            <p class="skills-description">
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores tenetur rem, delectus, optio inventore veniam maxime voluptatem commodi i
+            </p>
+            <div class="skills-bar">
+              <span class="skills-percentage" style="width: 95%;"></span>
+            </div>
+        </div>
+
+        <div class="skills-item">
+          <div class="skills-header">
+            <h3 class="skills-name">Flutter</h3>
+            <span class="skills-value">70 <b>%</b></span>
+            </div>
+            <p class="skills-description">
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores tenetur rem, delectus, optio inventore veniam maxime voluptatem commodi i
+            </p>
+            <div class="skills-bar">
+              <span class="skills-percentage" style="width: 70%;"></span>
+            </div>
+        </div>
+
+        <div class="skills-item">
+          <div class="skills-header">
+            <h3 class="skills-name">Python</h3>
+            <span class="skills-value">60 <b>%</b></span>
+            </div>
+            <p class="skills-description">
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores tenetur rem, delectus, optio inventore veniam maxime voluptatem commodi i
+            </p>
+            <div class="skills-bar">
+              <span class="skills-percentage" style="width: 60%;"></span>
+            </div>
         </div>
       </div>
     </section>
 
-    <!-- Contact Section
-    <section class="contact" id="contact">
-      <h2 class="heading"><i class="fa-regular fa-address-book"></i> Contact <span>Me</span></h2>
+    <!-- Contact Section -->
+    <section class="contact section" id="contact">
+      <h3 class="section-title"><i class="fa-regular fa-address-book"></i> Contact <span>Me</span></h3>
 
       <div class="contact-container container grid">
         <div class="contact-content">
@@ -258,28 +289,42 @@
           </div>
 
         </div>
-        <form action="#" class="contact-form">
-            <div class="input-box">
-              <input type="text" placeholder="Enter your name" required />
-              <input type="email" placeholder="Email Address" required />
+        <form action="#" class="contact-form grid">
+            <div class="contact-form-group grid">
+              <div class="contact-form-div">
+                <label for="" class="contact-form-label">Your Name<b>*</b></label>
+                <input type="text" class="contact-form-input" id="contact-name" placeholder="Enter your name" required />
+              </div>
+
+              <div class="contact-form-div">
+                <label for="" class="contact-form-label">Your Email Address<b>*</b></label>
+                <input type="email" class="contact-form-input" id="contact-email" placeholder="Enter your name" required />
+              </div>
             </div>
-            <div class="input-box">
-              <input type="tel" placeholder="Mobile Number" required />
-              <input type="text" placeholder="Email Subject" required />
+
+            <div class="contact-form-div">
+              <label for="" class="contact-form-label">Your Subject<b>*</b></label>
+              <input type="text" class="contact-form-input" id="contact-subject" placeholder="Enter your Subject" required />
             </div>
-            <textarea
-              name="message"
-              cols="30"
-              rows="10"
-              placeholder="Your Message"
-              required
-            ></textarea>
-            <input type="submit" value="Send Message" class="btn" />
+
+            <div class="contact-form-div">
+              <label for="" class="contact-form-label">Your Message<b>*</b></label>
+              <textarea class="contact-form-input contact-form-area" id="contact-message" placeholder="Enter your message" required></textarea>
+            </div>
+
+            <div class="contact-submit">
+              <span>* Accept the terms and conditions.</span>
+              <button type="submit" class="btn">
+                <i class="fa-solid fa-paper-plane"></i> Send Message
+              </button>
+            </div>
+
+            <p class="message" id="message"></p>
         </form>
       </div>
     </section>
 
-    Footer Section 
+    <!-- Footer Section  -->
     <footer class="footer">
       <div class="footer-text">
         <p>Copyright &copy; 2024 Afifa Sultana | All rights reserved.</p>
@@ -288,7 +333,7 @@
       <div class="footer-iconTop">
         <a href="#home"><i class="fa-solid fa-angle-up"></i></a>
       </div>
-    </footer> -->
+    </footer> 
 
     <!-- Style Switcher -->
     <!-- <div class="style-switcher" id="style-switcher">
