@@ -1,0 +1,26 @@
+/* FOOTER */
+.footer {
+    border-top: 1px solid var(--shadow-color);
+    background-color: var(--container-color);
+    padding-block: 2rem;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-copyright{
+    font-size: var(--small-font-size);
+    font-weight: var(--font-bold);
+    color: var(--text-color);
+}
+.footer-copyright span{
+    color: var(--main-color);
+}
+
+.footer-socials {
+    display: flex;
+    column-gap: 1.25rem;
+}

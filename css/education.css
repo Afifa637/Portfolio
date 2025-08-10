@@ -1,0 +1,55 @@
+.education{
+    padding: 8rem 15%;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+.education-content h3{
+    font-size: 2.5rem;
+    font-family: "Montserrat Alternates", sans-serif;
+    margin-bottom: 2rem;
+}
+
+.education-container {
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
+    margin-top: 3rem;
+}
+
+.timeline {
+    position: relative;
+    margin-top: 3rem;
+}
+
+.timeline-item{
+    position: relative;
+    padding-left: 5rem;
+    margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0.8rem;
+    width: 2px;
+    height: 100%;
+    background-color: var(--main-color);
+}
+
+.circle-dot{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--main-color);
+    background: var(--main-color);
+    border-radius: 50%;
+    transition: .5s;
+}
+
+.timeline-item:hover .circle-dot {
+    background: var(--bg-color);
+}
