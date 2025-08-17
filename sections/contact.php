@@ -73,8 +73,8 @@ if (!isset($is_included)) {
             <p class="message" id="message"></p>
         </form>
 
-        <div class="section-deco deco-left">
-          <img src="assets\images\deco1.png" alt="" class="shape" />
+        <div class="section-deco deco-right">
+          <img src="assets\images\deco2.png" alt="" class="shape" />
         </div>
       </div>
     </section>

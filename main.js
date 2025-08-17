@@ -9,12 +9,35 @@ navToggle.addEventListener('click', () => {
 // toggle icon navbar
 
 let menuIcon = document.querySelector('#menu-icon');
-let navbar = document.querySelector('.navbar');
+let navbar = document.querySelector('#nav-menu');
 
 menuIcon.onclick = () => {
     menuIcon.classList.toggle('fa-xmark');
     navbar.classList.toggle('active');
 }   
+
+function toggleReadMore() {
+    const moreText = document.getElementById("moreText");
+    const btn = document.getElementById("readMoreBtn");
+
+    if (moreText.style.display === "block") {
+      // Hide the content
+      moreText.style.display = "none";
+      btn.textContent = "Read More";
+    } else {
+      // Show the content
+      moreText.style.display = "block";
+      btn.textContent = "Read Less";
+    }
+  }
+
+  // Ensure the read-more content is hidden on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    const moreText = document.getElementById("moreText");
+    if (moreText) {
+      moreText.style.display = "none";
+    }
+  });
 
 // Scroll section active link
 

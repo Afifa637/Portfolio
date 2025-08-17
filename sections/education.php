@@ -6,7 +6,7 @@ if (!isset($is_included)) {
  <!-- Education Section -->
  <section class="education section" id="education">
       <h3 class="section-title"><i class="fa-solid fa-graduation-cap"></i> My <span>Education</span></h3>
-      <div class="education-container">
+      <div class="education-container container">
         <div class="timeline">
           <div class="timeline-item">
             <div class="circle-dot"></div>

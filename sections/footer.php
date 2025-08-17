@@ -17,5 +17,7 @@ if (!isset($is_included)) {
         <p>Developed by Afifa</p>
     </div>
 </footer>
+
+<script src="main.js"></script>
 </body>
 </html>

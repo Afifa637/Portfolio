@@ -4,26 +4,63 @@ if (!isset($is_included)) {
 }
 ?>
 
- <!-- About Section -->
- <section class="about section" id="about">
+<!-- About Section -->
+<section class="about section" id="about">
+  <div class="about-container container">
+    
+    <!-- Section Title -->
+    <h2 class="section-title">About <span>Me</span></h2>
+
+    <div class="about-content-wrapper">
+      <!-- Profile Image -->
       <div class="about-img">
-        <img src="assets/images/profile1.png" alt="profile picture" />
+        <img src="assets/images/profile1.png" alt="Afifa Sultana Profile" class="about-profile" />
       </div>
 
+      <!-- Content -->
       <div class="about-content">
-        <h3 class="section-title">About <span>Me</span></h3>
         <p>
-          As a dedicated developer, I enjoy bringing ideas to life through
-          technology. My expertise lies in building intuitive user interfaces,
-          responsive web applications, and high-performance mobile apps. I am
-          continuously learning and exploring new technologies to improve my
-          craft.
+          Hello! I’m <strong>Afifa Sultana</strong>, an aspiring 
+          <span class="highlight">Software Engineer</span> passionate about 
+          crafting seamless user experiences and building impactful 
+          applications. I love working with modern technologies and 
+          translating ideas into elegant solutions.
         </p>
-        <button class="btn">Read more</button>
-      </div>
 
-      <div class="section-deco deco-left">
-        <img src="assets\images\deco1.png" alt="" class="shape" />
-      </div>
-    </section>
+        <!-- Read More Content -->
+        <div class="read-more-content" id="moreText">
+          <p>
+            My journey started as a curious learner exploring 
+            <em>web development</em>, mobile applications, and 
+            problem-solving with algorithms. Over time, I’ve developed 
+            strong foundations in <strong>HTML, CSS, JavaScript, PHP, 
+            C++, Java, Kotlin, Flutter</strong>, and frameworks like 
+            <strong>React Native & Laravel</strong>.
+          </p>
+          <p>
+            Beyond coding, I am highly motivated by challenges and teamwork. 
+            I believe in <span class="highlight">continuous learning</span>, 
+            exploring innovative solutions, and contributing to projects that 
+            create a real difference.
+          </p>
+          <p>
+            ✨ Fun fact: I enjoy blending design and logic, making my projects 
+            not only functional but also visually appealing.  
+            🌱 Currently, I’m exploring <strong>Kotlin Multiplatform (KMP)</strong> 
+            and advanced <strong>AI/ML integrations</strong>.
+          </p>
+        </div>
 
+        <!-- Read More Button -->
+        <button class="btn" id="readMoreBtn" onclick="toggleReadMore()">Read More</button>
+
+      </div>
+    </div>
+
+    <!-- Decorative Shapes -->
+    <div class="section-deco deco-right">
+      <img src="assets/images/deco2.png" alt="" class="shape" />
+    </div>
+
+  </div>
+</section>
