@@ -53,3 +53,71 @@
 .timeline-item:hover .circle-dot {
     background: var(--bg-color);
 }
+
+@media (max-width: 992px) {
+    .education {
+      padding: 6rem 8%;
+    }
+  
+    .education-container {
+      flex-direction: column;
+      gap: 3rem;
+      align-items: flex-start;
+    }
+  
+    .timeline {
+      margin-top: 2rem;
+      padding-left: 2rem;
+    }
+  
+    .timeline-item {
+      padding-left: 3.5rem;
+    }
+  
+    .timeline-item::before {
+      left: 1rem;
+    }
+  
+    .circle-dot {
+      width: 1.6rem;
+      height: 1.6rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .education {
+      padding: 4rem 6%;
+    }
+  
+    .education-content h3 {
+      font-size: 2rem;
+      text-align: center;
+    }
+  
+    .timeline {
+      padding-left: 1.5rem;
+    }
+  
+    .timeline-item {
+      padding-left: 2.8rem;
+      margin-bottom: 1.5rem;
+    }
+  
+    .timeline-title {
+      font-size: 1.2rem;
+    }
+  
+    .timeline-text {
+      font-size: 0.95rem;
+    }
+  
+    .timeline-date {
+      font-size: 0.85rem;
+    }
+  
+    .circle-dot {
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
+  

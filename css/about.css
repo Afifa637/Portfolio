@@ -9,7 +9,6 @@
     overflow: hidden;
   }
   
-  /* Container as a Card */
   .about-container {
     display: flex;
     align-items: center;
@@ -32,7 +31,6 @@
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
   }
   
-  /* Profile Image */
   .about-img {
     position: relative;
     flex: 1 1 260px;
@@ -60,7 +58,6 @@
     transform: scale(1.08);
   }
   
-  /* Decorative overlay circle */
   .about-img::after {
     content: "";
     position: absolute;
@@ -79,7 +76,6 @@
         transform: translate(-50%, -50%) rotate(360deg); }
   }
   
-  /* Content */
   .about-content {
     flex: 2 1 400px;
     text-align: left;
@@ -109,7 +105,6 @@
     font-weight: 600;
   }
   
-  /* Read More Animation */
   .read-more-content {
     display: none;
     margin-top: 1rem;
@@ -127,7 +122,6 @@
     }
   }
   
- /* 🌐 Responsive Design */
 @media (max-width: 768px) {
     .about-container {
       flex-direction: column;

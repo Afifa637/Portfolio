@@ -1,20 +1,19 @@
 const navMenu = document.getElementById('nav-menu');
 const navToggle = document.getElementById('nav-toggle');
 
+// Toggle drawer + animate icon
 navToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('show-menu');
-    navToggle.classList.toggle('animate-toggle');
+  navMenu.classList.toggle('active');
+  navToggle.classList.toggle('active');
 });
 
-// toggle icon navbar
-
-let menuIcon = document.querySelector('#menu-icon');
-let navbar = document.querySelector('#nav-menu');
-
-menuIcon.onclick = () => {
-    menuIcon.classList.toggle('fa-xmark');
-    navbar.classList.toggle('active');
-}   
+// Close drawer when a nav link is clicked
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    navMenu.classList.remove('active');
+    navToggle.classList.remove('active');
+  });
+});
 
 function toggleReadMore() {
     const moreText = document.getElementById("moreText");

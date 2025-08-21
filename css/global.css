@@ -201,9 +201,10 @@ textarea {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: transparent;
-  box-shadow: 0 2px 4px var(--shadow-color);
+  background-color: var(--container-color);
+  box-shadow: 0 2px 6px var(--shadow-color);
   z-index: 1000;
+  transition: background 0.3s ease-in-out;
 }
 
 .nav {
@@ -211,11 +212,10 @@ textarea {
   justify-content: space-between;
   align-items: center;
   height: 5rem;
-  max-width: 1540px;
-  margin-inline: auto;
-  padding-inline: 1.5rem;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
-
 .nav-logo,
 .nav-link {
   color: var(--title-color);
@@ -249,24 +249,9 @@ textarea {
 
 .nav-toggle::before,
 .nav-toggle::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: var(--title-color);
-  transition: all 0.3s ease-in-out;
+  content: none;
 }
 
-.nav-toggle::before {
-  top: 7px;
-}
-
-.nav-toggle::after {
-  bottom: 7px;
-}
-
-/* ========== NAV MENU (desktop default) ========== */
 .nav-menu {
   display: flex;
   align-items: center;
@@ -282,7 +267,7 @@ textarea {
 }
 
 .nav-item {
-  margin: 0; /* no vertical spacing on desktop */
+  margin: 0; 
 }
 
 .nav-link {
@@ -312,7 +297,6 @@ textarea {
   display: none;
 }
 
-/* Hide toggle buttons on desktop */
 .nav-buttons {
   display: none;
 }
@@ -323,13 +307,18 @@ textarea {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 40%;
+    width: 50%;
     height: 100%;
-    background-color: var(--container-color);
-    padding: 5rem 2rem;
+    background: var(--container-color);
     flex-direction: column;
     align-items: flex-start;
-    transition: right 0.4s ease-in-out;
+    padding: 5rem 2rem;
+    box-shadow: -2px 0 6px var(--shadow-color);
+    transition: right 0.4s ease;
+    z-index: 999;
+  }
+  .nav-menu.active {
+    right: 0;
   }
 
   .nav-list {
@@ -338,34 +327,61 @@ textarea {
     margin-bottom: 2rem;
   }
 
-  .nav-buttons {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .nav-menu.active {
-    right: 0;
-  }
-
   .social-links {
     display: flex;
-    column-gap: 1.25rem;
-    margin-left: 2rem;
+    gap: 1.25rem;
+    margin-top: auto;
   }
-  
+
   .social-link {
     color: var(--title-color);
-    font-size: 1.8rem;
-    transition: color 0.3s ease-in-out;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
   }
-  
   .social-link:hover {
     color: var(--main-color);
   }
+
+  .nav-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .nav-toggle {
+    width: 28px;
+    height: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  .nav-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: var(--title-color) !important; 
+    border-radius: 2px;
+    margin: 0;    
+    padding: 0;
+    box-shadow: none;
+  }
+  
+  .nav-toggle {
+    background: none;
+  }
+  .nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
 }
 
-/* HEADER */
 .bg-header {
   background-color: var(--container-color);
 }
