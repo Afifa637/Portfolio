@@ -119,42 +119,44 @@ themeInputs.forEach(input => {
     });
 });
 
-// Ensure MixItUp is properly initialized
-let mixerProject = mixitup('.project-container', {
-    selectors: {    
-        target : '.project-card'
-    },
-    animation: {
-        duration: 300
-    }
+// Filtering (MixItUp)
+let mixer = mixitup('.project-container', {
+    selectors: { target: '.mix' },
+    animation: { duration: 300 },
+    controls: { scope: 'local' }
 });
 
-//link active work
-const linkWork = document.querySelectorAll('.project-item');
+// Popup functionality
+document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.querySelector(".project-popup");
+    const popupClose = document.querySelector(".project-popup-close");
+    const popupImg = document.querySelector(".project-popup-img");
+    const popupCategory = document.querySelector("#popup-category");
+    const popupTitle = document.querySelector(".project-popup .details-title");
+    const popupDesc = document.querySelector(".project-popup .details-description");
+    const popupInfo = document.querySelector(".project-popup .details-info");
 
-function activeWork() {
-        linkWork.forEach(l => l.classList.remove('active-work'));
-        this.classList.add('active-work');
-}
+    document.querySelectorAll(".project-button").forEach(btn => {
+        btn.addEventListener("click", () => {
+            let card = btn.closest(".project-card");
+            let details = card.querySelector(".portfolio-item-details");
 
-linkWork.forEach(l => l.addEventListener('click', activeWork));
+            if (!details) return;
 
-//project popup
-document.addEventListener('click', (e) => {
-    if(e.target.classList.contains('project-button')) {
-        toggleProjectPopup();
-        projectItemDetails(e.target.parentElement);
-    }
-})
+            // Fill popup content
+            popupImg.src = card.querySelector(".project-img").src;
+            popupCategory.textContent =
+                card.classList.contains("web") ? "Web" :
+                card.classList.contains("app") ? "App" : "Design";
 
-function toggleProjectPopup() {
-    document.querySelector('.project-popup').classList.toggle('open'); 
-}
+            popupTitle.textContent = details.querySelector(".details-title").textContent;
+            popupDesc.textContent = details.querySelector(".details-description").textContent;
+            popupInfo.innerHTML = details.querySelector(".details-info").innerHTML;
 
-document.querySelector('.project-popup-close').addEventListener('click', toggleProjectPopup);
+            popup.classList.add("open");
+        });
+    });
 
-function projectItemDetails(projectItem) {
-    document.querySelector('.pp-thumbnail img').src = projectItem.querySelector('.project-img').src;
-    document.querySelector('.project-popup-subtitles span').innerHTML = projectItem.querySelector('.project-title').innerHTML;
-    document.querySelector('.project-popup-body').innerHTML = projectItem.querySelector('.project-item-details').innerHTML;
-}   
+    // Close popup
+    popupClose.addEventListener("click", () => popup.classList.remove("open"));
+});

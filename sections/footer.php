@@ -18,6 +18,8 @@ if (!isset($is_included)) {
     </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/mixitup@3"></script>
 <script src="main.js"></script>
+
 </body>
 </html>
