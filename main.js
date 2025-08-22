@@ -69,94 +69,56 @@ window.onscroll = () => {
     navbar.classList.remove('active');
 };
 
-//Scroll reveal animation
-ScrollReveal({ 
-    distance: '80px',
-    duration: 2000,
-    delay: 200
- });
-
-ScrollReveal().reveal('.home-content, .heading', { origin: 'top' });
-ScrollReveal().reveal('.home-img, .services-container, .project-box, .skills-container, .contact-form, .education-container', { origin: 'bottom' });
-ScrollReveal().reveal('.home-content h1, .about-img, .contact-content', { origin: 'left' });
-ScrollReveal().reveal('.home-content p, .about-content, .home-img-container', { origin: 'right' });
-
-
-// Style Switcher Toggle
-const styleSwitcher = document.getElementById('style-switcher'),
-    switcherToggle = document.getElementById('switcher-toggle'),
-    switcherClose = document.getElementById('switcher-close');
-
-switcherToggle.addEventListener('click', () => {
-    styleSwitcher.classList.add('show-switcher');
-});
-
-switcherClose.addEventListener('click', () => {
-    styleSwitcher.classList.remove('show-switcher');
-});
-
-// Change color theme
-const colors = document.querySelectorAll('.style-switcher-color');
-colors.forEach(color => {
-    color.addEventListener('click', () => {
-        const activeColor = color.style.getPropertyValue('--hue');
-
-        // Remove active class from previous selection
-        colors.forEach(c => c.classList.remove('active-color'));
-        color.classList.add('active-color');
-
-        // Apply new hue to root
-        document.documentElement.style.setProperty('--hue', activeColor);
-    });
-});
-
-// Theme Switcher (Light / Dark)
-const themeInputs = document.querySelectorAll('input[name="body-theme"]');
-
-themeInputs.forEach(input => {
-    input.addEventListener('change', () => {
-        document.documentElement.setAttribute('data-theme', input.value);
-    });
-});
-
 // Filtering (MixItUp)
 let mixer = mixitup('.project-container', {
-    selectors: { target: '.mix' },
-    animation: { duration: 300 },
-    controls: { scope: 'local' }
+  selectors: { target: '.mix' },
+  animation: { duration: 300 }
 });
 
 // Popup functionality
 document.addEventListener("DOMContentLoaded", () => {
-    const popup = document.querySelector(".project-popup");
-    const popupClose = document.querySelector(".project-popup-close");
-    const popupImg = document.querySelector(".project-popup-img");
-    const popupCategory = document.querySelector("#popup-category");
-    const popupTitle = document.querySelector(".project-popup .details-title");
-    const popupDesc = document.querySelector(".project-popup .details-description");
-    const popupInfo = document.querySelector(".project-popup .details-info");
+  const popup = document.querySelector(".project-popup");
+  const popupClose = document.querySelector(".project-popup-close");
+  const popupImg = document.querySelector(".project-popup-img");
+  const popupCategory = document.querySelector("#popup-category");
+  const popupTitle = document.querySelector(".popup-title");
+  const popupDesc = document.querySelector(".popup-description");
+  const popupInfo = document.querySelector(".popup-info");
 
-    document.querySelectorAll(".project-button").forEach(btn => {
-        btn.addEventListener("click", () => {
-            let card = btn.closest(".project-card");
-            let details = card.querySelector(".portfolio-item-details");
+  document.querySelectorAll(".project-button").forEach(btn => {
+      btn.addEventListener("click", () => {
+          let card = btn.closest(".project-card");
+          let details = card.querySelector(".portfolio-item-details");
 
-            if (!details) return;
+          if (!details) return;
 
-            // Fill popup content
-            popupImg.src = card.querySelector(".project-img").src;
-            popupCategory.textContent =
-                card.classList.contains("web") ? "Web" :
-                card.classList.contains("app") ? "App" : "Design";
+          // Fill popup content
+          popupImg.src = card.querySelector(".project-img").src;
+          popupCategory.textContent =
+              card.classList.contains("web") ? "Web" :
+              card.classList.contains("app") ? "App" : "Design";
 
-            popupTitle.textContent = details.querySelector(".details-title").textContent;
-            popupDesc.textContent = details.querySelector(".details-description").textContent;
-            popupInfo.innerHTML = details.querySelector(".details-info").innerHTML;
+          popupTitle.textContent = details.querySelector(".details-title").textContent;
+          popupDesc.textContent = details.querySelector(".details-description").textContent;
+          popupInfo.innerHTML = details.querySelector(".details-info").innerHTML;
 
-            popup.classList.add("open");
-        });
-    });
+          popup.classList.add("open");
+      });
+  });
 
-    // Close popup
-    popupClose.addEventListener("click", () => popup.classList.remove("open"));
+  // Close popup
+  popupClose.addEventListener("click", () => popup.classList.remove("open"));
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  new Typed(".typing-text", {
+    strings: ["Web Developer", "App Developer", "Designer"],
+    typeSpeed: 70,
+    backSpeed: 70,
+    backDelay: 1000,
+    loop: true,
+    showCursor: true,
+    cursorChar: "|",
+  });
 });

@@ -1,3 +1,10 @@
+.home {
+  position: relative;
+  background-color: var(--bg-color); 
+  color: var(--text-color);
+  overflow: hidden;
+  padding: 5rem 3%;
+}
 
 .home-container {
     padding-block: 5rem;
@@ -62,8 +69,27 @@
     padding: 0.75rem;
     box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     animation: floatProfile 6s ease-in-out infinite alternate;
+
+    .shape-bg {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(45,212,191,0.25) 0%, transparent 70%),
+                  radial-gradient(circle, rgba(14,165,233,0.2) 0%, transparent 70%),
+                  radial-gradient(circle, rgba(244,114,182,0.2) 0%, transparent 70%);
+      background-size: 50% 50%;
+      animation: animateBg 10s infinite alternate ease-in-out;
+      z-index: 0;
+    }
   }
   
+  @keyframes animateBg {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(-10%, -10%); }
+  }
+
   @keyframes floatProfile {
     from { transform: translateY(0); }
     to { transform: translateY(-12px); }
@@ -108,7 +134,7 @@
     background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid var(--main-color);
     transition: all 0.3s ease;
   }
   
@@ -124,8 +150,46 @@
     align-items: center;
     column-gap: 4.25rem;
   }
-  
+  .highlight {
+  color: var(--main-color);
+  font-weight: bold;
+}
+
   .home-btns { gap: 1.2rem; } .home-btns .btn { padding: 0.75rem 1.8rem; font-size: 0.9rem; }
+  .home-info {
+    margin-top: 1.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .info-item {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--main-color);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .typing-text {
+    display: inline-block;
+    font-weight: var(--font-medium);
+    color: var(--text-color);
+  }
+  
+  .typing-text .typed-cursor {
+    font-weight: 400;
+    color: var(--main-color);
+    animation: blinkCursor 0.7s steps(1) infinite;
+  }
+  
+  @keyframes blinkCursor {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+  }
+   
   
   /* ==============================
      RESPONSIVE

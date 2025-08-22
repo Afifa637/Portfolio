@@ -32,7 +32,7 @@
 <body>
 <!-- HEADER -->
 <header class="header" id="header">
-  <nav class="nav container">
+  <nav class="nav container section">
     <a href="#" class="nav-logo">Afifa Sultana</a>
 
     <!-- Navigation Menu -->
@@ -65,5 +65,9 @@
     <span></span>
   </div>
 </div>
+<!-- Decorative Shape -->
+<div class="section-deco deco-left">
+        <img src="assets/images/deco1.png" alt="" class="shape" />
+    </div>
 </nav> </header>
 <main class="main">

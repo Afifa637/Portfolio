@@ -20,22 +20,23 @@ $result = $conn->query($sql);
 
     <!-- Filters -->
     <div class="project-filters">
-        <span class="project-item btn" data-filter="*">All</span>
-        <span class="project-item btn" data-filter=".web">Web</span>
-        <span class="project-item btn" data-filter=".app">App</span>
-        <span class="project-item btn" data-filter=".design">Design</span>
+        <span class="project-item btn" data-filter="all" data-mixitup-control>All</span>
+        <span class="project-item btn" data-filter=".web" data-mixitup-control>Web</span>
+        <span class="project-item btn" data-filter=".app" data-mixitup-control>App</span>
+        <span class="project-item btn" data-filter=".design" data-mixitup-control>Design</span>
     </div>
 
     <!-- Project Cards -->
     <div class="project-container container grid">
         <?php while ($row = $result->fetch_assoc()): ?>
-            <div class="project-card mix <?= htmlspecialchars($row['category']); ?>">
+            <?php $cat = strtolower($row['category']); // ensure class is lower-case ?>
+            <div class="project-card mix <?= htmlspecialchars($cat); ?>">
                 <img src="<?= htmlspecialchars($row['image']); ?>" alt="<?= htmlspecialchars($row['title']); ?>" class="project-img">
                 <h3 class="project-title"><?= htmlspecialchars($row['title']); ?></h3>
 
-                <span class="btn project-button" data-id="<?= $row['id']; ?>">Demo
-                    <i class="uil uil-arrow-right project-button-icon"></i>
-                </span>
+                <button type="button" class="btn project-button" data-id="<?= (int)$row['id']; ?>">
+                    Demo <i class="uil uil-arrow-right project-button-icon"></i>
+                </button>
 
                 <!-- Hidden project details -->
                 <div class="portfolio-item-details" style="display: none;">
@@ -45,33 +46,34 @@ $result = $conn->query($sql);
                         <li>Created - <span><?= htmlspecialchars($row['created_at']); ?></span></li>
                         <li>Skills - <span><?= htmlspecialchars($row['skills_used']); ?></span></li>
                         <li>Role - <span><?= htmlspecialchars($row['role']); ?></span></li>
-                        <li>View - <span><a href="<?= htmlspecialchars($row['view_link']); ?>" target="_blank"><?= htmlspecialchars($row['view_link']); ?></a></span></li>
+                        <li>View - <span><a href="<?= htmlspecialchars($row['view_link']); ?>" target="_blank" rel="noopener"><?= htmlspecialchars($row['view_link']); ?></a></span></li>
                     </ul>
                 </div>
             </div>
         <?php endwhile; ?>
-    </div>
-
-    <!-- Decorative Shape -->
-    <div class="section-deco deco-left">
-        <img src="assets/images/deco1.png" alt="" class="shape" />
+        <!-- Decorative Shape -->
+        <div class="section-deco deco-left">
+            <img src="assets/images/deco1.png" alt="" class="shape" />
+        </div>
     </div>
 </section>
 
 <!-- Project Popup -->
-<div class="project-popup">
+<div class="project-popup" aria-hidden="true">
     <div class="project-popup-inner">
         <div class="project-popup-content grid">
-            <span class="project-popup-close"><i class="fa-solid fa-xmark"></i></span>
+            <button type="button" class="project-popup-close" aria-label="Close popup">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
             <div class="pp-thumbnail">
                 <img src="" alt="" class="project-popup-img">
             </div>
             <div class="project-popup-info">
                 <div class="project-popup-subtitle">Featured - <span id="popup-category"></span></div>
                 <div class="project-popup-body">
-                    <h3 class="details-title"></h3>
-                    <p class="details-description"></p>
-                    <ul class="details-info"></ul>
+                    <h3 class="popup-title"></h3>
+                    <p class="popup-description"></p>
+                    <ul class="popup-info"></ul>
                 </div>
             </div>
         </div>
