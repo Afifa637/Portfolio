@@ -60,22 +60,32 @@ $result = $conn->query($sql);
 
 <!-- Project Popup -->
 <div class="project-popup" aria-hidden="true">
-    <div class="project-popup-inner">
-        <div class="project-popup-content grid">
-            <button type="button" class="project-popup-close" aria-label="Close popup">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="pp-thumbnail">
-                <img src="" alt="" class="project-popup-img">
-            </div>
-            <div class="project-popup-info">
-                <div class="project-popup-subtitle">Featured - <span id="popup-category"></span></div>
-                <div class="project-popup-body">
-                    <h3 class="popup-title"></h3>
-                    <p class="popup-description"></p>
-                    <ul class="popup-info"></ul>
-                </div>
-            </div>
+  <div class="project-popup-inner">
+    <div class="project-popup-content">
+      <button type="button" class="project-popup-close" aria-label="Close popup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Left: Project Image -->
+      <div class="pp-left">
+        <img src="" alt="" class="project-popup-img">
+      </div>
+
+      <!-- Right: Project Info -->
+      <div class="pp-right">
+        <h3 class="popup-title"></h3>
+        <div class="popup-category">Category: <span id="popup-category"></span></div>
+        <p class="popup-description"></p>
+
+        <ul class="popup-info">
+          <!-- Filled dynamically -->
+        </ul>
+
+        <div class="popup-links">
+          <a href="#" target="_blank" class="btn view-link"><i class="fa-solid fa-link"></i> View Project</a>
         </div>
+      </div>
     </div>
+  </div>
 </div>
+
