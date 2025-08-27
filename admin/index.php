@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+  }
 include "config.php";
 if (!isset($_SESSION['admin'])) {
     header("Location: login.php");
@@ -23,6 +26,7 @@ if (!isset($_SESSION['admin'])) {
             <a href="manage_projects.php" class="card">Manage Projects</a>
             <a href="manage_skills.php" class="card">Manage Skills</a>
             <a href="manage_contact.php" class="card">Manage Contact</a>
+            <a href="manage_footer.php" class="card">Manage Footer</a>
             <a href="manage_messages.php" class="card">Manage Messages</a>
         </div>
     </div>

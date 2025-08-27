@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // List all your CSS files here
 $page_css = [
     "css/global.css",
+
     "css/home.css",
     "css/about.css",
     "css/education.css",

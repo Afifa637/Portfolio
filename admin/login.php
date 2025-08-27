@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+  }
 include "config.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -15,6 +18,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $admin = $res->fetch_assoc();
         if (password_verify($pass, $admin['password'])) {
             $_SESSION['admin'] = $admin['email'];
+
+            // Optional: remember me with cookie
+            if (!empty($_POST['remember'])) {
+                setcookie("admin_email", $email, time()+60*60*24*30, "/"); // 30 days
+            }
+
             header("Location: index.php");
             exit;
         }

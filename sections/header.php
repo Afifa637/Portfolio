@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-        crossorigin="anonymous" />
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    crossorigin="anonymous" />
 
   <!-- Global CSS -->
   <link rel="stylesheet" href="css/global.css">
@@ -15,59 +16,102 @@
   <title><?php echo $page_title ?? "Portfolio | Afifa Sultana"; ?></title>
 
   <?php
-    // Load page-specific CSS if set
-    if (isset($page_css)) {
-        if (is_array($page_css)) {
-            foreach ($page_css as $css_file) {
-                if ($css_file !== "css/global.css") {
-                    echo '<link rel="stylesheet" href="' . htmlspecialchars($css_file) . '">' . "\n";
-                }
-            }
-        } elseif ($page_css !== "css/global.css") {
-            echo '<link rel="stylesheet" href="' . htmlspecialchars($page_css) . '">' . "\n";
+  session_start();
+  $theme = $_COOKIE['theme'] ?? 'light';
+
+  // Load page-specific CSS if set
+  if (isset($page_css)) {
+    if (is_array($page_css)) {
+      foreach ($page_css as $css_file) {
+        if ($css_file !== "css/global.css") {
+          echo '<link rel="stylesheet" href="' . htmlspecialchars($css_file) . '">' . "\n";
         }
+      }
+    } elseif ($page_css !== "css/global.css") {
+      echo '<link rel="stylesheet" href="' . htmlspecialchars($page_css) . '">' . "\n";
     }
+  }
   ?>
 </head>
-<body>
-<!-- HEADER -->
-<header class="header" id="header">
-  <nav class="nav container section">
-    <a href="#" class="nav-logo">Afifa Sultana</a>
 
-    <!-- Navigation Menu -->
-    <div class="nav-menu" id="nav-menu">
-      <ul class="nav-list">
-        <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
-        <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-        <li class="nav-item"><a href="#education" class="nav-link">Education</a></li>
-        <li class="nav-item"><a href="#skills" class="nav-link">Skills</a></li>
-        <li class="nav-item"><a href="#project" class="nav-link">Projects</a></li>
-        <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
-      </ul>
+<body class="<?php echo htmlspecialchars($theme); ?>">
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <nav class="nav container section">
+      <a href="#" class="nav-logo">Afifa Sultana</a>
 
-      <!-- Social Links (mobile only) -->
-      <div class="social-links">
-        <a href="https://www.facebook.com/share/1ECBdwaepb/" target="_blank" class="social-link"><i class="fab fa-facebook"></i></a>
-        <a href="https://join.skype.com/invite/qIoH5oRmoO2e" target="_blank" class="social-link"><i class="fab fa-skype"></i></a>
-        <a href="https://www.linkedin.com/in/afifa-sultana-346a13256/" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-        <a href="https://github.com/Afifa637?tab=repositories" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
+      <!-- Navigation Menu -->
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
+          <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+          <li class="nav-item"><a href="#education" class="nav-link">Education</a></li>
+          <li class="nav-item"><a href="#skills" class="nav-link">Skills</a></li>
+          <li class="nav-item"><a href="#project" class="nav-link">Projects</a></li>
+          <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+
+        <!-- Social Links (mobile only) -->
+        <div class="social-links">
+          <a href="https://www.facebook.com/share/1ECBdwaepb/" target="_blank" class="social-link"><i class="fab fa-facebook"></i></a>
+          <a href="https://join.skype.com/invite/qIoH5oRmoO2e" target="_blank" class="social-link"><i class="fab fa-skype"></i></a>
+          <a href="https://www.linkedin.com/in/afifa-sultana-346a13256/" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://github.com/Afifa637?tab=repositories" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
+        </div>
       </div>
-    </div>
 
-    <div class="nav-buttons">
-  <div class="nav-settings">
-    <i class="fa-solid fa-gear settings"></i>
-  </div>
-  <div class="nav-toggle" id="nav-toggle">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<!-- Decorative Shape -->
-<div class="section-deco deco-left">
-        <img src="assets/images/deco1.png" alt="" class="shape" />
-    </div>
-</nav> </header>
-<main class="main">
+      <div class="nav-buttons">
+        <div class="nav-settings" id="switcher-toggle">
+          <i class="fa-solid fa-gear settings"></i>
+        </div>
+
+        <div class="nav-toggle" id="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <!-- Style Switcher Drawer -->
+        <div class="style-switcher" id="style-switcher">
+          <div class="switcher-header">
+            <h2 class="style-switcher-title">Style Switcher</h2>
+            <span id="switcher-close" class="switcher-close">&times;</span>
+          </div>
+
+          <!-- Color Theme Section -->
+          <div class="style-switcher-item">
+            <h3 class="style-switcher-subtitle">Color</h3>
+            <div class="style-switcher-colors">
+              <span class="style-switcher-color active-color" style="--hue: 155"></span>
+              <span class="style-switcher-color" style="--hue: 185"></span>
+              <span class="style-switcher-color" style="--hue: 345"></span>
+              <span class="style-switcher-color" style="--hue: 50"></span>
+            </div>
+          </div>
+
+          <!-- Theme Switcher Section -->
+          <div class="style-switcher-item">
+            <h3 class="style-switcher-subtitle">Theme</h3>
+            <div class="style-switcher-themes">
+              <div class="style-switcher-theme">
+                <input type="radio" class="style-switcher-input" name="body-theme" value="light" id="light-theme" checked />
+                <label for="light-theme" class="style-switcher-label">Light</label>
+              </div>
+              <div class="style-switcher-theme">
+                <input type="radio" class="style-switcher-input" name="body-theme" value="dark" id="dark-theme" />
+                <label for="dark-theme" class="style-switcher-label">Dark</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ Admin Login Button -->
+          <div class="style-switcher-item">
+            <h3 class="style-switcher-subtitle">Admin</h3>
+            <a href="http://localhost/Portfolio001/admin/login.php" class="admin-login-btn">
+              <i class="fa-solid fa-user-shield"></i> Admin Login
+            </a>
+          </div>
+
+    </nav>
+  </header>
+  <main class="main">

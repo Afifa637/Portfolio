@@ -98,7 +98,7 @@
   border-radius: 0.75rem;
   border: 2px solid var(--main-color);
   font-size: 0.95rem;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--container-color); 
   color: var(--text-color);
   transition: all 0.3s ease;
 }
@@ -106,13 +106,15 @@
 .contact-form-input:focus {
   outline: none;
   border-color: var(--main-color);
-  background: #fff;
+  background: var(--bg-color); 
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
 }
 
 .contact-form-area {
   resize: none;
   min-height: 140px;
+  background: var(--container-color); /* ✅ textarea matches */
+  color: var(--text-color);
 }
 
 .contact-submit {

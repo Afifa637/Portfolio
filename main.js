@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
           popupImg.src = card.querySelector(".project-img").src;
           popupCategory.textContent =
               card.classList.contains("web") ? "Web" :
-              card.classList.contains("app") ? "App" : "Design";
+              card.classList.contains("app") ? "App" : "Terminal";
 
           popupTitle.textContent = details.querySelector(".details-title").textContent;
           popupDesc.textContent = details.querySelector(".details-description").textContent;
@@ -122,3 +122,70 @@ document.addEventListener("DOMContentLoaded", () => {
     cursorChar: "|",
   });
 });
+
+
+
+const styleSwitcher = document.getElementById('style-switcher');
+const switcherToggle = document.getElementById('switcher-toggle');
+const switcherClose = document.getElementById('switcher-close');
+const gear = document.querySelector('.nav-settings');
+
+switcherToggle.addEventListener('click', () => {
+  styleSwitcher.classList.add('show-switcher');
+  gear.classList.add('active'); // rotate gear
+});
+
+switcherClose.addEventListener('click', () => {
+  styleSwitcher.classList.remove('show-switcher');
+  gear.classList.remove('active'); // reset gear
+});
+
+const colors = document.querySelectorAll('.style-switcher-color');
+
+colors.forEach(color => {
+  color.addEventListener('click', () => {
+    const activeColor = color.style.getPropertyValue('--hue');
+    colors.forEach(c => c.classList.remove('active-color'));
+    color.classList.add('active-color');
+    document.documentElement.style.setProperty('--hue', activeColor);
+
+    // Save selected color
+    localStorage.setItem('preferredColor', activeColor);
+  });
+});
+
+// Restore saved color on load
+const savedColor = localStorage.getItem('preferredColor');
+if (savedColor) {
+  document.documentElement.style.setProperty('--hue', savedColor);
+  colors.forEach(c => {
+    c.classList.toggle(
+      'active-color',
+      c.style.getPropertyValue('--hue') === savedColor
+    );
+  });
+}
+
+const themeInputs = document.querySelectorAll('.style-switcher-input');
+const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+themeInputs.forEach(input => {
+  input.addEventListener('change', () => {
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(input.value);
+
+    localStorage.setItem('preferredTheme', input.value);
+  });
+});
+
+const savedTheme = localStorage.getItem('preferredTheme');
+if (savedTheme) {
+  document.documentElement.classList.add(savedTheme);
+  document.getElementById(`${savedTheme}-theme`).checked = true;
+} else if (userPrefersDark) {
+  document.documentElement.classList.add('dark');
+  document.getElementById('dark-theme').checked = true;
+} else {
+  document.documentElement.classList.add('light');
+  document.getElementById('light-theme').checked = true;
+}

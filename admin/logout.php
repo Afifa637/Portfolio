@@ -1,7 +1,11 @@
 <?php
-session_start();
-session_unset(); // remove all session variables
-session_destroy(); // destroy the session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+  }
+session_unset(); 
+session_destroy(); 
+
+setcookie("admin_email", "", time() - 3600, "/"); // clear cookie
 
 // Redirect to login page
 header("Location: login.php");
