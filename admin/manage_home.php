@@ -67,6 +67,7 @@ $socials = $conn->query("SELECT * FROM home_socials");
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="container py-5">
+<a href="index.php" class="btn btn-primary">Go Back</a>
 
   <h2>Manage Home Section</h2>
   <?php if (isset($_GET['updated'])) echo "<p class='text-success'>Home updated successfully!</p>"; ?>

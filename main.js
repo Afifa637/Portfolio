@@ -75,7 +75,6 @@ let mixer = mixitup('.project-container', {
   animation: { duration: 300 }
 });
 
-// Popup functionality
 document.addEventListener("DOMContentLoaded", () => {
   const popup = document.querySelector(".project-popup");
   const popupClose = document.querySelector(".project-popup-close");
@@ -84,32 +83,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const popupTitle = document.querySelector(".popup-title");
   const popupDesc = document.querySelector(".popup-description");
   const popupInfo = document.querySelector(".popup-info");
+  const popupLink = document.querySelector(".view-link"); // get the button
+
+  // Format description into structured HTML
+  function formatDescription(desc) {
+    const lines = desc.split("\n");
+    let html = "";
+    let inList = false;
+
+    lines.forEach(line => {
+      line = line.trim();
+      if (!line) {
+        if (inList) { html += "</ul>"; inList = false; }
+        return;
+      }
+      if (/[:：]$/.test(line) && !line.startsWith('-')) {
+        if (inList) { html += "</ul>"; inList = false; }
+        html += `<h4>${line}</h4>`;
+      }
+      else if (/^[-–]\s+/.test(line)) {
+        if (!inList) { html += "<ul>"; inList = true; }
+        html += `<li>${line.replace(/^[-–]\s+/, "")}</li>`;
+      } else {
+        if (inList) { html += "</ul>"; inList = false; }
+        html += `<p>${line}</p>`;
+      }
+    });
+
+    if (inList) html += "</ul>";
+    return html;
+  }
 
   document.querySelectorAll(".project-button").forEach(btn => {
-      btn.addEventListener("click", () => {
-          let card = btn.closest(".project-card");
-          let details = card.querySelector(".portfolio-item-details");
+    btn.addEventListener("click", () => {
+      const card = btn.closest(".project-card");
+      const details = card.querySelector(".portfolio-item-details");
+      if (!details) return;
 
-          if (!details) return;
+      // Fill popup content
+      popupImg.src = card.querySelector(".project-img").src;
+      popupCategory.textContent =
+        card.classList.contains("web") ? "Web" :
+        card.classList.contains("app") ? "App" : "Terminal";
 
-          // Fill popup content
-          popupImg.src = card.querySelector(".project-img").src;
-          popupCategory.textContent =
-              card.classList.contains("web") ? "Web" :
-              card.classList.contains("app") ? "App" : "Terminal";
+      popupTitle.textContent = details.querySelector(".details-title").textContent;
+      popupDesc.innerHTML = formatDescription(details.querySelector(".details-description").textContent);
+      popupInfo.innerHTML = details.querySelector(".details-info").innerHTML;
 
-          popupTitle.textContent = details.querySelector(".details-title").textContent;
-          popupDesc.textContent = details.querySelector(".details-description").textContent;
-          popupInfo.innerHTML = details.querySelector(".details-info").innerHTML;
+      // Set the "View Project" link from database
+      const viewLink = details.querySelector(".details-info li a")?.href || "#";
+      popupLink.href = viewLink;
 
-          popup.classList.add("open");
-      });
+      popup.classList.add("open");
+      popup.setAttribute("aria-hidden", "false");
+    });
   });
 
   // Close popup
-  popupClose.addEventListener("click", () => popup.classList.remove("open"));
+  popupClose.addEventListener("click", () => {
+    popup.classList.remove("open");
+    popup.setAttribute("aria-hidden", "true");
+  });
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
   new Typed(".typing-text", {

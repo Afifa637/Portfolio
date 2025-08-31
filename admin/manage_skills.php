@@ -44,6 +44,7 @@ if (isset($_GET['edit'])) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="container py-5">
+<a href="index.php" class="btn btn-primary">Go Back</a>
   <h2>Manage Skills</h2>
 
   <form method="POST" class="row g-2 mb-4">

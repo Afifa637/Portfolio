@@ -1,21 +1,21 @@
 <?php
 require "config.php";
 
+$successMsg = "";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_project'])) {
   $stmt = $conn->prepare("INSERT INTO projects (title, category, image, description, details_title, skills_used, role, view_link, created_at) 
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
   $stmt->bind_param("sssssssss", $_POST['title'], $_POST['category'], $_POST['image'], $_POST['description'], $_POST['details_title'], $_POST['skills_used'], $_POST['role'], $_POST['view_link'], $_POST['created_at']);
   $stmt->execute();
-  header("Location: ./manage_project.php");
-  exit;
+  $successMsg = "Project added successfully!";
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_project'])) {
   $stmt = $conn->prepare("UPDATE projects SET title=?, category=?, image=?, description=?, details_title=?, skills_used=?, role=?, view_link=?, created_at=? WHERE id=?");
   $stmt->bind_param("sssssssssi", $_POST['title'], $_POST['category'], $_POST['image'], $_POST['description'], $_POST['details_title'], $_POST['skills_used'], $_POST['role'], $_POST['view_link'], $_POST['created_at'], $_POST['id']);
   $stmt->execute();
-  header("Location: ./manage_project.php");
-  exit;
+  $successMsg = "Project updated successfully!";
 }
 
 if (isset($_GET['delete'])) {
@@ -23,7 +23,8 @@ if (isset($_GET['delete'])) {
   $stmt = $conn->prepare("DELETE FROM projects WHERE id=?");
   $stmt->bind_param("i", $id);
   $stmt->execute();
-  header("Location: ./manage_project.php");
+  $successMsg = "Project deleted successfully!";
+  header("Location: manage_project.php");
   exit;
 }
 
@@ -46,7 +47,12 @@ if (isset($_GET['edit'])) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 
+<?php if (!empty($successMsg)): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($successMsg) ?></div>
+<?php endif; ?>
+
 <body class="container py-5">
+<a href="index.php" class="btn btn-primary">Go Back</a>
   <h2>Manage Projects</h2>
 
   <form method="POST" class="row g-2 mb-4">

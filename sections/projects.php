@@ -52,6 +52,7 @@ $result = $conn->query($sql);
     </div>
 </section>
 
+<!-- Project Popup HTML -->
 <div class="project-popup" aria-hidden="true">
   <div class="project-popup-inner">
     <div class="project-popup-content">
@@ -66,10 +67,9 @@ $result = $conn->query($sql);
       <div class="pp-right">
         <h3 class="popup-title"></h3>
         <div class="popup-category">Category: <span id="popup-category"></span></div>
-        <p class="popup-description"></p>
+        <div class="popup-description"></div>
 
-        <ul class="popup-info">
-        </ul>
+        <ul class="popup-info"></ul>
 
         <div class="popup-links">
           <a href="#" target="_blank" class="btn view-link"><i class="fa-solid fa-link"></i> View Project</a>
@@ -78,4 +78,3 @@ $result = $conn->query($sql);
     </div>
   </div>
 </div>
-

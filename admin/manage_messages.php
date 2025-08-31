@@ -12,6 +12,7 @@ if (isset($_GET['delete'])) {
 }
 
 $result = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC");
+$counter = $result->num_rows; // start from total count
 ?>
 <!DOCTYPE html>
 <html>
@@ -20,6 +21,7 @@ $result = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC"
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="container py-5">
+<a href="index.php" class="btn btn-primary">Go Back</a>
   <h2>Contact Messages</h2>
 
   <?php if ($result->num_rows > 0): ?>
@@ -39,7 +41,7 @@ $result = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC"
     <tbody>
       <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
-          <td><?= $row['id'] ?></td>
+          <td><?= $counter-- ?></td> <!-- Show custom decreasing ID -->
           <td><?= htmlspecialchars($row['name']) ?></td>
           <td><a href="mailto:<?= htmlspecialchars($row['email']) ?>"><?= htmlspecialchars($row['email']) ?></a></td>
           <td><?= htmlspecialchars($row['subject']) ?></td>

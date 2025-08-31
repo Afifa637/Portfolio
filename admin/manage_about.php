@@ -46,6 +46,10 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
 </head>
 <body>
   <div class="admin-container">
+    <div style="margin-bottom:20px;">
+      <a href="index.php" class="btn">Go Back</a>
+    </div>
+
     <h2>Manage About Section</h2>
 
     <?php
