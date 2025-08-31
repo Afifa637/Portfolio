@@ -11,55 +11,55 @@ use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(__DIR__ . "/..");
 $dotenv->load();
 
-$mail = new PHPMailer(true);
+// $mail = new PHPMailer(true);
 
-try {
-  $mail->SMTPDebug = 2;
-  $mail->Debugoutput = 'html';
-  $mail->isSMTP();
-  $mail->Host       = $_ENV['MAIL_HOST'];
-  $mail->SMTPAuth   = true;
-  $mail->Username   = $_ENV['MAIL_USERNAME'];
-  $mail->Password   = $_ENV['MAIL_PASSWORD'];
-  $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-  $mail->Port       = $_ENV['MAIL_PORT'];
+// try {
+//   $mail->SMTPDebug = 2;
+//   $mail->Debugoutput = 'html';
+//   $mail->isSMTP();
+//   $mail->Host       = $_ENV['MAIL_HOST'];
+//   $mail->SMTPAuth   = true;
+//   $mail->Username   = $_ENV['MAIL_USERNAME'];
+//   $mail->Password   = $_ENV['MAIL_PASSWORD'];
+//   $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+//   $mail->Port       = $_ENV['MAIL_PORT'];
 
-  $mail->setFrom($_ENV['MAIL_USERNAME'], $_ENV['MAIL_FROM_NAME']);
-  $mail->addAddress($_ENV['MAIL_FROM_ADDRESS'], $_ENV['MAIL_FROM_NAME']);
+//   $mail->setFrom($_ENV['MAIL_USERNAME'], $_ENV['MAIL_FROM_NAME']);
+//   $mail->addAddress($_ENV['MAIL_FROM_ADDRESS'], $_ENV['MAIL_FROM_NAME']);
 
-  $mail->isHTML(true);
-  $mail->Subject = "Test Mail";
-  $mail->Body    = "<b>This is a test email</b>";
-  $mail->AltBody = "This is a test email";
+//   $mail->isHTML(true);
+//   $mail->Subject = "Test Mail";
+//   $mail->Body    = "<b>This is a test email</b>";
+//   $mail->AltBody = "This is a test email";
 
-  echo "📤 Trying to send...<br>";
-  $mail->send();
-  echo "✅ Mail sent!";
-} catch (Exception $e) {
-  echo "⚠️ Mailer Error: {$mail->ErrorInfo}";
-}
+//   echo "📤 Trying to send...<br>";
+//   $mail->send();
+//   echo "✅ Mail sent!";
+// } catch (Exception $e) {
+//   echo "⚠️ Mailer Error: {$mail->ErrorInfo}";
+// }
 
-// Fetch contact info fields
-$sql = "SELECT * FROM contact_info ORDER BY id ASC";
-$result = $conn->query($sql);
+// // Fetch contact info fields
+// $sql = "SELECT * FROM contact_info ORDER BY id ASC";
+// $result = $conn->query($sql);
 
-$cards = $radios = $checkboxes = $terms = [];
-while ($row = $result->fetch_assoc()) {
-  switch ($row['input_type']) {
-    case 'card':
-      $cards[] = $row;
-      break;
-    case 'radio':
-      $radios[] = $row;
-      break;
-    case 'checkbox':
-      $checkboxes[] = $row;
-      break;
-    case 'terms':
-      $terms[] = $row;
-      break;
-  }
-}
+// $cards = $radios = $checkboxes = $terms = [];
+// while ($row = $result->fetch_assoc()) {
+//   switch ($row['input_type']) {
+//     case 'card':
+//       $cards[] = $row;
+//       break;
+//     case 'radio':
+//       $radios[] = $row;
+//       break;
+//     case 'checkbox':
+//       $checkboxes[] = $row;
+//       break;
+//     case 'terms':
+//       $terms[] = $row;
+//       break;
+//   }
+// }
 ?>
 
 <section class="contact section" id="contact">

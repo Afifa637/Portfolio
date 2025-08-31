@@ -1,4 +1,4 @@
-/* ========== GLOBAL ========== */
+
 * {
     margin: 0;
     padding: 0;
@@ -12,7 +12,6 @@
     line-height: 1.6;
   }
   
-  /* Container */
   .admin-container {
     width: 90%;
     max-width: 1200px;

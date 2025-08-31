@@ -17,6 +17,7 @@ if (!isset($_SESSION['admin'])) {
 <body>
     <div class="admin-container">
         <h1>Welcome, <?= $_SESSION['admin']; ?></h1>
+        <a href="change_password.php" class="btn">Change Password</a> |
         <a href="logout.php" class="btn logout">Logout</a>
 
         <div class="admin-grid">
