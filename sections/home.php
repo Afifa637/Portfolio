@@ -50,10 +50,10 @@ $social_result = $conn->query($social_sql);
           </a>
         <?php endwhile; ?>
       </div>
-
+          
       <div class="home-btns">
         <a href="#contact" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Hire Me</a>
-        <a download href="<?= htmlspecialchars($home['cv_link']); ?>" class="btn"><i class="fa-solid fa-download"></i> Download CV</a>
+        <a href="download_cv.php" class="btn"><i class="fa-solid fa-download"></i> Download CV</a>
       </div>
     </div>
 

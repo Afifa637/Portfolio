@@ -1,109 +1,42 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Dotenv\Dotenv;
 
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
-}
+$dotenv = Dotenv::createImmutable(__DIR__ . "/..");
+$dotenv->load();
 
-// Page title (if not included elsewhere)
-if (!isset($is_included)) {
-    $page_title = "Contact | Afifa Sultana";
-}
+$mail = new PHPMailer(true);
 
-// DB connection
-$conn = new mysqli("localhost", "root", "", "portfolio_db");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+try {
+  $mail->SMTPDebug = 2;
+  $mail->Debugoutput = 'html';
+  $mail->isSMTP();
+  $mail->Host       = $_ENV['MAIL_HOST'];
+  $mail->SMTPAuth   = true;
+  $mail->Username   = $_ENV['MAIL_USERNAME'];
+  $mail->Password   = $_ENV['MAIL_PASSWORD'];
+  $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+  $mail->Port       = $_ENV['MAIL_PORT'];
 
-// Load PHPMailer
-require __DIR__ . '/../vendor/autoload.php'; 
+  $mail->setFrom($_ENV['MAIL_USERNAME'], $_ENV['MAIL_FROM_NAME']);
+  $mail->addAddress($_ENV['MAIL_FROM_ADDRESS'], $_ENV['MAIL_FROM_NAME']);
 
-// Handle form submission
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $_SESSION['form_data'] = $_POST;
+  $mail->isHTML(true);
+  $mail->Subject = "Test Mail";
+  $mail->Body    = "<b>This is a test email</b>";
+  $mail->AltBody = "This is a test email";
 
-    if (empty($_POST['name']) || empty($_POST['email']) || empty($_POST['subject']) || empty($_POST['message'])) {
-        $_SESSION['error'] = "⚠️ Please fill in all required fields.";
-        header("Location: contact.php#contact");
-        exit;
-    }
-
-    $name    = trim($_POST['name']);
-    $email   = trim($_POST['email']);
-    $subject = trim($_POST['subject']);
-    $message = trim($_POST['message']);
-
-    // Insert into DB
-    $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, subject, message) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $name, $email, $subject, $message);
-    $stmt->execute();
-    $stmt->close();
-
-    // ===== SEND EMAILS WITH PHPMailer =====
-    $mail = new PHPMailer(true);
-    try {
-        // SMTP settings (example: Gmail SMTP)
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com'; // your SMTP server
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'your-email@gmail.com'; // your Gmail
-        $mail->Password   = 'your-app-password';    // Gmail app password, NOT your normal pass
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
-
-        // 1. Send to YOU
-        $mail->setFrom($email, $name);
-        $mail->addAddress('your-email@gmail.com', 'Afifa Sultana'); // replace with your real email
-        $mail->Subject = "📩 New Contact Form Message: " . $subject;
-        $mail->Body    = "You received a new message from your portfolio contact form.\n\n" .
-                         "👤 Name: $name\n" .
-                         "📧 Email: $email\n" .
-                         "📌 Subject: $subject\n\n" .
-                         "📝 Message:\n$message\n\n" .
-                         "---------------------------\n" .
-                         "This message was also saved in your database.";
-
-        $mail->send();
-
-        // 2. Send Confirmation to Sender
-        $confirm = new PHPMailer(true);
-        $confirm->isSMTP();
-        $confirm->Host       = 'smtp.gmail.com';
-        $confirm->SMTPAuth   = true;
-        $confirm->Username   = 'your-email@gmail.com';
-        $confirm->Password   = 'your-app-password';
-        $confirm->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $confirm->Port       = 587;
-
-        $confirm->setFrom('your-email@gmail.com', 'Afifa Sultana');
-        $confirm->addAddress($email, $name);
-        $confirm->Subject = "✅ We received your message - Afifa Sultana Portfolio";
-        $confirm->Body    = "Hello $name,\n\n" .
-                            "Thank you for reaching out through my portfolio website. 🙏\n\n" .
-                            "I’ve received your message and will get back to you as soon as possible.\n\n" .
-                            "Here’s a copy of your submission:\n" .
-                            "---------------------------\n" .
-                            "📌 Subject: $subject\n" .
-                            "📝 Message:\n$message\n" .
-                            "---------------------------\n\n" .
-                            "Best regards,\n" .
-                            "Afifa Sultana";
-
-        $confirm->send();
-
-        unset($_SESSION['form_data']);
-        $_SESSION['success'] = "✅ Message sent successfully! A confirmation email has also been sent to you.";
-    } catch (Exception $e) {
-        $_SESSION['error'] = "⚠️ Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    }
-
-    // ===== Redirect back with success =====
-    unset($_SESSION['form_data']);
-    $_SESSION['success'] = "✅ Message sent successfully! A confirmation email has also been sent to you.";
-    header("Location: contact.php#contact");
-    exit;
+  echo "📤 Trying to send...<br>";
+  $mail->send();
+  echo "✅ Mail sent!";
+} catch (Exception $e) {
+  echo "⚠️ Mailer Error: {$mail->ErrorInfo}";
 }
 
 // Fetch contact info fields
@@ -112,14 +45,23 @@ $result = $conn->query($sql);
 
 $cards = $radios = $checkboxes = $terms = [];
 while ($row = $result->fetch_assoc()) {
-    switch ($row['input_type']) {
-        case 'card': $cards[] = $row; break;
-        case 'radio': $radios[] = $row; break;
-        case 'checkbox': $checkboxes[] = $row; break;
-        case 'terms': $terms[] = $row; break;
-    }
+  switch ($row['input_type']) {
+    case 'card':
+      $cards[] = $row;
+      break;
+    case 'radio':
+      $radios[] = $row;
+      break;
+    case 'checkbox':
+      $checkboxes[] = $row;
+      break;
+    case 'terms':
+      $terms[] = $row;
+      break;
+  }
 }
 ?>
+
 <section class="contact section" id="contact">
   <h3 class="section-title"><i class="fa-regular fa-address-book"></i> Contact <span>Me</span></h3>
 
@@ -137,33 +79,34 @@ while ($row = $result->fetch_assoc()) {
     </div>
 
     <form action="" method="POST" class="contact-form grid" onsubmit="return validateForm();">
-      
-      <!-- Show error/success messages -->
+
       <?php if (!empty($_SESSION['error'])): ?>
-        <p class="error-msg"><?= $_SESSION['error']; unset($_SESSION['error']); ?></p>
+        <p class="error-msg"><?= $_SESSION['error'];
+                              unset($_SESSION['error']); ?></p>
       <?php endif; ?>
 
       <?php if (!empty($_SESSION['success'])): ?>
-        <p class="success-msg"><?= $_SESSION['success']; unset($_SESSION['success']); ?></p>
+        <p class="success-msg"><?= $_SESSION['success'];
+                                unset($_SESSION['success']); ?></p>
       <?php endif; ?>
 
       <div class="contact-form-group grid">
         <div class="contact-form-div">
           <label class="contact-form-label">Your Name<b>*</b></label>
           <input type="text" class="contact-form-input" name="name"
-                 value="<?= $_SESSION['form_data']['name'] ?? '' ?>" required>
+            value="<?= $_SESSION['form_data']['name'] ?? '' ?>" required>
         </div>
         <div class="contact-form-div">
           <label class="contact-form-label">Your Email<b>*</b></label>
           <input type="email" class="contact-form-input" name="email"
-                 value="<?= $_SESSION['form_data']['email'] ?? '' ?>" required>
+            value="<?= $_SESSION['form_data']['email'] ?? '' ?>" required>
         </div>
       </div>
 
       <div class="contact-form-div">
         <label class="contact-form-label">Your Subject<b>*</b></label>
         <input type="text" class="contact-form-input" name="subject"
-               value="<?= $_SESSION['form_data']['subject'] ?? '' ?>" required>
+          value="<?= $_SESSION['form_data']['subject'] ?? '' ?>" required>
       </div>
 
       <div class="contact-form-div">
@@ -219,17 +162,18 @@ while ($row = $result->fetch_assoc()) {
 </section>
 
 <script>
-function validateForm() {
-  const terms = document.getElementById("terms");
-  if (terms && !terms.checked) {
-    alert("You must agree to the Terms & Conditions before submitting.");
-    return false;
+  function validateForm() {
+    const terms = document.getElementById("terms");
+    if (terms && !terms.checked) {
+      alert("You must agree to the Terms & Conditions before submitting.");
+      return false;
+    }
+    return true;
   }
-  return true;
-}
-function acceptTerms() {
-  if (document.getElementById("terms").checked) {
-    document.cookie = "terms_accepted=true; path=/; max-age=" + 60*60*24*365; // 1 year
+
+  function acceptTerms() {
+    if (document.getElementById("terms").checked) {
+      document.cookie = "terms_accepted=true; path=/; max-age=" + 60 * 60 * 24 * 365; // 1 year
+    }
   }
-}
 </script>

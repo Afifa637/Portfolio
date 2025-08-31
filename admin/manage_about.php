@@ -2,7 +2,6 @@
 include "config.php";
 if (!isset($_SESSION['admin'])) { header("Location: login.php"); exit; }
 
-// Handle Create
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
     $short = $_POST['short_intro'];
     $long  = $_POST['long_intro'];
@@ -15,7 +14,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
     exit;
 }
 
-// Handle Update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $id    = $_POST['id'];
     $short = $_POST['short_intro'];
@@ -29,7 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     exit;
 }
 
-// Handle Delete
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM about WHERE id=?");
@@ -39,7 +36,6 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Fetch all about records
 $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
 ?>
 <!DOCTYPE html>
@@ -58,7 +54,6 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
       if (isset($_GET['deleted'])) echo "<p class='success'>About entry deleted!</p>";
     ?>
 
-    <!-- Create New -->
     <h3>Add New About</h3>
     <form method="POST">
       <input type="hidden" name="create" value="1">
@@ -76,7 +71,6 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
 
     <hr>
 
-    <!-- Existing About Records -->
     <h3>Existing About Records</h3>
     <?php while ($about = $result->fetch_assoc()): ?>
       <div class="card" style="margin-bottom:15px; padding:15px; text-align:left;">
@@ -86,7 +80,6 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
         <p><strong>Profile Image:</strong> <img src="<?= htmlspecialchars($about['profile_image']); ?>" alt="Profile" width="80"></p>
         <p><strong>Updated:</strong> <?= $about['updated_at']; ?></p>
 
-        <!-- Update Form -->
         <form method="POST" style="margin-top:10px;">
           <input type="hidden" name="update" value="1">
           <input type="hidden" name="id" value="<?= $about['id']; ?>">

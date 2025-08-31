@@ -1,7 +1,6 @@
 <?php
 require "config.php";
 
-// Add Skill
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_skill'])) {
     $stmt = $conn->prepare("INSERT INTO skills (skill_name, percentage, description) VALUES (?, ?, ?)");
     $stmt->bind_param("sis", $_POST['skill_name'], $_POST['percentage'], $_POST['description']);
@@ -10,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_skill'])) {
     exit;
 }
 
-// Update Skill
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_skill'])) {
     $stmt = $conn->prepare("UPDATE skills SET skill_name=?, percentage=?, description=? WHERE id=?");
     $stmt->bind_param("sisi", $_POST['skill_name'], $_POST['percentage'], $_POST['description'], $_POST['id']);
@@ -19,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_skill'])) {
     exit;
 }
 
-// Delete Skill
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM skills WHERE id=?");
@@ -29,10 +26,8 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Fetch Skills
 $result = $conn->query("SELECT * FROM skills ORDER BY id DESC");
 
-// If editing, fetch the skill
 $editData = null;
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
@@ -51,7 +46,6 @@ if (isset($_GET['edit'])) {
 <body class="container py-5">
   <h2>Manage Skills</h2>
 
-  <!-- Add / Edit Skill Form -->
   <form method="POST" class="row g-2 mb-4">
     <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
 
@@ -75,7 +69,6 @@ if (isset($_GET['edit'])) {
     </div>
   </form>
 
-  <!-- Skills Table -->
   <table class="table table-bordered table-striped">
     <tr><th>ID</th><th>Skill</th><th>Percentage</th><th>Description</th><th>Actions</th></tr>
     <?php while ($row = $result->fetch_assoc()): ?>

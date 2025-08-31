@@ -3,18 +3,15 @@ if (!isset($is_included)) {
     $page_title = "Skills | Afifa Sultana";
 }
 
-// Database connection
 $conn = new mysqli("localhost", "root", "", "portfolio_db");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch skills from DB (ordered)
 $sql = "SELECT * FROM skills ORDER BY order_no ASC";
 $result = $conn->query($sql);
 ?>
 
-<!-- Skills Section -->
 <section class="skills section" id="skills">
   <h2 class="heading section-title" data-title="My Skills">Professional Skills</h2>
   <div class="skills-container container grid">

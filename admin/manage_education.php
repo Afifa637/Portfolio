@@ -1,7 +1,6 @@
 <?php
 require "config.php";
 
-// Add new
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_edu'])) {
     $stmt = $conn->prepare("INSERT INTO education (degree, major, institution, location, grade, start_year, end_year) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssss", $_POST['degree'], $_POST['major'], $_POST['institution'], $_POST['location'], $_POST['grade'], $_POST['start_year'], $_POST['end_year']);
@@ -10,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_edu'])) {
     exit;
 }
 
-// Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_edu'])) {
     $stmt = $conn->prepare("UPDATE education SET degree=?, major=?, institution=?, location=?, grade=?, start_year=?, end_year=? WHERE id=?");
     $stmt->bind_param("sssssssi", $_POST['degree'], $_POST['major'], $_POST['institution'], $_POST['location'], $_POST['grade'], $_POST['start_year'], $_POST['end_year'], $_POST['id']);
@@ -19,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_edu'])) {
     exit;
 }
 
-// Delete
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM education WHERE id=?");
@@ -29,10 +26,8 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Fetch all
 $result = $conn->query("SELECT * FROM education ORDER BY start_year DESC");
 
-// If editing, fetch record
 $editData = null;
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
@@ -51,7 +46,6 @@ if (isset($_GET['edit'])) {
 <body class="container py-5">
   <h2>Manage Education</h2>
 
-  <!-- Add / Edit Form -->
   <form method="POST" class="mb-4 row g-2">
     <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
     <div class="col"><input type="text" name="degree" value="<?= htmlspecialchars($editData['degree'] ?? '') ?>" placeholder="Degree" class="form-control" required></div>
@@ -71,7 +65,6 @@ if (isset($_GET['edit'])) {
     </div>
   </form>
 
-  <!-- Education List -->
   <table class="table table-bordered table-striped">
     <tr>
       <th>ID</th><th>Degree</th><th>Major</th><th>Institution</th><th>Grade</th><th>Years</th><th>Actions</th>

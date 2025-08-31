@@ -6,10 +6,10 @@
 }
 
 .skills-item {
-  background: var(--container-color); /* ✅ theme aware */
+  background: var(--container-color);
   padding: 2rem 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 4px 12px var(--shadow-color); /* ✅ global shadow */
+  box-shadow: 0 4px 12px var(--shadow-color);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -17,17 +17,20 @@
 
 .skills-item:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 20px var(--shadow-color); /* ✅ consistent hover depth */
+  box-shadow: 0 8px 20px var(--shadow-color);
 }
 
 .skills-item::after {
   content: "";
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 1rem;
   border: 2px solid transparent;
-  background: linear-gradient(120deg, var(--main-color), var(--border-color)) border-box;
+  background: linear-gradient(120deg, var(--main-color), var(--border-color))
+    border-box;
   -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
@@ -49,7 +52,7 @@
 .skills-name {
   font-size: var(--h3-font-size);
   font-weight: var(--font-medium);
-  color: var(--title-color); /* ✅ theme aware */
+  color: var(--title-color);
 }
 
 .skills-value {
@@ -65,13 +68,13 @@
 .skills-description {
   margin: 1rem 0 1.5rem;
   font-size: 0.95rem;
-  color: var(--text-color); /* ✅ theme aware */
+  color: var(--text-color);
   line-height: 1.6;
 }
 
 .skills-bar {
   height: 8px;
-  background-color: var(--shadow-color); /* ✅ subtle base */
+  background-color: var(--shadow-color);
   border-radius: 50px;
   overflow: hidden;
 }
@@ -86,7 +89,7 @@
 }
 
 .skills-percentage::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -7px;
   right: 0;
@@ -94,7 +97,7 @@
   height: 18px;
   border-radius: 50%;
   background: var(--main-color);
-  border: 2px solid var(--container-color); /* ✅ adapts light/dark */
+  border: 2px solid var(--container-color);
   box-shadow: 0 4px 6px var(--shadow-color);
 }
 

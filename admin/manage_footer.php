@@ -1,11 +1,9 @@
 <?php
-// Database connection
 $conn = new mysqli("localhost", "root", "", "portfolio_db");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Create
 if (isset($_POST['add'])) {
     $name = $_POST['social_name'];
     $icon = $_POST['social_icon'];
@@ -14,7 +12,6 @@ if (isset($_POST['add'])) {
     $conn->query("INSERT INTO footer (social_name, social_icon, social_link, footer_text) VALUES ('$name','$icon','$link','$text')");
 }
 
-// Update
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
     $name = $_POST['social_name'];
@@ -24,13 +21,11 @@ if (isset($_POST['update'])) {
     $conn->query("UPDATE footer SET social_name='$name', social_icon='$icon', social_link='$link', footer_text='$text' WHERE id=$id");
 }
 
-// Delete
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $conn->query("DELETE FROM footer WHERE id=$id");
 }
 
-// Fetch all
 $result = $conn->query("SELECT * FROM footer");
 ?>
 
@@ -51,7 +46,6 @@ $result = $conn->query("SELECT * FROM footer");
 <body>
   <h2>Manage Footer</h2>
 
-  <!-- Add / Update Form -->
   <form method="post">
     <input type="hidden" name="id" id="id">
     <input type="text" name="social_name" id="social_name" placeholder="Social Name" required>
@@ -62,7 +56,6 @@ $result = $conn->query("SELECT * FROM footer");
     <button type="submit" name="update">Update</button>
   </form>
 
-  <!-- Footer Table -->
   <table>
     <tr>
       <th>ID</th>

@@ -7,6 +7,5 @@ session_destroy();
 
 setcookie("admin_email", "", time() - 3600, "/"); // clear cookie
 
-// Redirect to login page
 header("Location: login.php");
 exit();

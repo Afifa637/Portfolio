@@ -3,30 +3,25 @@ if (!isset($is_included)) {
     $page_title = "Projects | Afifa Sultana";
 }
 
-// Database connection
 $conn = new mysqli("localhost", "root", "", "portfolio_db");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch projects
 $sql = "SELECT * FROM projects ORDER BY order_no ASC";
 $result = $conn->query($sql);
 ?>
 
-<!-- Project Section -->
 <section class="project section" id="project">
     <h2 class="heading section-title">My <span>Projects</span></h2>
 
-    <!-- Filters -->
     <div class="project-filters">
         <span class="project-item btn" data-filter="all" data-mixitup-control>All</span>
         <span class="project-item btn" data-filter=".web" data-mixitup-control>Web</span>
         <span class="project-item btn" data-filter=".app" data-mixitup-control>App</span>
-        <span class="project-item btn" data-filter=".design" data-mixitup-control>Design</span>
+        <span class="project-item btn" data-filter=".terminal" data-mixitup-control>Terminal</span>
     </div>
 
-    <!-- Project Cards -->
     <div class="project-container container grid">
         <?php while ($row = $result->fetch_assoc()): ?>
             <?php $cat = strtolower($row['category']); // ensure class is lower-case ?>
@@ -38,7 +33,6 @@ $result = $conn->query($sql);
                     Demo <i class="uil uil-arrow-right project-button-icon"></i>
                 </button>
 
-                <!-- Hidden project details -->
                 <div class="portfolio-item-details" style="display: none;">
                     <h3 class="details-title"><?= htmlspecialchars($row['details_title']); ?></h3>
                     <p class="details-description"><?= htmlspecialchars($row['description']); ?></p>
@@ -51,14 +45,13 @@ $result = $conn->query($sql);
                 </div>
             </div>
         <?php endwhile; ?>
-        <!-- Decorative Shape -->
+
         <div class="section-deco deco-left">
             <img src="assets/images/deco1.png" alt="" class="shape" />
         </div>
     </div>
 </section>
 
-<!-- Project Popup -->
 <div class="project-popup" aria-hidden="true">
   <div class="project-popup-inner">
     <div class="project-popup-content">
@@ -66,19 +59,16 @@ $result = $conn->query($sql);
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <!-- Left: Project Image -->
       <div class="pp-left">
         <img src="" alt="" class="project-popup-img">
       </div>
 
-      <!-- Right: Project Info -->
       <div class="pp-right">
         <h3 class="popup-title"></h3>
         <div class="popup-category">Category: <span id="popup-category"></span></div>
         <p class="popup-description"></p>
 
         <ul class="popup-info">
-          <!-- Filled dynamically -->
         </ul>
 
         <div class="popup-links">

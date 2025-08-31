@@ -90,7 +90,6 @@
   font-size: 1rem;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .education {
     padding: 6rem 8%;

@@ -2,7 +2,6 @@
 require "config.php";
 if (!isset($_SESSION['admin'])) { header("Location: login.php"); exit; }
 
-// Handle Add
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_contact'])) {
     $stmt = $conn->prepare("INSERT INTO contact_info (type, icon, data, input_type, label, value, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssss", $_POST['type'], $_POST['icon'], $_POST['data'], $_POST['input_type'], $_POST['label'], $_POST['value'], $_POST['description']);
@@ -11,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_contact'])) {
     exit;
 }
 
-// Handle Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
     $stmt = $conn->prepare("UPDATE contact_info SET type=?, icon=?, data=?, input_type=?, label=?, value=?, description=? WHERE id=?");
     $stmt->bind_param("sssssssi", $_POST['type'], $_POST['icon'], $_POST['data'], $_POST['input_type'], $_POST['label'], $_POST['value'], $_POST['description'], $_POST['id']);
@@ -20,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
     exit;
 }
 
-// Handle Delete
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM contact_info WHERE id=?");
@@ -30,10 +27,8 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Fetch all
 $result = $conn->query("SELECT * FROM contact_info ORDER BY id ASC");
 
-// If editing, fetch record
 $editData = null;
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
@@ -52,7 +47,6 @@ if (isset($_GET['edit'])) {
 <body class="container py-5">
   <h2>Manage Contact Info</h2>
 
-  <!-- Add / Edit Form -->
   <form method="POST" class="mb-4 row g-2">
     <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
     <div class="col-md-3"><input type="text" name="type" value="<?= htmlspecialchars($editData['type'] ?? '') ?>" placeholder="Type (e.g. Email, Phone, Address)" class="form-control" required></div>
@@ -73,7 +67,6 @@ if (isset($_GET['edit'])) {
     </div>
   </form>
 
-  <!-- Table -->
   <table class="table table-bordered table-striped">
     <tr>
       <th>ID</th>

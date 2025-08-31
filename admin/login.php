@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($pass, $admin['password'])) {
             $_SESSION['admin'] = $admin['email'];
 
-            // Optional: remember me with cookie
+            // cookie added
             if (!empty($_POST['remember'])) {
                 setcookie("admin_email", $email, time()+60*60*24*30, "/"); // 30 days
             }

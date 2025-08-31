@@ -2,10 +2,8 @@
 require "config.php";
 if (!isset($_SESSION['admin'])) { header("Location: login.php"); exit; }
 
-// --- FETCH HOME INFO ---
 $home = $conn->query("SELECT * FROM home_info LIMIT 1")->fetch_assoc();
 
-// --- UPDATE HOME INFO ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_home'])) {
     $stmt = $conn->prepare("UPDATE home_info 
         SET name=?, subtitle=?, description=?, location=?, email=?, availability=?, profile_image=?, cv_link=? 
@@ -27,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_home'])) {
     exit;
 }
 
-// --- ADD ROLE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_role'])) {
     $stmt = $conn->prepare("INSERT INTO home_roles (role) VALUES (?)");
     $stmt->bind_param("s", $_POST['role']);
@@ -36,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_role'])) {
     exit;
 }
 
-// --- DELETE ROLE ---
 if (isset($_GET['delete_role'])) {
     $stmt = $conn->prepare("DELETE FROM home_roles WHERE id=?");
     $stmt->bind_param("i", $_GET['delete_role']);
@@ -45,7 +41,6 @@ if (isset($_GET['delete_role'])) {
     exit;
 }
 
-// --- ADD SOCIAL ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_social'])) {
     $stmt = $conn->prepare("INSERT INTO home_socials (platform, url, icon_class) VALUES (?, ?, ?)");
     $stmt->bind_param("sss", $_POST['platform'], $_POST['url'], $_POST['icon_class']);
@@ -54,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_social'])) {
     exit;
 }
 
-// --- DELETE SOCIAL ---
 if (isset($_GET['delete_social'])) {
     $stmt = $conn->prepare("DELETE FROM home_socials WHERE id=?");
     $stmt->bind_param("i", $_GET['delete_social']);
@@ -63,7 +57,6 @@ if (isset($_GET['delete_social'])) {
     exit;
 }
 
-// --- FETCH ROLES & SOCIALS ---
 $roles = $conn->query("SELECT * FROM home_roles");
 $socials = $conn->query("SELECT * FROM home_socials");
 ?>
@@ -82,7 +75,6 @@ $socials = $conn->query("SELECT * FROM home_socials");
   <?php if (isset($_GET['social_added'])) echo "<p class='text-success'>Social link added!</p>"; ?>
   <?php if (isset($_GET['social_deleted'])) echo "<p class='text-danger'>Social link deleted!</p>"; ?>
 
-  <!-- HOME INFO FORM -->
   <form method="POST" class="row g-3 mb-5">
     <input type="hidden" name="update_home" value="1">
     <div class="col-md-6"><input type="text" name="name" value="<?= htmlspecialchars($home['name']) ?>" placeholder="Name" class="form-control"></div>
@@ -96,7 +88,6 @@ $socials = $conn->query("SELECT * FROM home_socials");
     <div class="col-12"><button type="submit" class="btn btn-success">Update Home</button></div>
   </form>
 
-  <!-- ROLES -->
   <h3>Manage Roles</h3>
   <ul class="list-group mb-3">
     <?php while($role = $roles->fetch_assoc()): ?>
@@ -112,7 +103,6 @@ $socials = $conn->query("SELECT * FROM home_socials");
     <button type="submit" class="btn btn-primary">Add</button>
   </form>
 
-  <!-- SOCIALS -->
   <h3>Manage Social Links</h3>
   <ul class="list-group mb-3">
     <?php while($social = $socials->fetch_assoc()): ?>

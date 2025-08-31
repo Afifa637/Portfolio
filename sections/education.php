@@ -8,12 +8,10 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch education data
 $sql = "SELECT * FROM education ORDER BY start_year DESC";
 $result = $conn->query($sql);
 ?>
 
-<!-- Education Section -->
 <section class="education section" id="education">
   <h2 class="section-title">
     <i class="fa-solid fa-graduation-cap"></i> My <span>Education</span>
@@ -57,7 +55,7 @@ $result = $conn->query($sql);
     <?php else: ?>
       <p>No education records found.</p>
     <?php endif; ?>
-    <!-- Decorative Shape -->
+    
     <div class="section-deco deco-left">
       <img src="assets/images/deco1.png" alt="" class="shape" />
     </div>

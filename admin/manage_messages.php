@@ -2,7 +2,6 @@
 require "config.php";
 if (!isset($_SESSION['admin'])) { header("Location: login.php"); exit; }
 
-// Handle Delete
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM contact_messages WHERE id=?");
@@ -12,7 +11,6 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Fetch all messages (newest first)
 $result = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
