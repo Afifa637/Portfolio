@@ -13,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $newPass = $_POST['new_password'];
     $email   = $_SESSION['admin'];
 
-    // Fetch current hash
     $sql = "SELECT password FROM admins WHERE email=?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);

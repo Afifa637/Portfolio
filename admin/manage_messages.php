@@ -41,7 +41,7 @@ $counter = $result->num_rows; // start from total count
     <tbody>
       <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
-          <td><?= $counter-- ?></td> <!-- Show custom decreasing ID -->
+          <td><?= $counter-- ?></td>
           <td><?= htmlspecialchars($row['name']) ?></td>
           <td><a href="mailto:<?= htmlspecialchars($row['email']) ?>"><?= htmlspecialchars($row['email']) ?></a></td>
           <td><?= htmlspecialchars($row['subject']) ?></td>

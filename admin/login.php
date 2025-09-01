@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include "config.php";
 
-// If already logged in, redirect to dashboard
+//If already logged in, redirect to dashboard
 if (isset($_SESSION['admin'])) {
     header("Location: index.php");
     exit;
@@ -59,7 +59,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                    value="<?= isset($_COOKIE['admin_email']) ? htmlspecialchars($_COOKIE['admin_email']) : '' ?>"
                    autocomplete="off" required>
 
-            <!-- Randomized name attribute to prevent browser autofill -->
             <input type="password" name="password" placeholder="Password" autocomplete="new-password" required>
 
             <label style="display:block; margin:10px 0;">

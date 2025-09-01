@@ -38,6 +38,8 @@ $result = $conn->query($sql);
   </div>
 </footer>
 
+<script src="https://unpkg.com/scrollreveal"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/mixitup@3"></script>
 <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
 <script src="main.js"></script>

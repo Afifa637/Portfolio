@@ -4,7 +4,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Add new entry
 if (isset($_POST['add'])) {
     $name = $_POST['social_name'];
     $icon = $_POST['social_icon'];
@@ -14,7 +13,6 @@ if (isset($_POST['add'])) {
                   VALUES ('$name','$icon','$link','$text')");
 }
 
-// Update entry
 if (isset($_POST['update'])) {
     $id   = $_POST['id'];
     $name = $_POST['social_name'];
@@ -26,13 +24,11 @@ if (isset($_POST['update'])) {
                   WHERE id=$id");
 }
 
-// Delete entry
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $conn->query("DELETE FROM footer WHERE id=$id");
 }
 
-// Fetch all records
 $result = $conn->query("SELECT * FROM footer");
 ?>
 <!DOCTYPE html>
