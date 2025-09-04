@@ -1,7 +1,4 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -30,6 +27,8 @@ if ($conn->connect_error) {
     die("DB Connection failed: " . $conn->connect_error);
 }
 
+$successMsg = $errorMsg = "";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Collect/sanitize
     $name     = trim($_POST['name'] ?? '');
@@ -39,33 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $purpose  = $_POST['purpose'] ?? '';
     $options  = isset($_POST['options']) ? implode(", ", (array)$_POST['options']) : '';
 
-    $_SESSION['form_data'] = [
-        'name'    => $name,
-        'email'   => $email,
-        'subject' => $subject,
-        'message' => $message,
-    ];
-
     $stmt = $conn->prepare("INSERT INTO messages (name, email, subject, message, purpose, options) VALUES (?, ?, ?, ?, ?, ?)");
     if ($stmt === false) {
-        $_SESSION['error'] = "❌ Failed to prepare DB statement.";
-        header("Location: " . $_SERVER['REQUEST_URI']);
-        exit;
-    }
-    $stmt->bind_param("ssssss", $name, $email, $subject, $message, $purpose, $options);
-
-    $dbOk = $stmt->execute();
-    $stmt->close();
-
-    if ($dbOk) {
-        unset($_SESSION['form_data']);
-        $_SESSION['success'] = "✅ Your message has been saved successfully!";
+        $errorMsg = "❌ Failed to prepare DB statement.";
     } else {
-        $_SESSION['error'] = "❌ Failed to save message.";
+        $stmt->bind_param("ssssss", $name, $email, $subject, $message, $purpose, $options);
+        if ($stmt->execute()) {
+            $successMsg = "✅ Your message has been saved successfully!";
+        } else {
+            $errorMsg = "❌ Failed to save message.";
+        }
+        $stmt->close();
     }
-
-    header("Location: " . $_SERVER['REQUEST_URI']);
-    exit;
 }
 
 $sql = "SELECT * FROM contact_info ORDER BY id ASC";
@@ -101,36 +85,33 @@ if ($result) {
 
     <form action="" method="POST" class="contact-form grid" onsubmit="return validateForm();">
 
-      <?php if (!empty($_SESSION['error'])): ?>
-        <p class="error-msg"><?= $_SESSION['error']; unset($_SESSION['error']); ?></p>
+      <?php if (!empty($errorMsg)): ?>
+        <p class="error-msg"><?= $errorMsg; ?></p>
       <?php endif; ?>
 
-      <?php if (!empty($_SESSION['success'])): ?>
-        <p class="success-msg"><?= $_SESSION['success']; unset($_SESSION['success']); ?></p>
+      <?php if (!empty($successMsg)): ?>
+        <p class="success-msg"><?= $successMsg; ?></p>
       <?php endif; ?>
 
       <div class="contact-form-group grid">
         <div class="contact-form-div">
           <label class="contact-form-label">Your Name<b>*</b></label>
-          <input type="text" class="contact-form-input" name="name"
-            value="<?= $_SESSION['form_data']['name'] ?? '' ?>" required>
+          <input type="text" class="contact-form-input" name="name" required>
         </div>
         <div class="contact-form-div">
           <label class="contact-form-label">Your Email<b>*</b></label>
-          <input type="email" class="contact-form-input" name="email"
-            value="<?= $_SESSION['form_data']['email'] ?? '' ?>" required>
+          <input type="email" class="contact-form-input" name="email" required>
         </div>
       </div>
 
       <div class="contact-form-div">
         <label class="contact-form-label">Your Subject<b>*</b></label>
-        <input type="text" class="contact-form-input" name="subject"
-          value="<?= $_SESSION['form_data']['subject'] ?? '' ?>" required>
+        <input type="text" class="contact-form-input" name="subject" required>
       </div>
 
       <div class="contact-form-div">
         <label class="contact-form-label">Your Message<b>*</b></label>
-        <textarea class="contact-form-input contact-form-area" name="message" required><?= $_SESSION['form_data']['message'] ?? '' ?></textarea>
+        <textarea class="contact-form-input contact-form-area" name="message" required></textarea>
       </div>
 
       <?php if (!empty($radios)): ?>

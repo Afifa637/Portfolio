@@ -23,7 +23,9 @@ if (isset($_GET['delete'])) {
     $stmt = $conn->prepare("DELETE FROM projects WHERE id=?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    header("Location: manage_project.php");
+    $successMsg = "Project deleted successfully!";
+    $redirectUrl = strtok($_SERVER["REQUEST_URI"], '?'); // base file
+    header("Location: " . $redirectUrl);
     exit;
 }
 
@@ -45,9 +47,10 @@ if (isset($_GET['edit'])) {
     <title>Manage Projects</title>
     <link rel="stylesheet" href="css/admin_project.css">
 </head>
+
 <body>
     <div class="container">
-        <a href="index.php" class="btn">Go Back</a>
+        <a href="index.php" class="btn btn-primary">Go Back</a>
         <h2>Manage Projects</h2>
 
         <?php if (!empty($successMsg)): ?>
