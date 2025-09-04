@@ -1,7 +1,6 @@
 <?php
 $page_title = "Portfolio | Afifa Sultana";
 
-// ================= FORM HANDLING FIRST =================
 $conn = new mysqli("localhost", "root", "", "portfolio_db");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -32,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// List all your CSS files here
 $page_css = [
     "css/global.css",
     "css/header&navbar.css",
