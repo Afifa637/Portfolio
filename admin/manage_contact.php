@@ -42,60 +42,74 @@ if (isset($_GET['edit'])) {
 <html>
 <head>
   <title>Manage Contact Info</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/admin_contact.css">
 </head>
-<body class="container py-5">
-<a href="index.php" class="btn btn-primary">Go Back</a>
+<body>
+
+<div class="admin-container">
+  <a href="index.php" class="btn back-btn">Go Back</a>
   <h2>Manage Contact Info</h2>
 
-  <form method="POST" class="mb-4 row g-2">
+  <form method="POST" class="contact-form">
     <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
-    <div class="col-md-3"><input type="text" name="type" value="<?= htmlspecialchars($editData['type'] ?? '') ?>" placeholder="Type (e.g. Email, Phone, Address)" class="form-control" required></div>
-    <div class="col-md-3"><input type="text" name="icon" value="<?= htmlspecialchars($editData['icon'] ?? '') ?>" placeholder="Icon class (fa-solid fa-envelope)" class="form-control"></div>
-    <div class="col-md-3"><input type="text" name="data" value="<?= htmlspecialchars($editData['data'] ?? '') ?>" placeholder="Data (e.g. email@example.com)" class="form-control"></div>
-    <div class="col-md-3"><input type="text" name="input_type" value="<?= htmlspecialchars($editData['input_type'] ?? '') ?>" placeholder="Input Type (e.g. card, radio, terms)" class="form-control"></div>
-    <div class="col-md-4"><input type="text" name="label" value="<?= htmlspecialchars($editData['label'] ?? '') ?>" placeholder="Label" class="form-control"></div>
-    <div class="col-md-4"><input type="text" name="value" value="<?= htmlspecialchars($editData['value'] ?? '') ?>" placeholder="Value" class="form-control"></div>
-    <div class="col-md-4"><input type="text" name="description" value="<?= htmlspecialchars($editData['description'] ?? '') ?>" placeholder="Description" class="form-control"></div>
     
-    <div class="col-12">
+    <div class="form-row">
+      <input type="text" name="type" value="<?= htmlspecialchars($editData['type'] ?? '') ?>" placeholder="Type (e.g. Email, Phone, Address)" required>
+      <input type="text" name="icon" value="<?= htmlspecialchars($editData['icon'] ?? '') ?>" placeholder="Icon class (fa-solid fa-envelope)">
+      <input type="text" name="data" value="<?= htmlspecialchars($editData['data'] ?? '') ?>" placeholder="Data (e.g. email@example.com)">
+      <input type="text" name="input_type" value="<?= htmlspecialchars($editData['input_type'] ?? '') ?>" placeholder="Input Type (e.g. card, radio, terms)">
+    </div>
+    
+    <div class="form-row">
+      <input type="text" name="label" value="<?= htmlspecialchars($editData['label'] ?? '') ?>" placeholder="Label">
+      <input type="text" name="value" value="<?= htmlspecialchars($editData['value'] ?? '') ?>" placeholder="Value">
+      <input type="text" name="description" value="<?= htmlspecialchars($editData['description'] ?? '') ?>" placeholder="Description">
+    </div>
+    
+    <div class="form-row">
       <?php if ($editData): ?>
-        <button type="submit" name="update_contact" class="btn btn-warning">Update Contact</button>
-        <a href="manage_contact.php" class="btn btn-secondary">Cancel</a>
+        <button type="submit" name="update_contact" class="btn update-btn">Update Contact</button>
+        <a href="manage_contact.php" class="btn cancel-btn">Cancel</a>
       <?php else: ?>
-        <button type="submit" name="add_contact" class="btn btn-primary">Add Contact</button>
+        <button type="submit" name="add_contact" class="btn add-btn">Add Contact</button>
       <?php endif; ?>
     </div>
   </form>
 
-  <table class="table table-bordered table-striped">
-    <tr>
-      <th>ID</th>
-      <th>Type</th>
-      <th>Icon</th>
-      <th>Data</th>
-      <th>Input Type</th>
-      <th>Label</th>
-      <th>Value</th>
-      <th>Description</th>
-      <th>Actions</th>
-    </tr>
-    <?php while ($row = $result->fetch_assoc()): ?>
+  <table class="contact-table">
+    <thead>
       <tr>
-        <td><?= $row['id'] ?></td>
-        <td><?= htmlspecialchars($row['type']) ?></td>
-        <td><?php if ($row['icon']): ?><i class="<?= htmlspecialchars($row['icon']) ?>"></i> <?php endif; ?><?= htmlspecialchars($row['icon']) ?></td>
-        <td><?= htmlspecialchars($row['data']) ?></td>
-        <td><?= htmlspecialchars($row['input_type']) ?></td>
-        <td><?= htmlspecialchars($row['label']) ?></td>
-        <td><?= htmlspecialchars($row['value']) ?></td>
-        <td><?= htmlspecialchars($row['description']) ?></td>
-        <td>
-          <a href="?edit=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-          <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this contact?');" class="btn btn-sm btn-danger">Delete</a>
-        </td>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Icon</th>
+        <th>Data</th>
+        <th>Input Type</th>
+        <th>Label</th>
+        <th>Value</th>
+        <th>Description</th>
+        <th>Actions</th>
       </tr>
-    <?php endwhile; ?>
+    </thead>
+    <tbody>
+      <?php while ($row = $result->fetch_assoc()): ?>
+        <tr>
+          <td><?= $row['id'] ?></td>
+          <td><?= htmlspecialchars($row['type']) ?></td>
+          <td><?php if ($row['icon']): ?><i class="<?= htmlspecialchars($row['icon']) ?>"></i><?php endif; ?><?= htmlspecialchars($row['icon']) ?></td>
+          <td><?= htmlspecialchars($row['data']) ?></td>
+          <td><?= htmlspecialchars($row['input_type']) ?></td>
+          <td><?= htmlspecialchars($row['label']) ?></td>
+          <td><?= htmlspecialchars($row['value']) ?></td>
+          <td><?= htmlspecialchars($row['description']) ?></td>
+          <td>
+            <a href="?edit=<?= $row['id'] ?>" class="btn edit-btn">Edit</a>
+            <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this contact?');" class="btn delete-btn">Delete</a>
+          </td>
+        </tr>
+      <?php endwhile; ?>
+    </tbody>
   </table>
+</div>
+
 </body>
 </html>

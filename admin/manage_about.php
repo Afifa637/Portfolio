@@ -1,6 +1,9 @@
 <?php
 include "config.php";
-if (!isset($_SESSION['admin'])) { header("Location: login.php"); exit; }
+if (!isset($_SESSION['admin'])) { 
+    header("Location: login.php"); 
+    exit; 
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
     $short = $_POST['short_intro'];
@@ -42,11 +45,11 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
 <html>
 <head>
   <title>Manage About</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/admin_about.css">
 </head>
 <body>
   <div class="admin-container">
-    <div style="margin-bottom:20px;">
+    <div class="top-actions">
       <a href="index.php" class="btn">Go Back</a>
     </div>
 
@@ -59,7 +62,7 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
     ?>
 
     <h3>Add New About</h3>
-    <form method="POST">
+    <form method="POST" class="form-section">
       <input type="hidden" name="create" value="1">
       <label>Short Intro:</label>
       <textarea name="short_intro" rows="3" required></textarea>
@@ -77,14 +80,14 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
 
     <h3>Existing About Records</h3>
     <?php while ($about = $result->fetch_assoc()): ?>
-      <div class="card" style="margin-bottom:15px; padding:15px; text-align:left;">
+      <div class="card">
         <p><strong>ID:</strong> <?= $about['id']; ?></p>
         <p><strong>Short Intro:</strong> <?= htmlspecialchars($about['short_intro']); ?></p>
         <p><strong>Long Intro:</strong> <?= htmlspecialchars($about['long_intro']); ?></p>
         <p><strong>Profile Image:</strong> <img src="<?= htmlspecialchars($about['profile_image']); ?>" alt="Profile" width="80"></p>
         <p><strong>Updated:</strong> <?= $about['updated_at']; ?></p>
 
-        <form method="POST" style="margin-top:10px;">
+        <form method="POST" class="edit-form">
           <input type="hidden" name="update" value="1">
           <input type="hidden" name="id" value="<?= $about['id']; ?>">
 

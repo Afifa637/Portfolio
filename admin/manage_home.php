@@ -63,63 +63,87 @@ $socials = $conn->query("SELECT * FROM home_socials");
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Manage Home</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Manage Home</title>
+    <link rel="stylesheet" href="css/admin_home.css">
 </head>
-<body class="container py-5">
-<a href="index.php" class="btn btn-primary">Go Back</a>
+<body>
+<div class="admin-container">
+    <a href="index.php" class="btn">Go Back</a>
 
-  <h2>Manage Home Section</h2>
-  <?php if (isset($_GET['updated'])) echo "<p class='text-success'>Home updated successfully!</p>"; ?>
-  <?php if (isset($_GET['role_added'])) echo "<p class='text-success'>Role added successfully!</p>"; ?>
-  <?php if (isset($_GET['role_deleted'])) echo "<p class='text-danger'>Role deleted!</p>"; ?>
-  <?php if (isset($_GET['social_added'])) echo "<p class='text-success'>Social link added!</p>"; ?>
-  <?php if (isset($_GET['social_deleted'])) echo "<p class='text-danger'>Social link deleted!</p>"; ?>
+    <h2>Manage Home Section</h2>
 
-  <form method="POST" class="row g-3 mb-5">
-    <input type="hidden" name="update_home" value="1">
-    <div class="col-md-6"><input type="text" name="name" value="<?= htmlspecialchars($home['name']) ?>" placeholder="Name" class="form-control"></div>
-    <div class="col-md-6"><input type="text" name="subtitle" value="<?= htmlspecialchars($home['subtitle']) ?>" placeholder="Subtitle" class="form-control"></div>
-    <div class="col-12"><textarea name="description" class="form-control" rows="4"><?= htmlspecialchars($home['description']) ?></textarea></div>
-    <div class="col-md-4"><input type="text" name="location" value="<?= htmlspecialchars($home['location']) ?>" placeholder="Location" class="form-control"></div>
-    <div class="col-md-4"><input type="email" name="email" value="<?= htmlspecialchars($home['email']) ?>" placeholder="Email" class="form-control"></div>
-    <div class="col-md-4"><input type="text" name="availability" value="<?= htmlspecialchars($home['availability']) ?>" placeholder="Availability" class="form-control"></div>
-    <div class="col-md-6"><input type="text" name="profile_image" value="<?= htmlspecialchars($home['profile_image']) ?>" placeholder="Profile Image URL" class="form-control"></div>
-    <div class="col-md-6"><input type="text" name="cv_link" value="<?= htmlspecialchars($home['cv_link']) ?>" placeholder="CV Link" class="form-control"></div>
-    <div class="col-12"><button type="submit" class="btn btn-success">Update Home</button></div>
-  </form>
+    <?php if (isset($_GET['updated'])) echo "<p class='success'>Home updated successfully!</p>"; ?>
+    <?php if (isset($_GET['role_added'])) echo "<p class='success'>Role added successfully!</p>"; ?>
+    <?php if (isset($_GET['role_deleted'])) echo "<p class='error'>Role deleted!</p>"; ?>
+    <?php if (isset($_GET['social_added'])) echo "<p class='success'>Social link added!</p>"; ?>
+    <?php if (isset($_GET['social_deleted'])) echo "<p class='error'>Social link deleted!</p>"; ?>
 
-  <h3>Manage Roles</h3>
-  <ul class="list-group mb-3">
-    <?php while($role = $roles->fetch_assoc()): ?>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <?= htmlspecialchars($role['role']) ?>
-        <a href="?delete_role=<?= $role['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
-      </li>
-    <?php endwhile; ?>
-  </ul>
-  <form method="POST" class="d-flex mb-5">
-    <input type="hidden" name="add_role" value="1">
-    <input type="text" name="role" placeholder="New Role" class="form-control me-2" required>
-    <button type="submit" class="btn btn-primary">Add</button>
-  </form>
+    <form method="POST" class="form-section">
+        <input type="hidden" name="update_home" value="1">
+        <label>Name:</label>
+        <input type="text" name="name" value="<?= htmlspecialchars($home['name']) ?>">
 
-  <h3>Manage Social Links</h3>
-  <ul class="list-group mb-3">
-    <?php while($social = $socials->fetch_assoc()): ?>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <?= htmlspecialchars($social['platform']) ?> - <?= htmlspecialchars($social['url']) ?>
-        <a href="?delete_social=<?= $social['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
-      </li>
-    <?php endwhile; ?>
-  </ul>
-  <form method="POST" class="row g-2">
-    <input type="hidden" name="add_social" value="1">
-    <div class="col-md-3"><input type="text" name="platform" placeholder="Platform" class="form-control" required></div>
-    <div class="col-md-5"><input type="text" name="url" placeholder="URL" class="form-control" required></div>
-    <div class="col-md-3"><input type="text" name="icon_class" placeholder="Icon Class" class="form-control" required></div>
-    <div class="col-md-1"><button type="submit" class="btn btn-primary w-100">Add</button></div>
-  </form>
+        <label>Subtitle:</label>
+        <input type="text" name="subtitle" value="<?= htmlspecialchars($home['subtitle']) ?>">
 
+        <label>Description:</label>
+        <textarea name="description" rows="4"><?= htmlspecialchars($home['description']) ?></textarea>
+
+        <label>Location:</label>
+        <input type="text" name="location" value="<?= htmlspecialchars($home['location']) ?>">
+
+        <label>Email:</label>
+        <input type="email" name="email" value="<?= htmlspecialchars($home['email']) ?>">
+
+        <label>Availability:</label>
+        <input type="text" name="availability" value="<?= htmlspecialchars($home['availability']) ?>">
+
+        <label>Profile Image URL:</label>
+        <input type="text" name="profile_image" value="<?= htmlspecialchars($home['profile_image']) ?>">
+
+        <label>CV Link:</label>
+        <input type="text" name="cv_link" value="<?= htmlspecialchars($home['cv_link']) ?>">
+
+        <button type="submit" class="btn">Update Home</button>
+    </form>
+
+    <h3>Manage Roles</h3>
+    <ul class="list">
+        <?php while($role = $roles->fetch_assoc()): ?>
+            <li><?= htmlspecialchars($role['role']) ?> 
+                <a href="?delete_role=<?= $role['id'] ?>" class="btn logout">Delete</a>
+            </li>
+        <?php endwhile; ?>
+    </ul>
+
+    <form method="POST" class="form-inline">
+        <input type="hidden" name="add_role" value="1">
+        <input type="text" name="role" placeholder="New Role" required>
+        <button type="submit" class="btn">Add Role</button>
+    </form>
+
+    <h3>Manage Social Links</h3>
+    <ul class="list">
+        <?php while($social = $socials->fetch_assoc()): ?>
+            <li><?= htmlspecialchars($social['platform']) ?> - <?= htmlspecialchars($social['url']) ?>
+                <a href="?delete_social=<?= $social['id'] ?>" class="btn logout">Delete</a>
+            </li>
+        <?php endwhile; ?>
+    </ul>
+
+    <form method="POST" class="form-section">
+        <input type="hidden" name="add_social" value="1">
+        <label>Platform:</label>
+        <input type="text" name="platform" placeholder="Platform" required>
+
+        <label>URL:</label>
+        <input type="text" name="url" placeholder="URL" required>
+
+        <label>Icon Class:</label>
+        <input type="text" name="icon_class" placeholder="Icon Class" required>
+
+        <button type="submit" class="btn">Add Social Link</button>
+    </form>
+</div>
 </body>
 </html>

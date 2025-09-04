@@ -4,7 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include "config.php";
 
-//If already logged in, redirect to dashboard
 if (isset($_SESSION['admin'])) {
     header("Location: index.php");
     exit;
@@ -46,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
     <title>Admin Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="login-body">
     <div class="login-card">
@@ -67,6 +66,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <button type="submit" class="btn">Login</button>
         </form>
+
+        <div style="margin-top:15px; text-align:center;">
+            <a href="../index.php" class="btn" style="text-decoration:none;">
+                ← Back to Portfolio
+            </a>
+        </div>
     </div>
 </body>
 </html>

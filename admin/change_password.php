@@ -38,12 +38,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
     <title>Change Password</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/change_pass.css">
 </head>
 <body>
+  <div class="change-password-container">
     <h2>Change Password</h2>
     <?php if (!empty($msg)): ?>
-        <p><?= htmlspecialchars($msg) ?></p>
+        <p class="<?= strpos($msg, 'successfully') !== false ? 'success' : 'error' ?>">
+            <?= htmlspecialchars($msg) ?>
+        </p>
     <?php endif; ?>
 
     <form method="POST">
@@ -51,6 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="password" name="new_password" placeholder="New Password" required>
         <button type="submit" class="btn">Update Password</button>
     </form>
-    <p><a href="index.php">Back to Dashboard</a></p>
+
+    <a href="index.php">← Back to Dashboard</a>
+  </div>
 </body>
+
 </html>

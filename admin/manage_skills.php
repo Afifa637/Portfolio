@@ -40,50 +40,57 @@ if (isset($_GET['edit'])) {
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Manage Skills</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/admin_skills.css">
 </head>
-<body class="container py-5">
-<a href="index.php" class="btn btn-primary">Go Back</a>
-  <h2>Manage Skills</h2>
+<body>
+<div class="admin-container">
 
-  <form method="POST" class="row g-2 mb-4">
-    <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
+    <a href="index.php" class="btn back-btn">Go Back</a>
+    <h2>Manage Skills</h2>
 
-    <div class="col-md-4">
-      <input type="text" name="skill_name" value="<?= htmlspecialchars($editData['skill_name'] ?? '') ?>" placeholder="Skill Name" class="form-control" required>
-    </div>
-    <div class="col-md-2">
-      <input type="number" name="percentage" value="<?= htmlspecialchars($editData['percentage'] ?? '') ?>" placeholder="%" class="form-control" min="0" max="100" required>
-    </div>
-    <div class="col-md-6">
-      <input type="text" name="description" value="<?= htmlspecialchars($editData['description'] ?? '') ?>" placeholder="Description" class="form-control">
-    </div>
+    <form method="POST" class="form-section">
+        <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
 
-    <div class="col-12">
-      <?php if ($editData): ?>
-        <button type="submit" name="update_skill" class="btn btn-warning">Update Skill</button>
-        <a href="manage_skills.php" class="btn btn-secondary">Cancel</a>
-      <?php else: ?>
-        <button type="submit" name="add_skill" class="btn btn-primary">Add Skill</button>
-      <?php endif; ?>
-    </div>
-  </form>
+        <div class="form-row">
+            <input type="text" name="skill_name" value="<?= htmlspecialchars($editData['skill_name'] ?? '') ?>" placeholder="Skill Name" required>
+            <input type="number" name="percentage" value="<?= htmlspecialchars($editData['percentage'] ?? '') ?>" placeholder="Percentage" min="0" max="100" required>
+            <input type="text" name="description" value="<?= htmlspecialchars($editData['description'] ?? '') ?>" placeholder="Description">
+        </div>
 
-  <table class="table table-bordered table-striped">
-    <tr><th>ID</th><th>Skill</th><th>Percentage</th><th>Description</th><th>Actions</th></tr>
-    <?php while ($row = $result->fetch_assoc()): ?>
-      <tr>
-        <td><?= $row['id'] ?></td>
-        <td><?= htmlspecialchars($row['skill_name']) ?></td>
-        <td><?= $row['percentage'] ?>%</td>
-        <td><?= htmlspecialchars($row['description']) ?></td>
-        <td>
-          <a href="?edit=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-          <a href="?delete=<?= $row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this skill?');">Delete</a>
-        </td>
-      </tr>
-    <?php endwhile; ?>
-  </table>
+        <div class="form-row">
+            <?php if ($editData): ?>
+                <button type="submit" name="update_skill" class="btn update-btn">Update Skill</button>
+                <a href="manage_skills.php" class="btn cancel-btn">Cancel</a>
+            <?php else: ?>
+                <button type="submit" name="add_skill" class="btn add-btn">Add Skill</button>
+            <?php endif; ?>
+        </div>
+    </form>
+
+    <table class="skills-table">
+        <tr>
+            <th>ID</th>
+            <th>Skill</th>
+            <th>Percentage</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        <?php while ($row = $result->fetch_assoc()): ?>
+        <tr>
+            <td><?= $row['id'] ?></td>
+            <td><?= htmlspecialchars($row['skill_name']) ?></td>
+            <td><?= $row['percentage'] ?>%</td>
+            <td><?= htmlspecialchars($row['description']) ?></td>
+            <td>
+                <a href="?edit=<?= $row['id'] ?>" class="btn edit-btn">Edit</a>
+                <a href="?delete=<?= $row['id'] ?>" class="btn delete-btn" onclick="return confirm('Delete this skill?');">Delete</a>
+            </td>
+        </tr>
+        <?php endwhile; ?>
+    </table>
+
+</div>
 </body>
 </html>

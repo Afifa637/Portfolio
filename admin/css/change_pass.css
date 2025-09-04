@@ -1,0 +1,102 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #e3f2fd, #f5f7fa);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #333;
+}
+
+.change-password-container {
+    background: #fff;
+    padding: 40px 35px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    width: 400px;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.change-password-container h2 {
+    margin-bottom: 25px;
+    color: #007bff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.change-password-container input[type="password"] {
+    width: 100%;
+    padding: 14px 12px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    background: linear-gradient(to bottom, #ffffff, #f0f3f9);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.change-password-container input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(0,123,255,0.35), inset 0 1px 3px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    background: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 91, 187, 0.3);
+}
+
+.change-password-container p {
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.change-password-container p.success {
+    color: #28a745;
+}
+
+.change-password-container p.error {
+    color: #dc3545;
+}
+
+.change-password-container a {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: #555;
+    transition: color 0.3s;
+}
+
+.change-password-container a:hover {
+    color: #007bff;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

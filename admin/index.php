@@ -12,11 +12,19 @@ if (!isset($_SESSION['admin'])) {
 <html>
 <head>
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin_home.css">
+  <link rel="stylesheet" href="css/admin_about.css">
+  <link rel="stylesheet" href="css/admin_contact.css">
+  <link rel="stylesheet" href="css/admin_footer.css">
+  <link rel="stylesheet" href="css/admin_messages.css">
+  <link rel="stylesheet" href="css/admin_skills.css">
+
+
 </head>
 <body>
     <div class="admin-container">
-        <h1>Welcome, <?= $_SESSION['admin']; ?></h1>
+    <h1>Welcome, <?= htmlspecialchars($_SESSION['admin']); ?></h1>
         <a href="change_password.php" class="btn">Change Password</a> |
         <a href="logout.php" class="btn logout">Logout</a>
 

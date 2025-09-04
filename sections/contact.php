@@ -7,15 +7,11 @@ ini_set('display_errors', 1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 use Dotenv\Dotenv;
 
-// -------- .env loader --------
 $dotenv = Dotenv::createImmutable(__DIR__ . "/..");
 $dotenv->load();
 
-// -------- robust env() helper --------
 function env($key, $default = null) {
     if (isset($_ENV[$key])) return $_ENV[$key];
     if (isset($_SERVER[$key])) return $_SERVER[$key];
@@ -23,7 +19,6 @@ function env($key, $default = null) {
     return ($v !== false && $v !== null) ? $v : $default;
 }
 
-// -------- DB connection --------
 $conn = new mysqli(
     env('DB_HOST', '127.0.0.1'),
     env('DB_USERNAME', 'root'),
@@ -35,59 +30,6 @@ if ($conn->connect_error) {
     die("DB Connection failed: " . $conn->connect_error);
 }
 
-// -------- helper: build mailer --------
-function build_mailer(): PHPMailer {
-    $mail = new PHPMailer(true);
-    $mail->isSMTP();
-    $mail->Host       = env('MAIL_HOST', 'smtp.gmail.com');
-    $mail->SMTPAuth   = true;
-    $mail->Username   = env('MAIL_USERNAME');       // Gmail address for auth
-    $mail->Password   = env('MAIL_PASSWORD');       // Gmail App Password
-
-    // Map encryption properly
-    $enc = strtolower((string) env('MAIL_ENCRYPTION', 'tls'));
-    $mail->SMTPSecure = $enc === 'ssl'
-        ? PHPMailer::ENCRYPTION_SMTPS
-        : PHPMailer::ENCRYPTION_STARTTLS;
-
-    // Port as int (465 for ssl, 587 for tls by default)
-    $mail->Port = (int) env('MAIL_PORT', $enc === 'ssl' ? 465 : 587);
-
-    $mail->CharSet = 'UTF-8';
-
-    // Optional: allow self-signed certs in local dev (XAMPP + antivirus proxies)
-    if (filter_var(env('MAIL_ALLOW_SELF_SIGNED', 'false'), FILTER_VALIDATE_BOOLEAN)) {
-        $mail->SMTPOptions = [
-            'ssl' => [
-                'verify_peer'       => false,
-                'verify_peer_name'  => false,
-                'allow_self_signed' => true,
-            ],
-        ];
-    }
-
-    // Log SMTP transcript to file (won't break redirects)
-    $logFile = __DIR__ . '/../storage/logs/mail.log';
-    if (!is_dir(dirname($logFile))) {
-        @mkdir(dirname($logFile), 0777, true);
-    }
-    $mail->SMTPDebug  = 3; // verbose to file
-    $mail->Debugoutput = function($str, $level) use ($logFile) {
-        @file_put_contents($logFile, '[' . date('c') . "] ($level) $str\n", FILE_APPEND);
-    };
-
-    // Use MAIL_FROM_ADDRESS (same as Gmail) to satisfy Gmail/DMARC rules
-    $fromAddress = env('MAIL_FROM_ADDRESS', env('MAIL_USERNAME'));
-    $fromName    = env('MAIL_FROM_NAME', 'Website');
-    $mail->setFrom($fromAddress, $fromName);
-
-    // Admin notification recipient (you)
-    $mail->addAddress('afifasultana637@gmail.com', 'Admin');
-
-    return $mail;
-}
-
-// -------- handle form submission --------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Collect/sanitize
     $name     = trim($_POST['name'] ?? '');
@@ -97,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $purpose  = $_POST['purpose'] ?? '';
     $options  = isset($_POST['options']) ? implode(", ", (array)$_POST['options']) : '';
 
-    // Preserve form data on error
     $_SESSION['form_data'] = [
         'name'    => $name,
         'email'   => $email,
@@ -105,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'message' => $message,
     ];
 
-    // Insert into DB
     $stmt = $conn->prepare("INSERT INTO messages (name, email, subject, message, purpose, options) VALUES (?, ?, ?, ?, ?, ?)");
     if ($stmt === false) {
         $_SESSION['error'] = "❌ Failed to prepare DB statement.";
@@ -118,59 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     if ($dbOk) {
-        // Build and send mail
-        $mail = build_mailer();
-
-        // Safe body (avoid HTML injection)
-        $safeName    = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-        $safeEmail   = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
-        $safeSubject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
-        $safeMsgHtml = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8'));
-        $safePurpose = htmlspecialchars($purpose, ENT_QUOTES, 'UTF-8');
-        $safeOptions = htmlspecialchars($options, ENT_QUOTES, 'UTF-8');
-
-        // Reply-to: validate user email; fallback if invalid
-        if (PHPMailer::validateAddress($email)) {
-            $mail->addReplyTo($email, $name ?: 'Visitor');
-        } else {
-            // fallback reply-to so PHPMailer doesn't choke
-            $mail->addReplyTo('no-reply@localhost', 'Website Visitor');
-        }
-
-        $mail->isHTML(true);
-        $mail->Subject = "📩 New Contact Form Submission";
-        $mail->Body = "
-            <h2>New Contact Message Received</h2>
-            <p><b>Name:</b> {$safeName}</p>
-            <p><b>Email:</b> {$safeEmail}</p>
-            <p><b>Subject:</b> {$safeSubject}</p>
-            <p><b>Message:</b><br>{$safeMsgHtml}</p>
-            <p><b>Purpose:</b> {$safePurpose}</p>
-            <p><b>Options:</b> {$safeOptions}</p>
-            <hr>
-            <small>Sent from {$safeEmail}</small>
-        ";
-        $mail->AltBody =
-            "New contact submission\n" .
-            "Name: {$name}\n" .
-            "Email: {$email}\n" .
-            "Subject: {$subject}\n" .
-            "Message:\n{$message}\n" .
-            "Purpose: {$purpose}\n" .
-            "Options: {$options}\n";
-
-        try {
-            $ok = $mail->send();
-            if ($ok) {
-                unset($_SESSION['form_data']);
-                $_SESSION['success'] = "✅ Your message has been sent successfully!";
-            } else {
-                $_SESSION['error'] = "⚠️ Message saved but email could not be sent.";
-            }
-        } catch (Exception $e) {
-            // Detailed error also in storage/logs/mail.log
-            $_SESSION['error'] = "⚠️ Message saved but email could not be sent. Error: " . $mail->ErrorInfo;
-        }
+        unset($_SESSION['form_data']);
+        $_SESSION['success'] = "✅ Your message has been saved successfully!";
     } else {
         $_SESSION['error'] = "❌ Failed to save message.";
     }
@@ -179,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// -------- Fetch contact info fields --------
 $sql = "SELECT * FROM contact_info ORDER BY id ASC";
 $result = $conn->query($sql);
 
@@ -214,13 +102,11 @@ if ($result) {
     <form action="" method="POST" class="contact-form grid" onsubmit="return validateForm();">
 
       <?php if (!empty($_SESSION['error'])): ?>
-        <p class="error-msg"><?= $_SESSION['error'];
-                              unset($_SESSION['error']); ?></p>
+        <p class="error-msg"><?= $_SESSION['error']; unset($_SESSION['error']); ?></p>
       <?php endif; ?>
 
       <?php if (!empty($_SESSION['success'])): ?>
-        <p class="success-msg"><?= $_SESSION['success'];
-                                unset($_SESSION['success']); ?></p>
+        <p class="success-msg"><?= $_SESSION['success']; unset($_SESSION['success']); ?></p>
       <?php endif; ?>
 
       <div class="contact-form-group grid">

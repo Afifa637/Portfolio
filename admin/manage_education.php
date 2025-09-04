@@ -41,49 +41,65 @@ if (isset($_GET['edit'])) {
 <html>
 <head>
   <title>Manage Education</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/admin_edu.css">
 </head>
-<body class="container py-5">
-<a href="index.php" class="btn btn-primary">Go Back</a>
+<body>
+
+<div class="admin-container">
+  <a href="index.php" class="btn back-btn">Go Back</a>
   <h2>Manage Education</h2>
 
-  <form method="POST" class="mb-4 row g-2">
+  <form method="POST" class="education-form">
     <input type="hidden" name="id" value="<?= $editData['id'] ?? '' ?>">
-    <div class="col"><input type="text" name="degree" value="<?= htmlspecialchars($editData['degree'] ?? '') ?>" placeholder="Degree" class="form-control" required></div>
-    <div class="col"><input type="text" name="major" value="<?= htmlspecialchars($editData['major'] ?? '') ?>" placeholder="Major" class="form-control"></div>
-    <div class="col"><input type="text" name="institution" value="<?= htmlspecialchars($editData['institution'] ?? '') ?>" placeholder="Institution" class="form-control" required></div>
-    <div class="col"><input type="text" name="location" value="<?= htmlspecialchars($editData['location'] ?? '') ?>" placeholder="Location" class="form-control"></div>
-    <div class="col"><input type="text" name="grade" value="<?= htmlspecialchars($editData['grade'] ?? '') ?>" placeholder="Grade" class="form-control"></div>
-    <div class="col"><input type="text" name="start_year" value="<?= htmlspecialchars($editData['start_year'] ?? '') ?>" placeholder="Start Year" class="form-control" required></div>
-    <div class="col"><input type="text" name="end_year" value="<?= htmlspecialchars($editData['end_year'] ?? '') ?>" placeholder="End Year" class="form-control" required></div>
-    <div class="col">
+    <div class="form-row">
+      <input type="text" name="degree" value="<?= htmlspecialchars($editData['degree'] ?? '') ?>" placeholder="Degree" required>
+      <input type="text" name="major" value="<?= htmlspecialchars($editData['major'] ?? '') ?>" placeholder="Major">
+      <input type="text" name="institution" value="<?= htmlspecialchars($editData['institution'] ?? '') ?>" placeholder="Institution" required>
+      <input type="text" name="location" value="<?= htmlspecialchars($editData['location'] ?? '') ?>" placeholder="Location">
+      <input type="text" name="grade" value="<?= htmlspecialchars($editData['grade'] ?? '') ?>" placeholder="Grade">
+      <input type="text" name="start_year" value="<?= htmlspecialchars($editData['start_year'] ?? '') ?>" placeholder="Start Year" required>
+      <input type="text" name="end_year" value="<?= htmlspecialchars($editData['end_year'] ?? '') ?>" placeholder="End Year" required>
+    </div>
+    <div class="form-row">
       <?php if ($editData): ?>
-        <button type="submit" name="update_edu" class="btn btn-warning">Update</button>
-        <a href="manage_education.php" class="btn btn-secondary">Cancel</a>
+        <button type="submit" name="update_edu" class="btn update-btn">Update</button>
+        <a href="manage_education.php" class="btn cancel-btn">Cancel</a>
       <?php else: ?>
-        <button type="submit" name="add_edu" class="btn btn-primary">Add</button>
+        <button type="submit" name="add_edu" class="btn add-btn">Add</button>
       <?php endif; ?>
     </div>
   </form>
 
-  <table class="table table-bordered table-striped">
-    <tr>
-      <th>ID</th><th>Degree</th><th>Major</th><th>Institution</th><th>Grade</th><th>Years</th><th>Actions</th>
-    </tr>
-    <?php while ($row = $result->fetch_assoc()): ?>
+  <table class="education-table">
+    <thead>
       <tr>
-        <td><?= $row['id'] ?></td>
-        <td><?= htmlspecialchars($row['degree']) ?></td>
-        <td><?= htmlspecialchars($row['major']) ?></td>
-        <td><?= htmlspecialchars($row['institution']) ?> (<?= htmlspecialchars($row['location']) ?>)</td>
-        <td><?= htmlspecialchars($row['grade']) ?></td>
-        <td><?= htmlspecialchars($row['start_year']) ?> - <?= htmlspecialchars($row['end_year']) ?></td>
-        <td>
-          <a href="?edit=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-          <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Are you sure?');" class="btn btn-sm btn-danger">Delete</a>
-        </td>
+        <th>ID</th>
+        <th>Degree</th>
+        <th>Major</th>
+        <th>Institution</th>
+        <th>Grade</th>
+        <th>Years</th>
+        <th>Actions</th>
       </tr>
-    <?php endwhile; ?>
+    </thead>
+    <tbody>
+      <?php while ($row = $result->fetch_assoc()): ?>
+        <tr>
+          <td><?= $row['id'] ?></td>
+          <td><?= htmlspecialchars($row['degree']) ?></td>
+          <td><?= htmlspecialchars($row['major']) ?></td>
+          <td><?= htmlspecialchars($row['institution']) ?> (<?= htmlspecialchars($row['location']) ?>)</td>
+          <td><?= htmlspecialchars($row['grade']) ?></td>
+          <td><?= htmlspecialchars($row['start_year']) ?> - <?= htmlspecialchars($row['end_year']) ?></td>
+          <td>
+            <a href="?edit=<?= $row['id'] ?>" class="btn edit-btn">Edit</a>
+            <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Are you sure?');" class="btn delete-btn">Delete</a>
+          </td>
+        </tr>
+      <?php endwhile; ?>
+    </tbody>
   </table>
+</div>
+
 </body>
 </html>
