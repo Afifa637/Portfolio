@@ -1,0 +1,166 @@
+.education {
+  padding: 8rem 22%;
+  background: var(--bg-color);
+  color: var(--text-color);
+  position: relative;
+}
+
+.education .section-title {
+  font-size: 2.5rem;
+  font-family: "Montserrat Alternates", sans-serif;
+  margin-bottom: 4rem;
+  text-align: center;
+}
+
+.timeline {
+  position: relative;
+  margin-top: 3rem;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 5rem;
+  margin-bottom: 2.5rem;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0.8rem;
+  width: 2px;
+  height: 100%;
+  background-color: var(--main-color);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -0.2rem;
+  top: 0;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--main-color);
+  background: var(--main-color);
+  border-radius: 50%;
+  transition: background 0.5s ease;
+}
+
+.timeline-item:hover .timeline-dot {
+  background:
+    var(--bg-color) 0%,
+    var(--main-color) 100%;
+}
+
+.timeline-content {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 1.2rem;
+  padding: 1.8rem 2.2rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  left: 10rem;
+}
+.edu-degree {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--main-color);
+}
+
+.edu-major {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+}
+
+.edu-institute,
+.edu-location,
+.edu-grade,
+.edu-date {
+  font-size: 0.95rem;
+  margin: 0.3rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.edu-institute i,
+.edu-location i,
+.edu-grade i,
+.edu-date i {
+  color: var(--main-color);
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .education {
+    padding: 6rem 8%;
+  }
+  .timeline-container {
+    padding-left: 1.5rem;
+  }
+  .timeline-item {
+    padding-left: 2.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .education {
+    padding: 4rem 6%;
+  }
+  .education .section-title {
+    font-size: 2rem;
+  }
+  .edu-degree {
+    font-size: 1.2rem;
+  }
+  .edu-major {
+    font-size: 1rem;
+  }
+  .edu-institute,
+  .edu-location,
+  .edu-grade,
+  .edu-date {
+    font-size: 0.85rem;
+  }
+}
+
+/* === Premium Timeline Upgrade === */
+.education {
+  background: var(--bg-elevated);
+}
+
+.timeline {
+  border-left: 2px solid var(--border-color);
+  margin-left: 1.5rem;
+  padding-left: 2rem;
+}
+
+.timeline-item::before {
+  background-color: transparent;
+}
+
+.timeline-dot {
+  background: var(--gradient-primary);
+  box-shadow: 0 0 20px rgba(88, 101, 242, 0.5);
+}
+
+.timeline-content {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 20px 40px var(--shadow-color);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.edu-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
