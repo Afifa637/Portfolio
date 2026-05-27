@@ -56,6 +56,7 @@ $result = $conn->query("SELECT * FROM about ORDER BY updated_at DESC");
 <head>
   <title>Manage About</title>
   <link rel="stylesheet" href="css/admin_about.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

@@ -41,6 +41,7 @@ $result = $conn->query("SELECT * FROM footer");
   <meta charset="UTF-8">
   <title>Manage Footer</title>
   <link rel="stylesheet" href="css/admin_footer.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

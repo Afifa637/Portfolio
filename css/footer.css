@@ -133,6 +133,36 @@
   gap: 0.4rem;
 }
 
+.footer-links-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(110px, 1fr));
+  gap: 0.45rem 1.5rem;
+  padding: 0;
+  margin: 0.4rem 0 0;
+}
+
+.footer-links-list li {
+  list-style: none;
+}
+
 .footer-links a {
   color: var(--muted-text);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.footer-links a:hover {
+  color: var(--title-color);
+  transform: translateX(4px);
+}
+
+@media (max-width: 768px) {
+  .footer-links-list {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
 }

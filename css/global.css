@@ -60,6 +60,7 @@ html {
   --font-medium: 500;
 
   --transition: cubic-bezier(0.4, 0, 0.2, 1);
+  --neon-glow: 0 0 18px rgba(88, 101, 242, 0.35);
 }
 
 .light {
@@ -249,6 +250,44 @@ textarea {
   box-shadow: 0 18px 40px var(--shadow-color);
 }
 
+/* Futuristic floating cards */
+.tilt-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  transform: perspective(900px) rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg)) translateY(var(--ty, 0px));
+  box-shadow: 0 18px 40px var(--shadow-color);
+}
+
+.tilt-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(88, 101, 242, 0.35),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.tilt-card:hover::before {
+  opacity: 1;
+}
+
+.tilt-card:hover {
+  border-color: rgba(88, 101, 242, 0.45);
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, 0.35),
+    var(--neon-glow);
+}
+
 .skip-link {
   position: absolute;
   left: -999px;
@@ -334,5 +373,9 @@ textarea {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+
+  .tilt-card {
+    transform: none !important;
   }
 }

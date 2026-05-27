@@ -25,6 +25,7 @@ $counter = $result->num_rows; // start from total count
     <meta charset="UTF-8">
     <title>Manage Contact Messages</title>
     <link rel="stylesheet" href="css/admin_messages.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

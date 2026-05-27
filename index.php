@@ -85,14 +85,17 @@ $page_css = [
     "css/projects.css",
     "css/contact.css",
     "css/footer.css",
+    "css/effects.css",
 ];
 
 include 'sections/header.php';
 include 'sections/home.php';
 include 'sections/about.php';
+include 'sections/experience.php';
 include 'sections/education.php';
 include 'sections/skills.php';
 include 'sections/projects.php';
+include 'sections/current_work.php';
 include 'sections/contact.php';
 
 include 'sections/footer.php';

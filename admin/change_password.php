@@ -40,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <title>Change Password</title>
     <link rel="stylesheet" href="css/change_pass.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

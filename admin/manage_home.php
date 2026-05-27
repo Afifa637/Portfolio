@@ -86,6 +86,7 @@ $socials = $conn->query("SELECT * FROM home_socials");
 <head>
     <title>Manage Home</title>
     <link rel="stylesheet" href="css/admin_home.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

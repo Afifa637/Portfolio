@@ -197,6 +197,13 @@
   background: var(--glass-bg);
 }
 
+.detail-item p,
+.detail-item a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  display: inline-block;
+}
+
 .detail-item span {
   font-size: 0.75rem;
   color: var(--muted-text);

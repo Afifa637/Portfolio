@@ -12,6 +12,29 @@ $result = $conn->query($sql);
 ?>
 
 </main>
+
+<nav class="section-minimap" aria-label="Section quick navigation">
+  <a href="#home" data-label="Home"></a>
+  <a href="#about" data-label="About"></a>
+  <a href="#experience" data-label="Experience"></a>
+  <a href="#education" data-label="Education"></a>
+  <a href="#skills" data-label="Skills"></a>
+  <a href="#project" data-label="Projects"></a>
+  <a href="#current-work" data-label="Current"></a>
+  <a href="#contact" data-label="Contact"></a>
+</nav>
+
+<div class="command-palette" id="command-palette" aria-hidden="true" role="dialog" aria-label="Command palette">
+  <div class="command-panel">
+    <div class="command-header">
+      <i class="fa-solid fa-terminal"></i>
+      <input type="text" id="command-input" placeholder="Type a command or section name..." autocomplete="off">
+    </div>
+    <div class="command-list" id="command-list"></div>
+    <div class="command-footer"><span>Ctrl/Cmd + K</span><span>Enter to open · Esc to close</span></div>
+  </div>
+</div>
+
 <footer class="footer">
   <div class="footer-accent" aria-hidden="true"></div>
   <div class="footer-container container">
@@ -23,10 +46,13 @@ $result = $conn->query($sql);
 
     <div class="footer-links">
       <h4>Quick Links</h4>
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#project">Projects</a>
-      <a href="#contact">Contact</a>
+      <ul class="footer-links-list">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#project">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
     </div>
 
     <div class="footer-socials" aria-label="Footer social links">
@@ -68,6 +94,7 @@ $result = $conn->query($sql);
 <script src="https://cdn.jsdelivr.net/npm/mixitup@3"></script>
 <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
 <script src="main.js"></script>
+<script src="main-advanced.js"></script>
 </body>
 
 </html>

@@ -56,6 +56,7 @@ if (isset($_GET['edit'])) {
 <head>
   <title>Manage Contact Info</title>
   <link rel="stylesheet" href="css/admin_contact.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

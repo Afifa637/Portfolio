@@ -60,6 +60,7 @@ if (isset($_GET['edit'])) {
     <meta charset="UTF-8">
     <title>Manage Projects</title>
     <link rel="stylesheet" href="css/admin_project.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

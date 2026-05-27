@@ -27,19 +27,24 @@ $projectCount = (int)($conn->query("SELECT COUNT(*) AS total FROM projects")?->f
 $skillCount = (int)($conn->query("SELECT COUNT(*) AS total FROM skills")?->fetch_assoc()['total'] ?? 0);
 $eduCount = (int)($conn->query("SELECT COUNT(*) AS total FROM education")?->fetch_assoc()['total'] ?? 0);
 $availability = $home['availability'] ?? 'Available for work';
+$name = $home['name'] ?? 'Afifa Sultana';
+$nameParts = preg_split('/\s+/', trim($name));
+$firstName = $nameParts[0] ?? 'Afifa';
+$lastName = trim(str_replace($firstName, '', $name)) ?: 'Sultana';
+$email = $home['email'] ?? 'hello@example.com';
 ?>
 
 <section class="home section" id="home">
   <div class="hero-backdrop" aria-hidden="true"></div>
   <canvas class="hero-particles" id="hero-particles" aria-hidden="true"></canvas>
 
-  <div class="home-container container">
+  <div class="home-container container terminal-layout">
     <div class="home-content">
       <p class="eyebrow"><?= e($home['subtitle'] ?? 'Creative Developer & Designer'); ?></p>
 
       <h1 class="home-title">
-        <span><?= e(explode(" ", $home['name'] ?? 'Afifa')[0]); ?></span>
-        <?= e(explode(" ", $home['name'] ?? 'Sultana')[1] ?? ''); ?>
+        <span><?= e($firstName); ?></span>
+        <?= e($lastName); ?>
       </h1>
 
       <h3 class="home-job"><span class="typing-text"></span></h3>
@@ -48,7 +53,7 @@ $availability = $home['availability'] ?? 'Available for work';
 
       <div class="home-info">
         <div class="info-item"><i class="fa-solid fa-location-dot"></i> <?= e($home['location'] ?? 'Remote'); ?></div>
-        <div class="info-item"><i class="fa-solid fa-envelope"></i> <?= e($home['email'] ?? 'hello@example.com'); ?></div>
+        <div class="info-item"><i class="fa-solid fa-envelope"></i> <?= e($email); ?></div>
         <div class="info-item"><i class="fa-solid fa-circle-check"></i> <?= e($availability); ?></div>
       </div>
 
@@ -70,31 +75,46 @@ $availability = $home['availability'] ?? 'Available for work';
 
       <div class="home-stats">
         <div class="stat-card">
-          <h4><?= e((string) $projectCount); ?>+</h4>
+          <h4 data-count="<?= e((string) $projectCount); ?>"><?= e((string) $projectCount); ?>+</h4>
           <p>Projects Delivered</p>
         </div>
         <div class="stat-card">
-          <h4><?= e((string) $skillCount); ?>+</h4>
+          <h4 data-count="<?= e((string) $skillCount); ?>"><?= e((string) $skillCount); ?>+</h4>
           <p>Technologies</p>
         </div>
         <div class="stat-card">
-          <h4><?= e((string) $eduCount); ?></h4>
+          <h4 data-count="<?= e((string) $eduCount); ?>"><?= e((string) $eduCount); ?></h4>
           <p>Education Milestones</p>
-        </div>
-        <div class="stat-card">
-          <h4><?= e($availability); ?></h4>
-          <p>Availability</p>
         </div>
       </div>
     </div>
 
-    <div class="home-banner">
-      <div class="home-img-wrapper">
-        <img src="<?= e($home['profile_image'] ?? 'assets/images/profile.jpg'); ?>" alt="<?= e($home['name'] ?? 'Profile'); ?>" class="home-profile" loading="lazy" />
-        <div class="profile-ring" aria-hidden="true"></div>
-        <div class="profile-glow" aria-hidden="true"></div>
+    <aside class="hero-console" aria-label="Developer profile console">
+      <div class="console-tabs">
+        <span class="console-tab active">portfolio.php</span>
+        <span class="console-tab">profile.json</span>
+        <span class="console-tab">terminal</span>
       </div>
-    </div>
+      <div class="profile-terminal">
+        <div class="home-img-wrapper">
+          <img src="<?= e($home['profile_image'] ?? 'assets/images/profile1.png'); ?>" alt="<?= e($name); ?>" class="home-profile" loading="lazy" />
+          <div class="profile-ring" aria-hidden="true"></div>
+          <div class="profile-glow" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="console-body">
+        <div class="code-line"><span class="line-no">01</span><span><span class="code-key">const</span> profile = {</span></div>
+        <div class="code-line"><span class="line-no">02</span><span>&nbsp;&nbsp;name: <span class="code-string">"<?= e($name); ?>"</span>,</span></div>
+        <div class="code-line"><span class="line-no">03</span><span>&nbsp;&nbsp;role: <span class="code-value">"<span class="typing-text-mirror"><?= e($roles[0] ?? 'Developer'); ?></span>"</span>,</span></div>
+        <div class="code-line"><span class="line-no">04</span><span>&nbsp;&nbsp;projects: <span class="code-value"><?= e((string)$projectCount); ?></span>, skills: <span class="code-value"><?= e((string)$skillCount); ?></span>,</span></div>
+        <div class="code-line"><span class="line-no">05</span><span>&nbsp;&nbsp;status: <span class="code-string">"<?= e($availability); ?>"</span></span></div>
+        <div class="code-line"><span class="line-no">06</span><span>};</span></div>
+        <div class="terminal-output"><pre id="terminal-typing"></pre><span class="cursor-blink"></span></div>
+      </div>
+      <div class="dev-badges">
+        <span class="dev-badge">PHP</span><span class="dev-badge">MySQL</span><span class="dev-badge">JavaScript</span><span class="dev-badge">UI Motion</span>
+      </div>
+    </aside>
   </div>
 
   <a href="#about" class="scroll-indicator" aria-label="Scroll to About">

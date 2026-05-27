@@ -58,8 +58,9 @@ $long_intro = strip_tags($long_intro, $allowed_tags);
           <div class="detail-item"><span>Location</span>
             <p><?= e($homeRow['location'] ?? 'Remote'); ?></p>
           </div>
-          <div class="detail-item"><span>Email</span>
-            <p><?= e($homeRow['email'] ?? 'hello@example.com'); ?></p>
+          <div class="detail-item detail-email"><span>Email</span>
+            <?php $email = $homeRow['email'] ?? 'hello@example.com'; ?>
+            <p><a href="mailto:<?= e($email); ?>"><?= e($email); ?></a></p>
           </div>
           <div class="detail-item"><span>Focus</span>
             <p>UI/UX, Full-stack, Product Design</p>

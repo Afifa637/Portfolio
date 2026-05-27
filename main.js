@@ -111,6 +111,8 @@ if (projectSearch) {
 }
 
 // Project modal
+// Rich case-study style details panel
+
 document.addEventListener("DOMContentLoaded", () => {
   const popup = document.querySelector(".project-popup");
   const popupClose = document.querySelector(".project-popup-close");
@@ -120,16 +122,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const popupDesc = document.querySelector(".popup-description");
   const popupInfo = document.querySelector(".popup-info");
   const popupLink = document.querySelector(".view-link");
+  const popupTags = document.getElementById("popup-tags");
+  let lastFocusedElement = null;
 
   if (!popup) return;
 
+  function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value || "";
+    return div.innerHTML;
+  }
+
   function formatDescription(desc) {
-    const lines = desc.split("\n");
+    const lines = (desc || "").split("\n");
     let html = "";
     let inList = false;
 
-    lines.forEach((line) => {
-      line = line.trim();
+    lines.forEach((rawLine) => {
+      const line = rawLine.trim();
       if (!line) {
         if (inList) {
           html += "</ul>";
@@ -142,73 +152,108 @@ document.addEventListener("DOMContentLoaded", () => {
           html += "</ul>";
           inList = false;
         }
-        html += `<h4>${line}</h4>`;
+        html += `<h4>${escapeHtml(line)}</h4>`;
       } else if (/^[-–]\s+/.test(line)) {
         if (!inList) {
           html += "<ul>";
           inList = true;
         }
-        html += `<li>${line.replace(/^[-–]\s+/, "")}</li>`;
+        html += `<li>${escapeHtml(line.replace(/^[-–]\s+/, ""))}</li>`;
       } else {
         if (inList) {
           html += "</ul>";
           inList = false;
         }
-        html += `<p>${line}</p>`;
+        html += `<p>${escapeHtml(line)}</p>`;
       }
     });
 
     if (inList) html += "</ul>";
-    return html;
+    return html || "<p>No detailed description has been added yet.</p>";
+  }
+
+  function getFocusable() {
+    return [...popup.querySelectorAll('a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])')]
+      .filter((el) => el.offsetParent !== null);
+  }
+
+  function closePopup() {
+    popup.classList.remove("open");
+    popup.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    lastFocusedElement?.focus?.();
+  }
+
+  function openPopup(card, trigger) {
+    const details = card?.querySelector(".portfolio-item-details");
+    if (!details) return;
+    lastFocusedElement = trigger || document.activeElement;
+
+    const img = card.querySelector(".project-img");
+    const category = details.querySelector(".details-category")?.textContent || card.dataset.category || "Project";
+    const title = details.querySelector(".details-title")?.textContent || card.dataset.title || "Project";
+    const description = details.querySelector(".details-description")?.textContent || "";
+    const tech = (card.dataset.tech || "")
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    if (popupImg) {
+      popupImg.src = img?.src || details.querySelector(".details-image")?.textContent || "";
+      popupImg.alt = `${title} preview`;
+    }
+    if (popupCategory) popupCategory.textContent = category;
+    if (popupTitle) popupTitle.textContent = title;
+    if (popupDesc) popupDesc.innerHTML = formatDescription(description);
+    if (popupInfo) popupInfo.innerHTML = details.querySelector(".details-info")?.innerHTML || "";
+
+    if (popupTags) {
+      popupTags.innerHTML = tech.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("");
+      popupTags.style.display = tech.length ? "flex" : "none";
+    }
+
+    const viewLink = details.querySelector(".details-info li a")?.href || card.dataset.link || "";
+    if (popupLink) {
+      if (viewLink && viewLink !== window.location.href + "#") {
+        popupLink.href = viewLink;
+        popupLink.style.display = "inline-flex";
+      } else {
+        popupLink.href = "#";
+        popupLink.style.display = "none";
+      }
+    }
+
+    popup.classList.add("open");
+    popup.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    setTimeout(() => popupClose?.focus(), 30);
   }
 
   document.querySelectorAll(".project-button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const card = btn.closest(".project-card");
-      const details = card?.querySelector(".portfolio-item-details");
-      if (!details) return;
-
-      popupImg.src = card.querySelector(".project-img")?.src || "";
-      if (popupCategory) {
-        popupCategory.textContent = card.classList.contains("web")
-          ? "Web"
-          : card.classList.contains("app")
-            ? "App"
-            : "Terminal";
-      }
-
-      popupTitle.textContent =
-        details.querySelector(".details-title")?.textContent || "";
-      popupDesc.innerHTML = formatDescription(
-        details.querySelector(".details-description")?.textContent || "",
-      );
-      popupInfo.innerHTML =
-        details.querySelector(".details-info")?.innerHTML || "";
-
-      const viewLink = details.querySelector(".details-info li a")?.href || "#";
-      popupLink.href = viewLink;
-
-      popup.classList.add("open");
-      popup.setAttribute("aria-hidden", "false");
-    });
+    btn.addEventListener("click", () => openPopup(btn.closest(".project-card"), btn));
   });
 
-  popupClose?.addEventListener("click", () => {
-    popup.classList.remove("open");
-    popup.setAttribute("aria-hidden", "true");
-  });
+  popupClose?.addEventListener("click", closePopup);
 
   popup.addEventListener("click", (e) => {
-    if (e.target === popup) {
-      popup.classList.remove("open");
-      popup.setAttribute("aria-hidden", "true");
-    }
+    if (e.target === popup) closePopup();
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && popup.classList.contains("open")) {
-      popup.classList.remove("open");
-      popup.setAttribute("aria-hidden", "true");
+    if (!popup.classList.contains("open")) return;
+    if (e.key === "Escape") closePopup();
+    if (e.key === "Tab") {
+      const focusable = getFocusable();
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 });
@@ -241,7 +286,6 @@ const styleSwitcher = document.getElementById("style-switcher");
 const switcherToggle = document.getElementById("switcher-toggle");
 const switcherClose = document.getElementById("switcher-close");
 const gear = document.querySelector(".nav-settings");
-const themeToggle = document.getElementById("theme-toggle");
 
 switcherToggle?.addEventListener("click", () => {
   styleSwitcher?.classList.add("show-switcher");
@@ -276,37 +320,12 @@ if (savedColor) {
   });
 }
 
-const userPrefersDark = window.matchMedia(
-  "(prefers-color-scheme: dark)",
-).matches;
-
-function applyTheme(theme) {
-  document.documentElement.classList.remove("dark", "light");
-  document.documentElement.classList.add(theme);
-  document.body.classList.remove("dark", "light");
-  document.body.classList.add(theme);
-  localStorage.setItem("preferredTheme", theme);
-  document.cookie = `theme=${theme}; path=/; max-age=${60 * 60 * 24 * 365}`;
-  if (themeToggle) {
-    themeToggle.innerHTML =
-      theme === "dark"
-        ? '<i class="fa-solid fa-moon"></i>'
-        : '<i class="fa-solid fa-sun"></i>';
-  }
-}
-
-const savedTheme = localStorage.getItem("preferredTheme");
-applyTheme(savedTheme || (userPrefersDark ? "dark" : "light"));
-
-themeToggle?.addEventListener("click", () => {
-  const isDark = document.documentElement.classList.contains("dark");
-  applyTheme(isDark ? "light" : "dark");
-});
-
-const themeInputs = document.querySelectorAll(".style-switcher-input");
-themeInputs.forEach((input) => {
-  input.addEventListener("change", () => applyTheme(input.value));
-});
+document.documentElement.classList.remove("light");
+document.documentElement.classList.add("dark");
+document.body.classList.remove("light");
+document.body.classList.add("dark");
+localStorage.setItem("preferredTheme", "dark");
+document.cookie = `theme=dark; path=/; max-age=${60 * 60 * 24 * 365}`;
 
 // Scroll reveal
 document.addEventListener("DOMContentLoaded", () => {
@@ -328,6 +347,37 @@ document.addEventListener("DOMContentLoaded", () => {
   sr.reveal(".project-card", { interval: 150 });
   sr.reveal(".contact-card", { interval: 150 });
   sr.reveal(".contact-form", { origin: "right", delay: 200 });
+});
+
+// Futuristic tilt hover effect
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const tiltCards = document.querySelectorAll(
+    ".project-card, .service-card, .skills-item, .contact-card, .counter-card, .detail-item, .stat-card, .timeline-item",
+  );
+
+  tiltCards.forEach((card) => {
+    card.classList.add("tilt-card");
+
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      const rx = (-y * 6).toFixed(2);
+      const ry = (x * 8).toFixed(2);
+      card.style.setProperty("--rx", `${rx}deg`);
+      card.style.setProperty("--ry", `${ry}deg`);
+      card.style.setProperty("--ty", "-8px");
+      card.style.setProperty("--glow-x", `${(x + 0.5) * 100}%`);
+      card.style.setProperty("--glow-y", `${(y + 0.5) * 100}%`);
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.setProperty("--rx", "0deg");
+      card.style.setProperty("--ry", "0deg");
+      card.style.setProperty("--ty", "0px");
+    });
+  });
 });
 
 // Skills filter

@@ -17,6 +17,7 @@ $recentMessages = $conn->query("SELECT name, email, subject, created_at FROM con
 <head>
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
     <link rel="stylesheet" href="css/admin_home.css">
     <link rel="stylesheet" href="css/admin_about.css">
     <link rel="stylesheet" href="css/admin_contact.css">

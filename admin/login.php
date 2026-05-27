@@ -60,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <title>Admin Login</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body class="login-body">

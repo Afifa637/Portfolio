@@ -56,6 +56,7 @@ if (isset($_GET['edit'])) {
 <head>
   <title>Manage Education</title>
   <link rel="stylesheet" href="css/admin_edu.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>

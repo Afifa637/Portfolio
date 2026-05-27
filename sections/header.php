@@ -17,7 +17,7 @@
   <title><?php echo $page_title ?? "Portfolio | Afifa Sultana"; ?></title>
 
   <?php
-  $theme = $_COOKIE['theme'] ?? 'dark';
+  $theme = 'dark';
 
   if (isset($page_css)) {
     if (is_array($page_css)) {
@@ -34,6 +34,24 @@
 </head>
 
 <body class="<?php echo e($theme); ?>">
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="boot-panel">
+      <div class="boot-top"><span></span><span></span><span></span></div>
+      <div class="boot-body">
+        <p>$ initializing portfolio...</p>
+        <p>$ loading dynamic modules...</p>
+        <p>$ rendering futuristic interface...</p>
+        <div class="boot-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="site-bg" aria-hidden="true"><span class="orb"></span><span class="orb"></span><span class="orb"></span></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="noise-overlay" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="custom-cursor" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
 
   <a class="skip-link" href="#home">Skip to content</a>
   <div class="scroll-progress" aria-hidden="true">
@@ -48,9 +66,11 @@
         <ul class="nav-list" role="list">
           <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
           <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+          <li class="nav-item"><a href="#experience" class="nav-link">Experience</a></li>
           <li class="nav-item"><a href="#education" class="nav-link">Education</a></li>
           <li class="nav-item"><a href="#skills" class="nav-link">Skills</a></li>
           <li class="nav-item"><a href="#project" class="nav-link">Projects</a></li>
+          <li class="nav-item"><a href="#current-work" class="nav-link">Current</a></li>
           <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
 
@@ -63,8 +83,8 @@
       </div>
 
       <div class="nav-buttons">
-        <button class="nav-theme" id="theme-toggle" aria-label="Toggle theme" type="button">
-          <i class="fa-solid fa-moon"></i>
+        <button class="nav-settings" id="command-open" aria-label="Open command palette" type="button" title="Ctrl/Cmd + K">
+          <i class="fa-solid fa-terminal settings"></i>
         </button>
 
         <button class="nav-settings" id="switcher-toggle" aria-label="Open style switcher" type="button">
@@ -94,22 +114,20 @@
         </div>
 
         <div class="style-switcher-item">
-          <h3 class="style-switcher-subtitle">Theme</h3>
-          <div class="style-switcher-themes">
-            <div class="style-switcher-theme">
-              <input type="radio" class="style-switcher-input" name="body-theme" value="light" id="light-theme" checked />
-              <label for="light-theme" class="style-switcher-label">Light</label>
-            </div>
-            <div class="style-switcher-theme">
-              <input type="radio" class="style-switcher-input" name="body-theme" value="dark" id="dark-theme" />
-              <label for="dark-theme" class="style-switcher-label">Dark</label>
-            </div>
+          <h3 class="style-switcher-subtitle">Theme Presets</h3>
+          <div class="preset-grid">
+            <button type="button" class="preset-btn" data-preset="cyber-blue">Cyber Blue</button>
+            <button type="button" class="preset-btn" data-preset="purple-galaxy">Purple Galaxy</button>
+            <button type="button" class="preset-btn" data-preset="emerald-matrix">Emerald Matrix</button>
+            <button type="button" class="preset-btn" data-preset="crimson-neon">Crimson Neon</button>
+            <button type="button" class="preset-btn" data-preset="solar-gold">Solar Gold</button>
+            <button type="button" class="preset-btn" data-preset="minimal-light">Minimal Light</button>
           </div>
         </div>
 
         <div class="style-switcher-item">
           <h3 class="style-switcher-subtitle">Admin</h3>
-          <a href="http://localhost/Portfolio001/admin/login.php" class="admin-login-btn">
+          <a href="admin/login.php" class="admin-login-btn">
             <i class="fa-solid fa-user-shield"></i> Admin Login
           </a>
         </div>

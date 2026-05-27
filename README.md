@@ -35,3 +35,19 @@ It includes a complete **Admin Dashboard** for managing content such as Home, Ab
 
 ---
 <img width="1200" height="750" alt="Portfolio Website Final" src="https://github.com/user-attachments/assets/05e03ff0-55b2-4d79-81c0-4069aa1a508a" />
+
+## Futuristic Upgrade Notes
+
+This upgraded package adds a terminal/code-editor inspired frontend layer while preserving the PHP/MySQL dynamic system.
+
+New frontend additions:
+- `css/effects.css` for futuristic global visuals, glass cards, theme presets, command palette styling, custom cursor, minimap, and terminal UI.
+- `main-advanced.js` for preloader, command palette, magnetic buttons, cursor glow, section minimap sync, theme presets, and extra interactions.
+- `sections/experience.php` optional dynamic/fallback experience timeline.
+- `sections/current_work.php` optional dynamic/fallback current-work showcase.
+- `admin/css/futuristic_admin.css` for a premium futuristic admin dashboard look.
+
+Optional database migration:
+- `migrations/2026_05_27_optional_futuristic_sections.sql`
+
+The new experience/current-work sections work even without the optional migration because they include safe fallback cards. Run the migration only if you want these sections to become database-driven later.

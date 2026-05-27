@@ -57,6 +57,7 @@ if (isset($_GET['edit'])) {
     <meta charset="UTF-8">
     <title>Manage Skills</title>
     <link rel="stylesheet" href="css/admin_skills.css">
+    <link rel="stylesheet" href="css/futuristic_admin.css">
 </head>
 
 <body>
