@@ -1,0 +1,60 @@
+# ============================================================================
+# Local development stack
+# ----------------------------------------------------------------------------
+#   docker compose up -d          start the site and database
+#   docker compose logs -f web    follow application logs
+#   docker compose down           stop
+#   docker compose down -v        stop and delete the database volume
+#
+# The site is then at http://localhost:8080 and the admin at /admin.
+# ============================================================================
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: local
+      APP_URL: http://localhost:8080
+      DB_ENABLED: "true"
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_USERNAME: portfolio
+      DB_PASSWORD: portfolio
+      DB_DATABASE: portfolio_db
+      # Optional. Raises the GitHub rate limit from 60 to 5000 requests/hour.
+      GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+    volumes:
+      # Live-reload application code during development. Remove for production.
+      - .:/var/www/html
+      # Keep the container's vendor/ rather than shadowing it with the host's.
+      - /var/www/html/vendor
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: portfolio_db
+      MARIADB_USER: portfolio
+      MARIADB_PASSWORD: portfolio
+    volumes:
+      - db-data:/var/lib/mysql
+      # Files in this directory run on first start, in alphabetical order,
+      # so the schema is created before the seed inserts into it.
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+volumes:
+  db-data:

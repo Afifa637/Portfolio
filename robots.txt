@@ -1,0 +1,20 @@
+# robots.txt — Afifa Sultana portfolio
+
+User-agent: *
+Allow: /$
+Allow: /assets/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /includes/
+Disallow: /src/
+Disallow: /config/
+Disallow: /storage/
+Disallow: /database/
+Disallow: /vendor/
+Disallow: /migrations/
+
+# Large language model crawlers are welcome; the content is public and factual.
+User-agent: GPTBot
+Allow: /
+
+Sitemap: /sitemap.xml

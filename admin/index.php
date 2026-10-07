@@ -1,113 +1,139 @@
 <?php
-include "config.php";
-require_admin();
 
-$counts = [
-    'projects' => (int)($conn->query("SELECT COUNT(*) AS total FROM projects")?->fetch_assoc()['total'] ?? 0),
-    'skills' => (int)($conn->query("SELECT COUNT(*) AS total FROM skills")?->fetch_assoc()['total'] ?? 0),
-    'education' => (int)($conn->query("SELECT COUNT(*) AS total FROM education")?->fetch_assoc()['total'] ?? 0),
-    'messages' => (int)($conn->query("SELECT COUNT(*) AS total FROM contact_messages")?->fetch_assoc()['total'] ?? 0),
+/**
+ * Dashboard: what is on the site right now, and the quickest way to change it.
+ */
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/config.php';
+require_admin();
+require_once __DIR__ . '/_helpers.php';
+
+/** Row count for a table, or null when the table does not exist. */
+function admin_count(string $table): ?int
+{
+    if (!Database::hasTable($table)) {
+        return null;
+    }
+
+    return (int) (Database::first("SELECT COUNT(*) AS n FROM `{$table}`")['n'] ?? 0);
+}
+
+$unread   = (int) (Database::first('SELECT COUNT(*) AS n FROM contact_messages WHERE is_read = 0')['n'] ?? 0);
+$latest   = Database::all('SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 3');
+$gh       = GitHub::data();
+$identity = Content::get('identity', []);
+
+$stats = [
+    ['n' => admin_count('projects')   ?? 0, 'l' => 'Projects',   'href' => 'projects.php'],
+    ['n' => admin_count('skills')     ?? 0, 'l' => 'Skills',     'href' => 'resource.php?r=skills'],
+    ['n' => admin_count('education')  ?? 0, 'l' => 'Education',  'href' => 'resource.php?r=education'],
+    ['n' => $unread,                        'l' => 'Unread messages', 'href' => 'messages.php'],
 ];
 
-$recentMessages = $conn->query("SELECT name, email, subject, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 5");
+admin_head('Dashboard');
+
 ?>
-<!DOCTYPE html>
-<html>
+<div class="admin-head">
+    <p class="admin-blurb">
+        Signed in as <strong><?= e((string) ($_SESSION['admin'] ?? '')) ?></strong>.
+        Everything the public site shows is editable from here — changes are live immediately.
+    </p>
+</div>
 
-<head>
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/futuristic_admin.css">
-    <link rel="stylesheet" href="css/admin_home.css">
-    <link rel="stylesheet" href="css/admin_about.css">
-    <link rel="stylesheet" href="css/admin_contact.css">
-    <link rel="stylesheet" href="css/admin_footer.css">
-    <link rel="stylesheet" href="css/admin_messages.css">
-    <link rel="stylesheet" href="css/admin_skills.css">
+<div class="admin-stats">
+    <?php foreach ($stats as $stat): ?>
+        <div class="admin-stat">
+            <span class="n"><?= (int) $stat['n'] ?></span>
+            <span class="l"><?= e($stat['l']) ?></span>
+            <a href="<?= e($stat['href']) ?>">Manage →</a>
+        </div>
+    <?php endforeach; ?>
+</div>
 
-
-</head>
-
-<body>
-    <div class="admin-shell">
-        <aside class="admin-sidebar">
-            <div class="admin-brand">
-                <h2>Portfolio Admin</h2>
-                <p><?= htmlspecialchars($_SESSION['admin']); ?></p>
-            </div>
-            <nav class="admin-nav">
-                <a href="index.php" class="active">Dashboard</a>
-                <a href="manage_home.php">Home</a>
-                <a href="manage_about.php">About</a>
-                <a href="manage_education.php">Education</a>
-                <a href="manage_projects.php">Projects</a>
-                <a href="manage_skills.php">Skills</a>
-                <a href="manage_contact.php">Contact</a>
-                <a href="manage_footer.php">Footer</a>
-                <a href="manage_messages.php">Messages</a>
-            </nav>
-            <div class="admin-actions">
-                <a href="change_password.php" class="btn">Change Password</a>
-                <a href="logout.php" class="btn logout">Logout</a>
-            </div>
-        </aside>
-
-        <main class="admin-main">
-            <header class="admin-header">
-                <h1>Dashboard Overview</h1>
-                <p>Track your portfolio content and recent messages.</p>
-            </header>
-
-            <div class="admin-metrics">
-                <div class="metric-card">
-                    <h3><?= $counts['projects']; ?></h3>
-                    <p>Projects</p>
-                </div>
-                <div class="metric-card">
-                    <h3><?= $counts['skills']; ?></h3>
-                    <p>Skills</p>
-                </div>
-                <div class="metric-card">
-                    <h3><?= $counts['education']; ?></h3>
-                    <p>Education Entries</p>
-                </div>
-                <div class="metric-card">
-                    <h3><?= $counts['messages']; ?></h3>
-                    <p>Messages</p>
-                </div>
-            </div>
-
-            <section class="admin-section">
-                <h2>Recent Messages</h2>
-                <div class="admin-table">
-                    <?php if ($recentMessages && $recentMessages->num_rows > 0): ?>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Subject</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($msg = $recentMessages->fetch_assoc()): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($msg['name']); ?></td>
-                                        <td><?= htmlspecialchars($msg['email']); ?></td>
-                                        <td><?= htmlspecialchars($msg['subject']); ?></td>
-                                        <td><?= date("d M Y", strtotime($msg['created_at'])); ?></td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <div class="info-box">No recent messages.</div>
-                    <?php endif; ?>
-                </div>
-            </section>
-        </main>
+<div class="admin-section">
+    <h2>Jump to</h2>
+    <div class="admin-quick">
+        <a href="settings.php">
+            <?= icon('settings', 20) ?>
+            <span><strong>Site &amp; SEO</strong><small>Name, pitch, metadata</small></span>
+        </a>
+        <a href="projects.php">
+            <?= icon('layers', 20) ?>
+            <span><strong>Projects</strong><small>Case studies and screenshots</small></span>
+        </a>
+        <a href="resource.php?r=skills">
+            <?= icon('code', 20) ?>
+            <span><strong>Skills</strong><small>Technologies by group</small></span>
+        </a>
+        <a href="media.php">
+            <?= icon('copy', 20) ?>
+            <span><strong>Media</strong><small>Upload and browse images</small></span>
+        </a>
     </div>
-</body>
+</div>
 
-</html>
+<div class="admin-section">
+    <h2>Recent messages</h2>
+
+    <?php if ($latest === []): ?>
+        <p class="admin-empty">No messages yet. The contact form delivers them here and by email.</p>
+    <?php else: ?>
+        <div class="msg-list">
+            <?php foreach ($latest as $message): ?>
+                <article class="msg<?= empty($message['is_read']) ? ' is-unread' : '' ?>">
+                    <div class="msg-top">
+                        <strong><?= e((string) $message['name']) ?></strong>
+                        <span class="row-muted"><?= e((string) $message['email']) ?></span>
+                        <?php if (empty($message['is_read'])): ?>
+                            <span class="row-flag">New</span>
+                        <?php endif; ?>
+                        <span class="when"><?= e(time_ago((string) $message['created_at'])) ?></span>
+                    </div>
+                    <p class="row-muted"><?= e((string) $message['subject']) ?></p>
+                </article>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="admin-form-actions">
+            <a class="btn btn-ghost btn-sm" href="messages.php">All messages <?= icon('arrow-right', 15) ?></a>
+        </div>
+    <?php endif; ?>
+</div>
+
+<div class="admin-section">
+    <h2>System</h2>
+
+    <div class="admin-quick">
+        <div class="admin-stat">
+            <span class="l">GitHub sync</span>
+            <strong style="display:block;margin-top:4px">
+                <?php if (!empty($gh['ok'])): ?>
+                    <?= e((string) $gh['stats']['repos']) ?> repos ·
+                    <?= $gh['stale'] ? 'cached' : 'synced ' . e(time_ago(date('c', (int) $gh['fetched_at']))) ?>
+                <?php else: ?>
+                    Unavailable — the site falls back to saved content
+                <?php endif; ?>
+            </strong>
+        </div>
+
+        <div class="admin-stat">
+            <span class="l">Contact email</span>
+            <strong style="display:block;margin-top:4px">
+                <?php if (Mailer::configured()): ?>
+                    SMTP configured
+                <?php else: ?>
+                    Using PHP mail() — set MAIL_HOST in .env for reliable delivery
+                <?php endif; ?>
+            </strong>
+        </div>
+
+        <div class="admin-stat">
+            <span class="l">Delivering to</span>
+            <strong style="display:block;margin-top:4px"><?= e((string) env('MAIL_TO', $identity['email'])) ?></strong>
+        </div>
+    </div>
+</div>
+
+<?php admin_foot(); ?>

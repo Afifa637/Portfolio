@@ -1,0 +1,14 @@
+{
+  "name": "Afifa Sultana — Software Engineer",
+  "short_name": "Afifa Sultana",
+  "description": "Portfolio of Afifa Sultana: backend and full-stack engineering, Spring Boot, PHP, Flutter.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b0d14",
+  "theme_color": "#0b0d14",
+  "icons": [
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

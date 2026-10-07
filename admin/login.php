@@ -1,8 +1,15 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-include "config.php";
+
+/**
+ * Admin sign-in.
+ *
+ * config.php must be loaded before anything touches $_SESSION. It starts the
+ * session under the application's own name; calling session_start() first would
+ * open a second session under the default PHPSESSID, write the login flag
+ * there, and leave every other admin page still seeing an anonymous visitor.
+ */
+
+require_once __DIR__ . '/config.php';
 
 if (isset($_SESSION['admin'])) {
     header("Location: index.php");

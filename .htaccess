@@ -1,0 +1,138 @@
+# ============================================================================
+# Apache configuration — Afifa Sultana portfolio
+# ----------------------------------------------------------------------------
+# Covers routing, security, compression, and caching. Every block is wrapped in
+# an <IfModule> guard so the site still starts on a host where a given module is
+# unavailable, which is common on shared hosting.
+#
+# On Nginx, see the equivalent server block in README.md.
+# ============================================================================
+
+Options -Indexes -MultiViews
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # --- Force HTTPS -------------------------------------------------------
+    # Commented out by default so local development over plain HTTP still
+    # works. Uncomment on production once a certificate is installed.
+    # RewriteCond %{HTTPS} off
+    # RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+    # --- Canonical host ----------------------------------------------------
+    # Uncomment and set your domain to collapse www / non-www into one.
+    # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    # RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+    # --- Generated sitemap -------------------------------------------------
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+    # --- Block direct access to application internals ----------------------
+    # Defence in depth: the deny blocks below cover this too, but a rewrite
+    # returns a clean 404 rather than a 403 that advertises the path exists.
+    RewriteRule ^(includes|src|config|storage|database|migrations|vendor)/ - [R=404,L]
+
+    # --- Hide dotfiles -----------------------------------------------------
+    RewriteRule (^|/)\. - [F]
+</IfModule>
+
+# --- Error documents -------------------------------------------------------
+ErrorDocument 404 /404.php
+
+# --- Deny access to sensitive files ----------------------------------------
+<FilesMatch "^(\.env.*|composer\.(json|lock)|package(-lock)?\.json|Dockerfile|docker-compose\.ya?ml|.*\.sql|.*\.md|.*\.log)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# --- Security headers ------------------------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+
+    # Enable once the site is served over HTTPS only.
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Content-Security-Policy.
+    # 'unsafe-inline' on script-src is required by the pre-paint theme script in
+    # views/layout/head.php; removing it means moving that script to a file and
+    # accepting a flash of the wrong theme. style-src needs it for the handful
+    # of inline style attributes used for per-item colours and delays.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'"
+
+    Header unset X-Powered-By
+    Header always unset Server
+</IfModule>
+
+# --- Compression -----------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/json application/xml
+    AddOutputFilterByType DEFLATE image/svg+xml application/manifest+json
+</IfModule>
+
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/xml
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript application/json
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+# --- Caching ---------------------------------------------------------------
+# Assets are requested with a ?v=<mtime> fingerprint (see asset() in
+# src/helpers.php), so a long max-age is safe: editing a file changes its URL.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault                          "access plus 1 month"
+
+    ExpiresByType text/html                 "access plus 0 seconds"
+    ExpiresByType application/json          "access plus 0 seconds"
+
+    ExpiresByType text/css                  "access plus 1 year"
+    ExpiresByType application/javascript    "access plus 1 year"
+    ExpiresByType image/png                 "access plus 1 year"
+    ExpiresByType image/jpeg                "access plus 1 year"
+    ExpiresByType image/webp                "access plus 1 year"
+    ExpiresByType image/avif                "access plus 1 year"
+    ExpiresByType image/svg+xml             "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+    ExpiresByType application/pdf           "access plus 1 week"
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|png|jpe?g|webp|avif|svg|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    <FilesMatch "\.(php|html)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+# --- MIME types ------------------------------------------------------------
+<IfModule mod_mime.c>
+    AddType image/avif                  .avif
+    AddType image/webp                  .webp
+    AddType font/woff2                  .woff2
+    AddType application/manifest+json   .webmanifest
+    AddType image/svg+xml               .svg
+</IfModule>
+
+# --- Upload and execution limits -------------------------------------------
+<IfModule mod_php.c>
+    php_flag  display_errors        Off
+    php_flag  log_errors            On
+    php_value upload_max_filesize   8M
+    php_value post_max_size         10M
+    php_flag  expose_php            Off
+</IfModule>

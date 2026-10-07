@@ -1,81 +1,82 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
 
-if (file_exists(__DIR__ . '/../.env') && class_exists('Dotenv\\Dotenv')) {
-    $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-    $dotenv->safeLoad();
-}
+/**
+ * Admin bootstrap.
+ *
+ * Previously this file duplicated environment loading, session setup, the
+ * database connection, and the CSRF helpers from the public site — two copies
+ * that had already drifted apart. It now delegates to the single application
+ * bootstrap and only adds what is specific to the admin area.
+ *
+ * $conn stays a global for the manage_*.php screens, which were written
+ * against it directly.
+ */
 
-if (!function_exists('env')) {
-    function env(string $key, $default = null)
-    {
-        if (isset($_ENV[$key])) return $_ENV[$key];
-        if (isset($_SERVER[$key])) return $_SERVER[$key];
-        $v = getenv($key);
-        return ($v !== false && $v !== null) ? $v : $default;
-    }
-}
+declare(strict_types=1);
 
-$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'secure' => $secure,
-        'httponly' => true,
-        'samesite' => 'Lax',
-    ]);
-    session_start();
-}
+require_once __DIR__ . '/../includes/bootstrap.php';
 
-$conn = new mysqli(
-    env('DB_HOST', '127.0.0.1'),
-    env('DB_USERNAME', 'root'),
-    env('DB_PASSWORD', ''),
-    env('DB_DATABASE', 'portfolio_db'),
-    (int) env('DB_PORT', 3306)
-);
-
-if ($conn->connect_error) {
-    error_log("DB Connection failed: " . $conn->connect_error);
-    die("DB Connection failed.");
-}
-
-$conn->set_charset('utf8mb4');
-
-if (!function_exists('csrf_token')) {
-    function csrf_token(): string
-    {
-        if (empty($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        }
-        return $_SESSION['csrf_token'];
-    }
-}
-
-if (!function_exists('csrf_field')) {
-    function csrf_field(): string
-    {
-        return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') . '">';
-    }
-}
-
-if (!function_exists('csrf_verify')) {
-    function csrf_verify(?string $token): bool
-    {
-        if (empty($token) || empty($_SESSION['csrf_token'])) {
-            return false;
-        }
-        return hash_equals($_SESSION['csrf_token'], $token);
-    }
+/**
+ * The admin area genuinely requires a database — unlike the public site, which
+ * falls back to config/profile.php. Fail with a clear instruction rather than a
+ * stack of undefined-method errors.
+ */
+if (!Database::available()) {
+    http_response_code(503);
+    exit(
+        '<!doctype html><meta charset="utf-8"><title>Database unavailable</title>'
+        . '<style>body{font:16px/1.6 system-ui,sans-serif;background:#0b0d14;color:#e4e9f5;'
+        . 'display:grid;place-items:center;min-height:100vh;margin:0;padding:24px}'
+        . 'div{max-width:38rem}code{background:#1a1f2e;padding:2px 6px;border-radius:4px;'
+        . 'font-family:ui-monospace,monospace;font-size:.9em}a{color:#ffb454}</style>'
+        . '<div><h1>Database unavailable</h1>'
+        . '<p>The admin panel needs MySQL. The public site is unaffected and is still '
+        . 'serving content from <code>config/profile.php</code>.</p>'
+        . '<p>Check <code>.env</code>, make sure the server is running, then create the '
+        . 'schema with:</p>'
+        . '<p><code>mysql -u root -p portfolio_db &lt; database/schema.sql</code></p>'
+        . '<p><a href="../index.php">← Back to the site</a></p></div>'
+    );
 }
 
 if (!function_exists('require_admin')) {
+    /** Guard every admin screen; call at the top, before any output. */
     function require_admin(): void
     {
         if (empty($_SESSION['admin'])) {
             header('Location: login.php');
             exit;
         }
+
+        // Expire an idle session after two hours.
+        $idleLimit = 7200;
+
+        if (isset($_SESSION['admin_last_seen']) && (time() - $_SESSION['admin_last_seen']) > $idleLimit) {
+            $_SESSION = [];
+            session_destroy();
+            header('Location: login.php?expired=1');
+            exit;
+        }
+
+        $_SESSION['admin_last_seen'] = time();
     }
+}
+
+if (!function_exists('admin_redirect')) {
+    /** Redirect with a one-shot status message. */
+    function admin_redirect(string $to, string $message = '', bool $ok = true): never
+    {
+        if ($message !== '') {
+            flash($ok ? 'admin_success' : 'admin_error', $message);
+        }
+
+        header('Location: ' . $to, true, 303);
+        exit;
+    }
+}
+
+// Admin pages must never be cached or indexed.
+if (!headers_sent()) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, private');
+    header('X-Robots-Tag: noindex, nofollow');
 }
