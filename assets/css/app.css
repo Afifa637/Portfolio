@@ -2180,7 +2180,13 @@ body.is-locked { overflow: hidden; }
     }
 
     .hero { min-height: auto; }
-    .hero-panel { order: -1; }
+
+    /*
+     * The copy leads on narrow screens. Hoisting the code panel above it meant
+     * the first thing a visitor saw was a JSON block rather than a name and a
+     * role — the opposite of what the hero is for.
+     */
+    .hero-copy { order: -1; }
     .about-aside { position: static; }
     .scroll-cue { display: none; }
     .project.is-featured { grid-column: span 1; }
