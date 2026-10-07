@@ -21,22 +21,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (($_POST['action'] ?? '') === 'delete') {
         $name = basename((string) ($_POST['file'] ?? ''));
-        $path = APP_ROOT . '/' . MEDIA_DIR . '/' . $name;
 
-        // Refuse to delete an image a project still points at.
-        $inUse = Database::first(
-            'SELECT title FROM projects WHERE image = ? LIMIT 1',
-            [MEDIA_DIR . '/' . $name]
-        );
+        $path = MEDIA_DIR . '/' . $name;
 
-        if ($inUse) {
-            admin_redirect('media.php', 'That image is still used by "' . $inUse['title'] . '".', false);
+        // Refuse to delete an image anything still points at. Checking only
+        // projects meant the portrait and the social share card — which live in
+        // site_settings — could be deleted out from under the live site.
+        $usedBy = null;
+
+        $project = Database::first('SELECT title FROM projects WHERE image = ? LIMIT 1', [$path]);
+
+        if ($project) {
+            $usedBy = 'the project "' . $project['title'] . '"';
+        } elseif (Database::hasTable('site_settings')) {
+            $setting = Database::first(
+                'SELECT label FROM site_settings WHERE value = ? LIMIT 1',
+                [$path]
+            );
+
+            if ($setting) {
+                $usedBy = 'the "' . $setting['label'] . '" setting';
+            }
         }
 
-        $removed = 0;
+        if ($usedBy !== null) {
+            admin_redirect('media.php', 'That image is still used by ' . $usedBy . '.', false);
+        }
+
+        $absolute = APP_ROOT . '/' . $path;
+        $removed  = 0;
 
         // Remove the JPEG and its WebP sibling together.
-        foreach ([$path, preg_replace('/\.(jpe?g|png)$/i', '.webp', $path)] as $candidate) {
+        foreach ([$absolute, preg_replace('/\.(jpe?g|png)$/i', '.webp', $absolute)] as $candidate) {
             if ($candidate && is_file($candidate) && @unlink($candidate)) {
                 $removed++;
             }

@@ -44,10 +44,9 @@ services:
       MARIADB_PASSWORD: portfolio
     volumes:
       - db-data:/var/lib/mysql
-      # Files in this directory run on first start, in alphabetical order,
-      # so the schema is created before the seed inserts into it.
+      # Runs on first start, creating the schema. Content is imported
+      # afterwards with: docker compose exec web php database/migrate.php
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s

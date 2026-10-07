@@ -21,7 +21,7 @@ subdomain like `afifa.rf.gd`. Alternatives: **AwardSpace**, **ByetHost**.
    database name, username, password and host — they are not the same as your
    login.
 3. Upload the project to `htdocs/` over FTP (FileZilla is fine). Upload
-   everything **except** `.env`, `dist/`, `database/backups/` and
+   everything **except** `.env`, `database/backups/` and
    `assets/images/original/`.
 4. `vendor/` must be present. If the host has no Composer, run
    `composer install --no-dev --optimize-autoloader` locally and upload the
@@ -40,21 +40,24 @@ subdomain like `afifa.rf.gd`. Alternatives: **AwardSpace**, **ByetHost**.
    DB_DATABASE=if0_XXXXXXX_portfolio
    ```
 
-6. Import the schema through phpMyAdmin: run `database/schema.sql`, then
-   `database/seed.sql`.
-7. Create your admin login. Most free hosts have no SSH, so generate the hash
-   locally and insert it by hand:
+6. **Run the web installer.** Free hosts rarely give you a shell, so there is a
+   browser-based installer. Add a long random line to `.env`:
 
-   ```bash
-   php -r "echo password_hash('your-strong-password', PASSWORD_BCRYPT), PHP_EOL;"
+   ```dotenv
+   SETUP_KEY=paste-a-long-random-string-here
    ```
 
-   Then in phpMyAdmin:
+   Then open `https://your-subdomain.rf.gd/setup.php?key=YOUR_SETUP_KEY` and:
 
-   ```sql
-   INSERT INTO admins (name, email, password)
-   VALUES ('Afifa Sultana', 'afifasultana637@gmail.com', '<paste-the-hash>');
-   ```
+   - press **Run the migration** — creates every table and imports all of your
+     content, so the admin panel opens fully populated;
+   - press **Create admin account** and choose a password.
+
+   The installer refuses to act without that key, and the key must be at least
+   16 characters.
+
+7. **Delete the `SETUP_KEY` line from `.env`.** The installer switches itself off
+   the moment it is gone. Do not skip this.
 
 8. Visit `/admin` and sign in.
 

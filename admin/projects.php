@@ -294,11 +294,21 @@ admin_head($project ? 'Edit project' : ($creating ? 'New project' : 'Projects'))
                                 </td>
                                 <td><?= e($categories[$row['category']] ?? (string) $row['category']) ?></td>
                                 <td>
-                                    <?php if (!empty($row['featured'])): ?><span class="row-flag">Featured</span> <?php endif; ?>
-                                    <?php if (empty($row['is_published'])): ?><span class="row-muted">Hidden</span><?php endif; ?>
-                                    <?php if (empty($row['problem'])): ?>
-                                        <span class="row-muted" title="No case study written yet">Thin</span>
-                                    <?php endif; ?>
+                                    <div class="status-toggles">
+                                        <button class="chip-toggle<?= !empty($row['featured']) ? ' is-on' : '' ?>"
+                                                type="submit" form="feat-<?= (int) $row['id'] ?>"
+                                                title="<?= !empty($row['featured']) ? 'Remove from featured' : 'Mark as featured' ?>">
+                                            <?= icon('star', 12) ?> Featured
+                                        </button>
+                                        <button class="chip-toggle<?= !empty($row['is_published']) ? ' is-on' : '' ?>"
+                                                type="submit" form="pub-<?= (int) $row['id'] ?>"
+                                                title="<?= !empty($row['is_published']) ? 'Hide from the site' : 'Show on the site' ?>">
+                                            <?= icon('check', 12) ?> <?= !empty($row['is_published']) ? 'Visible' : 'Hidden' ?>
+                                        </button>
+                                        <?php if (empty($row['problem'])): ?>
+                                            <span class="row-muted" title="No case study written yet">Thin</span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                                 <td class="col-actions">
                                     <a class="btn btn-sm btn-ghost" href="projects.php?edit=<?= (int) $row['id'] ?>">Edit</a>
@@ -324,6 +334,18 @@ admin_head($project ? 'Edit project' : ($creating ? 'New project' : 'Projects'))
             <form method="post" action="projects.php" id="delete-<?= (int) $row['id'] ?>" class="visually-hidden">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
+            </form>
+            <form method="post" action="projects.php" id="feat-<?= (int) $row['id'] ?>" class="visually-hidden">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="toggle">
+                <input type="hidden" name="field" value="featured">
+                <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
+            </form>
+            <form method="post" action="projects.php" id="pub-<?= (int) $row['id'] ?>" class="visually-hidden">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="toggle">
+                <input type="hidden" name="field" value="is_published">
                 <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
             </form>
         <?php endforeach; ?>

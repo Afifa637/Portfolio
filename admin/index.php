@@ -102,6 +102,68 @@ admin_head('Dashboard');
     <?php endif; ?>
 </div>
 
+<?php
+/*
+ * Self-check for the one misconfiguration that silently leaks everything.
+ *
+ * .htaccess blocks /.env, but Nginx ignores .htaccess entirely and Apache does
+ * too when AllowOverride is off — and nothing about the site looks wrong when
+ * that happens. Asking the server for its own .env is the only reliable way to
+ * find out, so the answer is shown here rather than left to be discovered.
+ */
+$envExposed = null;      // null = could not determine
+$envCheckNote = 'cURL is unavailable, so this could not be checked.';
+
+if (!is_file(APP_ROOT . '/.env')) {
+    $envExposed = false;
+    $envCheckNote = 'No .env file on disk.';
+} elseif (PHP_SAPI === 'cli-server') {
+    // PHP's built-in server handles one request at a time, so asking it about
+    // itself from inside a request deadlocks until the timeout. Never report
+    // "blocked" from a request that simply never completed.
+    $envCheckNote = 'Skipped on the built-in PHP server; it cannot answer a request about itself.';
+} elseif (function_exists('curl_init')) {
+    $ch = curl_init(url('.env'));
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 4,
+        CURLOPT_CONNECTTIMEOUT => 3,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_FOLLOWLOCATION => false,
+    ]);
+
+    $body   = (string) curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
+
+    if ($status === 0) {
+        // No response at all: unreachable, not proven safe.
+        $envCheckNote = 'The server did not respond to the check.';
+    } elseif ($status === 200 && preg_match('/^\s*[A-Z_]+=/m', $body) === 1) {
+        $envExposed = true;
+    } else {
+        $envExposed = false;
+        $envCheckNote = 'Returns HTTP ' . $status . '.';
+    }
+}
+?>
+
+<?php if ($envExposed === true): ?>
+    <div class="admin-section">
+        <p class="alert alert-err" role="alert">
+            <?= icon('x', 18) ?>
+            <span>
+                <strong>Your .env file is readable over the web.</strong>
+                Anyone can fetch <code><?= e(url('.env')) ?></code> and read your database password,
+                mail password and GitHub token. Your web server is ignoring <code>.htaccess</code> —
+                on Apache ask your host to set <code>AllowOverride All</code>, on Nginx add the
+                <code>location ~ /\. { deny all; }</code> block from DEPLOY.md.
+                Rotate those credentials once it is fixed.
+            </span>
+        </p>
+    </div>
+<?php endif; ?>
+
 <div class="admin-section">
     <h2>System</h2>
 
@@ -127,6 +189,26 @@ admin_head('Dashboard');
                     Using PHP mail() — set MAIL_HOST in .env for reliable delivery
                 <?php endif; ?>
             </strong>
+        </div>
+
+        <div class="admin-stat">
+            <span class="l">.env protection</span>
+            <strong style="display:block;margin-top:4px">
+                <?php if ($envExposed === true): ?>
+                    Exposed — see the warning above
+                <?php elseif ($envExposed === false): ?>
+                    Blocked correctly
+                <?php else: ?>
+                    Unverified
+                <?php endif; ?>
+            </strong>
+            <span class="l" style="margin-top:6px">
+                <?php if ($envExposed === null): ?>
+                    <?= e($envCheckNote) ?> Check manually by visiting <code>/.env</code>.
+                <?php else: ?>
+                    <?= e($envCheckNote) ?>
+                <?php endif; ?>
+            </span>
         </div>
 
         <div class="admin-stat">

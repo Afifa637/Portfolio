@@ -101,8 +101,7 @@ To manage content through the admin panel instead, set up the database below.
 docker compose up -d          # site on http://localhost:8080
 ```
 
-Compose starts MariaDB, applies `database/schema.sql` and `database/seed.sql`
-on first boot, and mounts the source for live editing.
+Compose starts MariaDB, applies `database/schema.sql` on first boot, and mounts the source for live editing.
 
 ---
 
@@ -293,7 +292,7 @@ views/
 assets/css/app.css     Design system: tokens, components, sections
 assets/js/app.js       Theme, nav, reveals, filtering, modal, form
 api/github.php         Off-render-path GitHub refresh
-database/              schema.sql, seed.sql, migrate.php, create_admin.php
+database/              schema.sql, migrate.php, create_admin.php
 tools/                 Image optimisation and social-card generation
 admin/                 Content management screens
 ```

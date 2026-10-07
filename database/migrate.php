@@ -21,14 +21,20 @@
 
 declare(strict_types=1);
 
-if (PHP_SAPI !== 'cli') {
+/*
+ * Normally CLI only. setup.php includes this file to run the same migration
+ * through the browser, because most budget hosting offers no shell — it defines
+ * SETUP_RUNNER only after validating the setup key, which is the only way in.
+ */
+if (PHP_SAPI !== 'cli' && !defined('SETUP_RUNNER')) {
     http_response_code(403);
     exit("CLI only.\n");
 }
 
 require_once __DIR__ . '/../includes/bootstrap.php';
 
-$options  = getopt('', ['reimport', 'force']);
+// getopt() returns false outside the CLI.
+$options  = PHP_SAPI === 'cli' ? (getopt('', ['reimport', 'force']) ?: []) : [];
 $reimport = isset($options['reimport']);
 
 if (!Database::available()) {
@@ -190,47 +196,127 @@ foreach ($additions as $table => $columns) {
 printf("    ✓ %d column%s added\n", $added, $added === 1 ? '' : 's');
 
 /*
- * Column type corrections.
+ * Reconcile existing columns with schema.sql.
  *
- * The original schema declared projects.category as ENUM('web','app','terminal').
- * CREATE TABLE IF NOT EXISTS leaves an existing table alone, so the new
- * taxonomy (backend, fullstack, mobile, systems, ai, frontend) was being
- * written into an ENUM that rejects it — and MariaDB, outside strict mode,
- * stores an empty string instead of raising an error. The categories silently
- * vanished.
+ * CREATE TABLE IF NOT EXISTS leaves an existing table untouched, so a database
+ * created by an earlier version keeps its original column definitions forever.
+ * That drift is not cosmetic:
+ *
+ *   • projects.category was ENUM('web','app','terminal'), so every newer
+ *     category was silently stored as an empty string;
+ *   • home_socials.icon_class was NOT NULL, so adding a social link without
+ *     choosing an icon failed outright;
+ *   • skills.percentage was NOT NULL with no default, which works here only
+ *     because this server is not in strict mode — on a host that is, creating
+ *     a skill would fail.
+ *
+ * Changes are deliberately one-directional: columns are only ever relaxed,
+ * widened or converted toward the declared type. Nothing is narrowed, so no
+ * existing value can be truncated by this step.
  */
-$retypes = [
-    ['projects', 'category',    "VARCHAR(60) NOT NULL DEFAULT 'fullstack'", '/^enum/i'],
-    ['projects', 'skills_used', 'VARCHAR(500) DEFAULT NULL',                '/^varchar\((?:[1-9]?\d|1\d\d|2[0-4]\d)\)/i'],
-];
 
-$retyped = 0;
+/** @return array<string, array<string, string>> table => column => definition */
+function parseSchemaColumns(string $sql): array
+{
+    $tables = [];
 
-foreach ($retypes as [$table, $column, $definition, $pattern]) {
+    if (!preg_match_all('/CREATE TABLE IF NOT EXISTS\s+(\w+)\s*\((.*?)\n\)\s*ENGINE/s', $sql, $matches, PREG_SET_ORDER)) {
+        return $tables;
+    }
+
+    foreach ($matches as [, $table, $body]) {
+        foreach (preg_split('/\r?\n/', $body) ?: [] as $line) {
+            $line = trim($line);
+
+            // Skip keys, constraints and the trailing comma on the last column.
+            if ($line === '' || preg_match('/^(PRIMARY|UNIQUE|KEY|CONSTRAINT|FOREIGN|INDEX)/i', $line)) {
+                continue;
+            }
+
+            if (!preg_match('/^(\w+)\s+(.+?),?$/', $line, $parts)) {
+                continue;
+            }
+
+            $definition = rtrim($parts[2], ',');
+
+            // AUTO_INCREMENT primary keys are never reconciled.
+            if (stripos($definition, 'AUTO_INCREMENT') !== false) {
+                continue;
+            }
+
+            $tables[$table][$parts[1]] = $definition;
+        }
+    }
+
+    return $tables;
+}
+
+$intended = parseSchemaColumns($sql);
+$retyped  = 0;
+
+foreach ($intended as $table => $columns) {
     if (!Database::hasTable($table)) {
         continue;
     }
 
-    $info = Database::first(
-        'SELECT COLUMN_TYPE AS t FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
-        [$table, $column]
-    );
+    $live = [];
 
-    if (!$info || !preg_match($pattern, (string) $info['t'])) {
-        continue;
+    foreach (Database::all(
+        'SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
+        [$table]
+    ) as $row) {
+        $live[(string) $row['COLUMN_NAME']] = $row;
     }
 
-    try {
-        $conn->query("ALTER TABLE `{$table}` MODIFY `{$column}` {$definition}");
-        printf("    ~ %s.%s  %s → %s\n", $table, $column, $info['t'], strtok($definition, ' '));
-        $retyped++;
-    } catch (Throwable $e) {
-        printf("    ! %s.%s — %s\n", $table, $column, $e->getMessage());
+    foreach ($columns as $column => $definition) {
+        if (!isset($live[$column])) {
+            continue;
+        }
+
+        $currentType = strtolower((string) $live[$column]['COLUMN_TYPE']);
+        $isNullable  = $live[$column]['IS_NULLABLE'] === 'YES';
+        $wantsNull   = stripos($definition, 'NOT NULL') === false;
+
+        preg_match('/^\s*(\w+)(?:\(([^)]*)\))?/', $definition, $want);
+        $wantType = strtolower($want[1] ?? '');
+        $wantSize = isset($want[2]) ? (int) $want[2] : 0;
+
+        preg_match('/^(\w+)(?:\(([^)]*)\))?/', $currentType, $have);
+        $haveType = strtolower($have[1] ?? '');
+        $haveSize = isset($have[2]) ? (int) $have[2] : 0;
+
+        $reason = null;
+
+        if (!$isNullable && $wantsNull) {
+            $reason = 'NOT NULL → NULL';
+        } elseif ($haveType !== $wantType) {
+            // Only convert toward the declared type, never between unrelated
+            // families that could lose data.
+            $safe = ['enum' => ['varchar'], 'year' => ['varchar'], 'int' => ['varchar'], 'varchar' => ['text', 'varchar']];
+
+            if (in_array($wantType, $safe[$haveType] ?? [], true)) {
+                $reason = "{$haveType} → {$wantType}";
+            }
+        } elseif ($wantType === 'varchar' && $wantSize > $haveSize) {
+            $reason = "varchar({$haveSize}) → varchar({$wantSize})";
+        }
+
+        if ($reason === null) {
+            continue;
+        }
+
+        try {
+            $conn->query("ALTER TABLE `{$table}` MODIFY `{$column}` {$definition}");
+            printf("    ~ %-32s %s\n", "{$table}.{$column}", $reason);
+            $retyped++;
+        } catch (Throwable $e) {
+            printf("    ! %s.%s — %s\n", $table, $column, $e->getMessage());
+        }
     }
 }
 
-printf("    ✓ %d column type%s corrected\n\n", $retyped, $retyped === 1 ? '' : 's');
+printf("    ✓ %d column definition%s reconciled\n\n", $retyped, $retyped === 1 ? '' : 's');
 
 /* ================================================ 2. legacy repairs ======== */
 
@@ -350,7 +436,16 @@ if (Database::hasTable('projects')) {
         'console' => 'systems', 'desktop' => 'systems', 'iot' => 'systems',
     ];
 
-    $known      = ['backend', 'fullstack', 'mobile', 'systems', 'ai', 'frontend'];
+    // Valid slugs come from the table the admin manages, not a fixed list.
+    $known = array_map(
+        'strtolower',
+        array_column(Database::all('SELECT slug FROM project_categories'), 'slug')
+    );
+
+    if ($known === []) {
+        $known = ['backend', 'fullstack', 'mobile', 'systems', 'ai', 'frontend'];
+    }
+
     $fromConfig = [];
 
     foreach ((require APP_ROOT . '/config/profile.php')['projects'] as $project) {
@@ -363,17 +458,30 @@ if (Database::hasTable('projects')) {
 
     foreach (Database::all('SELECT id, category, repo_name FROM projects') as $row) {
         $current = strtolower(trim((string) $row['category']));
-        $target  = $fromConfig[strtolower((string) $row['repo_name'])]
-            ?? $legacy[$current]
-            ?? (in_array($current, $known, true) ? $current : 'fullstack');
 
-        if ($target !== $row['category']) {
-            Database::execute('UPDATE projects SET category = ? WHERE id = ?', [$target, (int) $row['id']]);
-            $recategorised++;
+        /*
+         * A category already valid is left alone. Preferring config/profile.php
+         * here meant every run reset categories the owner had changed in the
+         * admin panel — the migration is meant to repair data, not overwrite
+         * deliberate edits.
+         */
+        if (in_array($current, $known, true)) {
+            continue;
         }
+
+        $target = $legacy[$current]
+            ?? $fromConfig[strtolower((string) $row['repo_name'])]
+            ?? ($known[0] ?? 'fullstack');
+
+        if (!in_array(strtolower($target), $known, true)) {
+            $target = $known[0] ?? 'fullstack';
+        }
+
+        Database::execute('UPDATE projects SET category = ? WHERE id = ?', [$target, (int) $row['id']]);
+        $recategorised++;
     }
 
-    printf("    ✓ categories normalised (%d)\n", $recategorised);
+    printf("    ✓ invalid categories repaired (%d)\n", $recategorised);
 }
 
 echo "\n";

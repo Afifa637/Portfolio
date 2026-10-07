@@ -43,7 +43,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = (string) ($_POST['action'] ?? 'save');
 
     if ($action === 'delete') {
-        $id      = (int) ($_POST['id'] ?? 0);
+        $id = (int) ($_POST['id'] ?? 0);
+
+        /*
+         * Some rows are referenced by other tables. Deleting a skill group
+         * would leave its skills pointing at an id that no longer exists, and
+         * deleting a category would leave its projects unfilterable. The hook
+         * repairs those references before the row goes.
+         */
+        if (isset($resource['on_delete']) && is_callable($resource['on_delete'])) {
+            $blocked = $resource['on_delete']($id);
+
+            if (is_string($blocked)) {
+                admin_redirect($self, $blocked, false);
+            }
+        }
+
         $deleted = Database::execute("DELETE FROM `{$table}` WHERE id = ?", [$id]);
 
         admin_redirect(
@@ -85,6 +100,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data[$name] = $value;
     }
 
+    // An image field may carry an upload, which supersedes the typed path.
+    foreach ($fields as $field) {
+        if (($field['type'] ?? '') !== 'image') {
+            continue;
+        }
+
+        try {
+            $uploaded = admin_store_upload($field['name'] . '_upload');
+
+            if ($uploaded !== null) {
+                $data[$field['name']] = $uploaded;
+            }
+        } catch (RuntimeException $e) {
+            admin_redirect($self . ($id ? '&edit=' . $id : '&new=1'), $e->getMessage(), false);
+        }
+    }
+
     // Validate required fields before touching the database.
     $missing = [];
 
@@ -103,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($resource['before_save']) && is_callable($resource['before_save'])) {
-        $data = $resource['before_save']($data);
+        $data = $resource['before_save']($data, $id);
     }
 
     $columns = array_keys($data);
@@ -161,7 +193,7 @@ admin_head($resource['title']);
 
 <?php if ($creating || $editing): ?>
 
-    <form class="card admin-form" method="post" action="<?= e($self) ?>">
+    <form class="card admin-form" method="post" action="<?= e($self) ?>" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save">
         <?php if ($editing): ?>

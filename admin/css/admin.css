@@ -648,3 +648,29 @@ body.admin::before { display: none; }
 .repeater-row input:focus { outline: none; border-color: var(--accent-line); }
 .repeater-row input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .repeater-row .btn { flex: none; }
+
+/* Inline status toggles in the project list. */
+.status-toggles { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+.chip-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-full);
+    background: var(--bg-elev);
+    color: var(--text-mute);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease);
+}
+
+.chip-toggle:hover { color: var(--text); border-color: var(--border-hi); }
+
+.chip-toggle.is-on {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+    color: var(--accent);
+}

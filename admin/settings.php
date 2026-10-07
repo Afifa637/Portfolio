@@ -33,6 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $key  = (string) $row['setting_key'];
         $type = (string) $row['input_type'];
 
+        /*
+         * Only touch settings the request actually carried.
+         *
+         * Writing every row on every POST means any field missing from the
+         * submission is silently blanked — a partial form, a disabled input, or
+         * a malformed request wipes content that took real effort to write.
+         * Checkboxes are the one exception: an unchecked box sends nothing, so
+         * absence is the value.
+         */
+        if ($type !== 'bool' && !array_key_exists($key, $_POST) && empty($_FILES[$key . '_upload']['name'])) {
+            continue;
+        }
+
         if ($type === 'image') {
             // An upload replaces the typed path.
             try {

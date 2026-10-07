@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/includes/bootstrap.php';
 
-// Skipped on the CLI, where tools/build-static.php captures this output and
+// Skipped on the CLI, where this file may be included by another script and
 // headers would already have been sent.
 if (PHP_SAPI !== 'cli' && !headers_sent()) {
     header('Content-Type: application/xml; charset=utf-8');

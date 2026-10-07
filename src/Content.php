@@ -471,26 +471,59 @@ final class Content
         return array_values(array_filter(array_map('trim', explode(',', $value))));
     }
 
+    /** @var list<string>|null Valid category slugs, resolved once per request. */
+    private static ?array $categorySlugs = null;
+
     /**
      * Map a stored category onto the site's taxonomy.
      *
-     * The original schema used web / app / terminal, and those values still
-     * appear in older rows. Without translation their cards render but match no
-     * filter button, so they vanish the moment a visitor narrows the grid.
+     * The valid set is read from project_categories, because categories are
+     * managed in the admin panel. A hard-coded whitelist here silently rewrote
+     * every category the owner created to "fullstack", so a new category could
+     * be added, assigned, and then quietly discarded at render time.
+     *
+     * The legacy web / app / terminal values still appear in older rows, and
+     * without translation their cards render but match no filter button — so
+     * they vanish the moment a visitor narrows the grid.
      */
     private static function normaliseCategory(string $category): string
     {
         $category = strtolower(trim($category));
 
         $legacy = [
-            'web'     => 'fullstack', 'app'     => 'mobile', 'terminal' => 'systems',
-            'console' => 'systems',   'desktop' => 'systems', 'iot'     => 'systems',
+            'web'     => 'fullstack', 'app'     => 'mobile',  'terminal' => 'systems',
+            'console' => 'systems',   'desktop' => 'systems', 'iot'      => 'systems',
         ];
 
-        $category = $legacy[$category] ?? $category;
-        $known    = ['backend', 'fullstack', 'mobile', 'systems', 'ai', 'frontend'];
+        if (self::$categorySlugs === null) {
+            $slugs = [];
 
-        return in_array($category, $known, true) ? $category : 'fullstack';
+            if (Database::hasTable('project_categories')) {
+                $slugs = array_map(
+                    'strtolower',
+                    array_column(Database::all('SELECT slug FROM project_categories'), 'slug')
+                );
+            }
+
+            // Fall back to the file taxonomy when the table is empty or absent.
+            if ($slugs === []) {
+                $file = require APP_ROOT . '/config/profile.php';
+                $slugs = array_values(array_diff(array_keys($file['project_categories'] ?? []), ['all']));
+            }
+
+            self::$categorySlugs = $slugs;
+        }
+
+        // Translate a legacy value only when it is not itself a valid slug.
+        if (!in_array($category, self::$categorySlugs, true) && isset($legacy[$category])) {
+            $category = $legacy[$category];
+        }
+
+        if (in_array($category, self::$categorySlugs, true)) {
+            return $category;
+        }
+
+        return self::$categorySlugs[0] ?? 'fullstack';
     }
 
     public static function slugify(string $value): string

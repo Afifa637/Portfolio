@@ -58,6 +58,14 @@ function admin_resources(): array
                 ['name' => 'icon',  'label' => 'Icon', 'type' => 'select', 'options' => admin_icon_options(), 'default' => 'code'],
                 ['name' => 'note',  'label' => 'Caption', 'hint' => 'Small line under the group name', 'maxlength' => 190],
             ],
+            // Skills point at a group by id. Clearing the reference keeps them
+            // on the site under "Also" rather than leaving a dangling id.
+            'on_delete' => static function (int $id): void {
+                Database::execute(
+                    'UPDATE skills SET group_id = NULL, category = NULL WHERE group_id = ?',
+                    [$id]
+                );
+            },
         ],
 
         'skills' => [
@@ -73,7 +81,7 @@ function admin_resources(): array
                 ['name' => 'description', 'label' => 'Note', 'hint' => 'Optional, not shown on the site', 'maxlength' => 255],
             ],
             // Keep the legacy text column aligned with the chosen group.
-            'before_save' => static function (array $data): array {
+            'before_save' => static function (array $data, int $id = 0): array {
                 $groupId = (int) ($data['group_id'] ?? 0);
 
                 $data['category'] = $groupId > 0
@@ -221,8 +229,51 @@ function admin_resources(): array
             'fields'   => [
                 ['name' => 'label', 'label' => 'Label', 'required' => true, 'maxlength' => 80],
                 ['name' => 'slug',  'label' => 'Slug', 'required' => true, 'maxlength' => 40,
-                 'hint' => 'Lowercase, no spaces. Changing this unassigns existing projects.'],
+                 'hint' => 'Lowercase, no spaces. Projects using this category follow a rename automatically.'],
             ],
+            // A rename has to carry its projects with it, or they silently drop
+            // out of every filter.
+            'before_save' => static function (array $data, int $id): array {
+                $data['slug'] = trim(strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $data['slug'])), '-');
+
+                if ($id > 0) {
+                    $previous = Database::first('SELECT slug FROM project_categories WHERE id = ?', [$id]);
+
+                    if ($previous && $previous['slug'] !== $data['slug']) {
+                        Database::execute(
+                            'UPDATE projects SET category = ? WHERE category = ?',
+                            [$data['slug'], $previous['slug']]
+                        );
+                    }
+                }
+
+                return $data;
+            },
+            // Refuse rather than quietly stranding projects in a category that
+            // no longer has a filter button.
+            'on_delete' => static function (int $id): ?string {
+                $row = Database::first('SELECT slug, label FROM project_categories WHERE id = ?', [$id]);
+
+                if (!$row) {
+                    return null;
+                }
+
+                $count = (int) (Database::first(
+                    'SELECT COUNT(*) AS n FROM projects WHERE category = ?',
+                    [$row['slug']]
+                )['n'] ?? 0);
+
+                if ($count > 0) {
+                    return sprintf(
+                        '%d project%s still use "%s". Move them to another category first.',
+                        $count,
+                        $count === 1 ? '' : 's',
+                        $row['label']
+                    );
+                }
+
+                return null;
+            },
         ],
     ];
 }
