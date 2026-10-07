@@ -37,7 +37,22 @@ $options = getopt('', ['base::', 'url::', 'out::']);
 
 // Project pages live at https://<user>.github.io/<repo>/, so every root-relative
 // path needs that prefix. A custom domain would use '/'.
-$base   = rtrim((string) ($options['base'] ?? '/Portfolio/'), '/') . '/';
+$base = (string) ($options['base'] ?? '/Portfolio/');
+
+/*
+ * Guard against MSYS path mangling. Git Bash on Windows rewrites a bare
+ * "/Portfolio/" argument into "C:/Program Files/Git/Portfolio/" before PHP ever
+ * sees it, which bakes a local filesystem path into every link. Keep only the
+ * final segment when an absolute or drive-prefixed path arrives.
+ */
+if (preg_match('#^[a-z]:[\\\\/]#i', $base) || str_contains($base, 'Program Files')) {
+    $segments = array_values(array_filter(preg_split('#[\\\\/]+#', $base) ?: []));
+    $base = '/' . (end($segments) ?: '') . '/';
+
+    fwrite(STDERR, "  ! --base looked like a Windows path; using {$base}\n");
+}
+
+$base = rtrim($base, '/') . '/';
 $siteUrl = rtrim((string) ($options['url'] ?? 'https://afifa637.github.io/Portfolio'), '/');
 $outDir = (string) ($options['out'] ?? dirname(__DIR__) . '/dist');
 

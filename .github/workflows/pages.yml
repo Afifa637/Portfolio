@@ -1,0 +1,103 @@
+# Publishes a static preview of the portfolio to GitHub Pages.
+#
+# This is a PREVIEW, not the real deployment. GitHub Pages serves static files
+# only, so the admin panel and the contact form's POST handler cannot run there.
+# The full application needs PHP hosting — see DEPLOY.md.
+#
+# What the preview is good for: a shareable link that works today, with the
+# complete design, every project case study, and live GitHub data baked in at
+# build time. The contact form is replaced with a direct-email panel rather than
+# left as a control that would silently fail.
+#
+# Requires: Settings → Pages → Source set to "GitHub Actions".
+
+name: Deploy preview to Pages
+
+on:
+  push:
+    branches: [main]
+  # Rebuild daily so the baked-in GitHub statistics do not go stale.
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, curl, gd
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Refresh GitHub data
+        # Uses the workflow's own token, so the build is never rate limited.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          php -r '
+            $_SERVER["REQUEST_METHOD"] = "GET";
+            $_SERVER["HTTP_HOST"] = "afifa637.github.io";
+            $_SERVER["SCRIPT_NAME"] = "/index.php";
+            require "includes/bootstrap.php";
+            $data = GitHub::refresh();
+            if ($data) {
+                file_put_contents("storage/github-snapshot.json", json_encode($data, JSON_PRETTY_PRINT));
+                echo "Refreshed: {$data["stats"]["repos"]} repos\n";
+            } else {
+                echo "Refresh failed; the committed snapshot will be used.\n";
+            }
+          '
+
+      - name: Build static site
+        run: |
+          php tools/build-static.php \
+            --base="/${GITHUB_REPOSITORY#*/}/" \
+            --url="https://${GITHUB_REPOSITORY%%/*}.github.io/${GITHUB_REPOSITORY#*/}"
+
+      - name: Verify the build produced a real page
+        run: |
+          test -f dist/index.html || { echo "::error::No index.html produced"; exit 1; }
+          size=$(wc -c < dist/index.html)
+          echo "index.html: ${size} bytes"
+          [ "$size" -gt 20000 ] || { echo "::error::index.html is suspiciously small"; exit 1; }
+          grep -q "Afifa" dist/index.html || { echo "::error::Page content missing"; exit 1; }
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
