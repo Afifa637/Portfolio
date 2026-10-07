@@ -648,6 +648,8 @@ body.admin::before { display: none; }
 .repeater-row input:focus { outline: none; border-color: var(--accent-line); }
 .repeater-row input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .repeater-row .btn { flex: none; }
+.arch-row input:nth-child(3) { flex: 2; }
+@media (max-width: 640px) { .arch-row { flex-wrap: wrap; } .arch-row input { flex: 1 1 100%; } }
 
 /* Inline status toggles in the project list. */
 .status-toggles { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }

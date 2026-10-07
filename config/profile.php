@@ -40,10 +40,10 @@ return [
 
         // Rotated by the hero type-effect.
         'roles' => [
-            'Software Engineer',
-            'Backend Developer',
+            'Backend Engineer',
             'Full-Stack Developer',
-            'Spring Boot & PHP',
+            'Systems Builder',
+            'Problem Solver',
         ],
 
         // Short, factual positioning statement shown under the hero title.
@@ -148,8 +148,8 @@ return [
             'start'       => '2023',
             'end'         => 'Present',
             'current'     => true,
-            'grade'       => 'CGPA 3.69',
-            'grade_note'  => 'through 3rd semester',
+            'grade'       => 'CGPA 3.77 / 4.00',
+            'grade_note'  => 'Computer Science & Engineering',
             'detail'      => 'Coursework across data structures, algorithms, database systems, compiler design, '
                 . 'operating systems, software engineering, and artificial intelligence.',
         ],
@@ -160,7 +160,7 @@ return [
             'start'       => '2019',
             'end'         => '2021',
             'current'     => false,
-            'grade'       => 'GPA 5.00 / 5.00',
+            'grade'       => 'GPA 5.00 / 5.00 (With Scholarship)',
             'grade_note'  => 'Science',
             'detail'      => 'Science group, with mathematics and physics as the primary focus.',
         ],
@@ -168,7 +168,7 @@ return [
             'degree'      => 'Secondary School Certificate',
             'institution' => 'Viqarunnisa Noon School and College',
             'location'    => 'Dhaka, Bangladesh',
-            'start'       => '2017',
+            'start'       => '2014',
             'end'         => '2019',
             'current'     => false,
             'grade'       => 'GPA 5.00 / 5.00',
@@ -272,6 +272,23 @@ return [
                 . 'that taught me the most about authorization design.',
             'learned'  => 'Multiple security filter chains, Liquibase changelog discipline, and why DTOs '
                 . 'exist instead of returning entities straight out of a controller.',
+            'architecture' => [
+                ['layer' => 'Clients', 'tech' => 'Thymeleaf pages, REST clients', 'role' => 'Browsable pages for buyers; JSON for everything else'],
+                ['layer' => 'Security filter chains', 'tech' => 'Spring Security, JWT, sessions', 'role' => 'Sessions for page routes, stateless JWT for /api routes'],
+                ['layer' => 'Controllers', 'tech' => 'Spring MVC, REST', 'role' => 'Map requests onto DTOs rather than exposing entities'],
+                ['layer' => 'Service layer', 'tech' => 'Spring services', 'role' => 'Listing, resale and approval rules'],
+                ['layer' => 'Repositories', 'tech' => 'Spring Data JPA', 'role' => 'Persistence behind repository interfaces'],
+                ['layer' => 'Database', 'tech' => 'PostgreSQL, Liquibase', 'role' => 'Every schema change is a reviewed changelog'],
+            ],
+            'demo_request' => 'POST /api/auth/login',
+            'decisions' => 'Split Spring Security into two filter chains by request path, so server-rendered pages keep their session while /api routes stay stateless behind JWT.
+
+Return DTOs from controllers instead of JPA entities, so the API contract does not leak persistence details.
+
+Let Liquibase own every schema change, and run the whole stack from Docker Compose so the database and application start together.',
+            'security' => 'JWT-secured REST API alongside session-based page rendering, under one Spring Security configuration. Role-based dashboards separate buyer, seller and administrator capabilities.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'amar-ration',
@@ -301,6 +318,15 @@ return [
             'outcome'  => 'Deployed and publicly reachable on Vercel.',
             'learned'  => 'That the hard part of an inventory system is not the interface — it is deciding '
                 . 'what the single source of truth for a quantity is.',
+            'architecture' => [
+                ['layer' => 'Client', 'tech' => 'React', 'role' => 'Beneficiary search, distribution entry, reports'],
+                ['layer' => 'REST API', 'tech' => 'Node.js', 'role' => 'Distribution and stock endpoints'],
+                ['layer' => 'Ledger rules', 'tech' => 'JavaScript', 'role' => 'Every handout moves stock and the distribution log together'],
+                ['layer' => 'Hosting', 'tech' => 'Vercel', 'role' => 'Publicly deployed'],
+            ],
+            'decisions' => 'Treat each handout as one operation that updates both the stock ledger and the distribution log, so the two can never drift apart.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'socialstory',
@@ -330,6 +356,16 @@ return [
                 . 'ones with error messages that point at the right line.',
             'learned'  => 'How languages are actually parsed, why grammar conflicts arise, and what a '
                 . 'symbol table is really for.',
+            'architecture' => [
+                ['layer' => 'Source', 'tech' => 'SocialScript', 'role' => 'Program text in the custom language'],
+                ['layer' => 'Lexer', 'tech' => 'Flex', 'role' => 'Tokenises the grammar'],
+                ['layer' => 'Parser', 'tech' => 'Bison', 'role' => 'Builds the syntax tree'],
+                ['layer' => 'Symbol table', 'tech' => 'C', 'role' => 'Scope and declaration checks'],
+                ['layer' => 'Semantic analysis', 'tech' => 'C', 'role' => 'Rejects invalid programs with located errors'],
+            ],
+            'decisions' => 'Treat every parser-generator conflict as a question about the language design rather than a grammar-file bug to silence.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'prison-break',
@@ -359,6 +395,15 @@ return [
                 . 'are visible instead of described.',
             'learned'  => 'Pathfinding under changing conditions, agent state machines, and how easily a '
                 . 'benchmark can be biased without anyone intending it.',
+            'architecture' => [
+                ['layer' => 'Environment', 'tech' => 'Godot Engine', 'role' => 'Shared prison map with dynamic obstacles and guards'],
+                ['layer' => 'Agents', 'tech' => 'GDScript', 'role' => 'One agent per strategy'],
+                ['layer' => 'Strategies', 'tech' => 'Pathfinding, decision logic', 'role' => 'Different techniques, same escape objective'],
+                ['layer' => 'Observation', 'tech' => 'Godot', 'role' => 'Runs are watched, not only logged'],
+            ],
+            'decisions' => 'Keep the map and guard behaviour neutral, because any advantage baked into the environment invalidates the comparison between strategies.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'agroconnect',
@@ -390,6 +435,20 @@ return [
             'outcome'  => 'A working marketplace covering listing, bidding, negotiation, and fulfilment.',
             'learned'  => 'Laravel in depth — Eloquent relationships, middleware, policy-based authorization, '
                 . 'and Blade layouts — plus how much of marketplace design is really access control.',
+            'architecture' => [
+                ['layer' => 'Browser', 'tech' => 'Blade, Bootstrap, JavaScript', 'role' => 'Listings, bids and negotiation views'],
+                ['layer' => 'Routes & middleware', 'tech' => 'Laravel middleware, RBAC', 'role' => 'Separates farmer, buyer and administrator'],
+                ['layer' => 'Controllers', 'tech' => 'Laravel', 'role' => 'Listing, bidding and negotiation flows'],
+                ['layer' => 'Domain models', 'tech' => 'Eloquent ORM', 'role' => 'Users, listings and bids as related models'],
+                ['layer' => 'Database', 'tech' => 'MySQL', 'role' => 'Relational store for the marketplace'],
+            ],
+            'demo_request' => 'POST /listings/{id}/bids',
+            'decisions' => 'Model farmers and buyers as roles over one authentication layer, with Laravel middleware and policies deciding which actions each may take on a listing.
+
+Keep pricing records auditable so both sides can see how a price was reached.',
+            'security' => 'Role-based access control separating farmer, buyer and administrator, with secure authentication and policy-based authorization on listing actions.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'solartracker',
@@ -420,6 +479,17 @@ return [
                 . 'power output rather than a claimed improvement.',
             'learned'  => 'That real sensors are noisy, control loops need hysteresis, and measuring the '
                 . 'result is what separates a demo from a system.',
+            'architecture' => [
+                ['layer' => 'Sensing', 'tech' => 'LDR array, INA219', 'role' => 'Directional light; voltage, current and power'],
+                ['layer' => 'Controller', 'tech' => 'ESP32, C++', 'role' => 'Control loop with thresholds and smoothing'],
+                ['layer' => 'Actuation', 'tech' => 'Servo', 'role' => 'Single-axis panel orientation'],
+                ['layer' => 'Telemetry', 'tech' => 'Blynk', 'role' => 'Remote monitoring and load control'],
+            ],
+            'decisions' => 'Threshold and smooth sensor readings instead of reacting to every sample, so the servo settles rather than hunting.
+
+Measure real power with INA219 sensors rather than assuming a tracking gain.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'pulseverse',
@@ -449,6 +519,14 @@ return [
                 . 'social app, not just a feed mock-up.',
             'learned'  => 'Flutter state management, Firestore stream subscriptions, and theming a full '
                 . 'application rather than a single screen.',
+            'architecture' => [
+                ['layer' => 'Client', 'tech' => 'Flutter, Dart', 'role' => 'Feed, profiles, chat; dark and light themes'],
+                ['layer' => 'Authentication', 'tech' => 'Firebase Auth', 'role' => 'Sign-up and login'],
+                ['layer' => 'Data', 'tech' => 'Cloud Firestore', 'role' => 'Posts, likes, comments and follows'],
+                ['layer' => 'Realtime', 'tech' => 'Firestore streams', 'role' => 'Live chat between users'],
+            ],
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'fireflycatcher',
@@ -505,6 +583,14 @@ return [
             'outcome'  => 'A working catalogue whose queries answer real questions about the collection.',
             'learned'  => 'Practical normalisation, indexing where it actually matters, and designing for '
                 . 'data that has to outlive the application.',
+            'architecture' => [
+                ['layer' => 'Browser', 'tech' => 'HTML, JavaScript', 'role' => 'Search and filtering interface'],
+                ['layer' => 'Application', 'tech' => 'PHP', 'role' => 'Catalogue and administrative panel'],
+                ['layer' => 'Database', 'tech' => 'MySQL', 'role' => 'Normalised schema across sites, periods and regions'],
+            ],
+            'decisions' => 'Normalise far enough that queries stay expressive, but not so far that every page becomes a six-table join.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'student-management',
@@ -532,6 +618,21 @@ return [
                 . 'user and deciding what that user may do to one specific record.',
             'outcome'  => 'A cleanly structured service that documents itself and deploys as a container.',
             'learned'  => 'Method-level security, migration discipline, and generated API documentation.',
+            'architecture' => [
+                ['layer' => 'API clients', 'tech' => 'REST, Swagger UI', 'role' => 'Endpoints documented from the controllers'],
+                ['layer' => 'Security', 'tech' => 'Spring Security, RBAC', 'role' => 'Every endpoint checks both identity and role'],
+                ['layer' => 'REST controllers', 'tech' => 'Spring Web', 'role' => 'Request mapping and validation'],
+                ['layer' => 'Service layer', 'tech' => 'Spring services', 'role' => 'Student-record rules'],
+                ['layer' => 'Repositories', 'tech' => 'Spring Data JPA', 'role' => 'Data access'],
+                ['layer' => 'Database', 'tech' => 'PostgreSQL, Liquibase', 'role' => 'Migrations tracked in version control'],
+            ],
+            'demo_request' => 'GET /api/students/{id}',
+            'decisions' => 'Enforce role-based access with Spring Security on every endpoint, using method-level security where a rule depends on the record.
+
+Keep Liquibase migrations in version control and generate Swagger documentation from the controllers, so docs and schema cannot drift from the code.',
+            'security' => 'Role-based access control on every endpoint. The distinction the project is built around: authenticating a user is not the same as deciding what that user may do to one specific record.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'greengrocer',
@@ -560,6 +661,13 @@ return [
             'outcome'  => 'A complete two-sided application rather than a catalogue demo.',
             'learned'  => 'Android lifecycle and listener patterns, Firebase data modelling, and designing '
                 . 'one schema that serves two very different audiences.',
+            'architecture' => [
+                ['layer' => 'Android client', 'tech' => 'Android, Java, XML', 'role' => 'Customer journey and admin dashboard'],
+                ['layer' => 'Authentication', 'tech' => 'Firebase Auth', 'role' => 'Registration, login, password reset'],
+                ['layer' => 'Data', 'tech' => 'Firebase Realtime Database', 'role' => 'Products, carts, orders and revenue'],
+            ],
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'firebase-notes',
@@ -585,6 +693,15 @@ return [
                 . 'rules have to enforce it server-side, or the data is simply public with extra steps.',
             'outcome'  => 'A working app where users genuinely cannot reach one another\'s notes.',
             'learned'  => 'Firestore security rules and Swift\'s asynchronous data flow.',
+            'architecture' => [
+                ['layer' => 'iOS client', 'tech' => 'Swift', 'role' => 'Notes interface'],
+                ['layer' => 'Authentication', 'tech' => 'Firebase Auth', 'role' => 'Sign-up and sign-in'],
+                ['layer' => 'Security rules', 'tech' => 'Firestore rules', 'role' => 'Server-side enforcement of per-user access'],
+                ['layer' => 'Data', 'tech' => 'Cloud Firestore', 'role' => 'Notes partitioned by user ID'],
+            ],
+            'security' => 'Access is enforced by Firestore security rules on the server, not by filtering on the client — client-side filtering is not access control.',
+            'goal'   => '',
+            'future' => '',
         ],
         [
             'slug'     => 'coffee-shop',
@@ -720,7 +837,173 @@ return [
             ['label' => 'LinkedIn', 'value' => 'Afifa Sultana',             'href' => 'https://www.linkedin.com/in/afifa-sultana-346a13256/', 'icon' => 'linkedin'],
             ['label' => 'Location', 'value' => 'Khulna, Bangladesh',        'href' => '',                                 'icon' => 'map-pin'],
         ],
-        'purposes' => ['Job opportunity', 'Freelance project', 'Collaboration', 'Something else'],
+        'purposes' => ['Internship', 'Engineering role', 'Collaboration', 'Project', 'Other'],
+    ],
+
+    /* ----------------------------------------------------------- principles */
+
+    /**
+     * "How I think". Each principle names the projects that evidence it, so the
+     * claim is checkable rather than decorative.
+     */
+    'principles' => [
+        [
+            'title'    => 'Systems before screens',
+            'body'     => 'The interface is the cheapest layer to change. The schema, the API contract and the '
+                . 'authorization rules are not, so those get designed first and the screens follow them.',
+            'evidence' => ['timeless', 'student-management', 'heritage-explorer'],
+        ],
+        [
+            'title'    => 'Security is part of the architecture',
+            'body'     => 'Access control decided at the edge of the system, not patched onto it afterwards. '
+                . 'Filtering data in the client is not authorization — the server has to refuse.',
+            'evidence' => ['timeless', 'firebase-notes', 'agroconnect'],
+        ],
+        [
+            'title'    => 'Data models matter',
+            'body'     => 'Most bugs I have chased were really questions about where a value lives. Decide the '
+                . 'single source of truth for a quantity before writing the code that changes it.',
+            'evidence' => ['amar-ration', 'heritage-explorer', 'greengrocer'],
+        ],
+        [
+            'title'    => 'Ship, measure, improve',
+            'body'     => 'A deployed system teaches more than a polished demo. Measure what it actually does, '
+                . 'then improve the part the measurement points at.',
+            'evidence' => ['amar-ration', 'solartracker', 'timeless'],
+        ],
+    ],
+
+    /* ------------------------------------------------------------ blueprint */
+
+    /** The life of a request, annotated with the tools used at each stage. */
+    'blueprint' => [
+        [
+            'stage' => 'Request',
+            'body'  => 'A client calls a documented endpoint with a JSON body.',
+            'tech'  => ['REST APIs', 'JSON', 'Swagger / OpenAPI'],
+        ],
+        [
+            'stage' => 'Authentication',
+            'body'  => 'Identity is established, then the role decides what the caller may do.',
+            'tech'  => ['JWT', 'Spring Security', 'RBAC', 'Firebase Auth', 'Laravel middleware'],
+        ],
+        [
+            'stage' => 'Business logic',
+            'body'  => 'Validated DTOs reach a service layer that owns the rules.',
+            'tech'  => ['Spring services', 'Laravel controllers', 'DTOs', 'Validation'],
+        ],
+        [
+            'stage' => 'Database',
+            'body'  => 'A designed schema, changed only through versioned migrations.',
+            'tech'  => ['PostgreSQL', 'MySQL', 'JPA / Hibernate', 'Eloquent ORM', 'Liquibase'],
+        ],
+        [
+            'stage' => 'Response',
+            'body'  => 'A deliberate status code and a payload shaped for the client.',
+            'tech'  => ['HTTP status codes', 'JSON', 'Thymeleaf', 'Blade'],
+        ],
+    ],
+
+    /* -------------------------------------------------------------- journey */
+
+    /** Growth, not chronology: each stage names what it taught and where. */
+    'journey' => [
+        [
+            'period'   => '2014 – 2021',
+            'title'    => 'Foundations',
+            'body'     => 'Science stream at Viqarunnisa Noon School and College — mathematics and physics, '
+                . 'and the habit of working a problem until it gives.',
+            'tech'     => ['Mathematics', 'Physics'],
+            'projects' => [],
+        ],
+        [
+            'period'   => '2023 – 2025',
+            'title'    => 'Programming in C and C++',
+            'body'     => 'Started CSE at KUET. Learned to think in data structures and objects, and to make '
+                . 'a program hold its state correctly from start to finish.',
+            'tech'     => ['C', 'C++', 'OOP', 'File I/O'],
+            'projects' => ['travel-agency', 'hangman'],
+        ],
+        [
+            'period'   => '2025',
+            'title'    => 'Data and the web',
+            'body'     => 'Relational design, normalisation, and server-side PHP — then Laravel, where roles '
+                . 'and authorization first became the hard part.',
+            'tech'     => ['PHP', 'MySQL', 'Laravel', 'Eloquent ORM'],
+            'projects' => ['heritage-explorer', 'agroconnect'],
+        ],
+        [
+            'period'   => '2025',
+            'title'    => 'Mobile clients',
+            'body'     => 'Flutter, React Native and native Android against Firebase. State management, '
+                . 'real-time streams, and two applications sharing one database.',
+            'tech'     => ['Flutter', 'React Native', 'Android', 'Firebase'],
+            'projects' => ['pulseverse', 'fireflycatcher', 'coffee-shop', 'greengrocer'],
+        ],
+        [
+            'period'   => '2025',
+            'title'    => 'Hardware and control',
+            'body'     => 'An ESP32 solar tracker taught that real sensors are noisy and that a control loop '
+                . 'needs hysteresis — and that measuring beats assuming.',
+            'tech'     => ['ESP32', 'C++', 'Sensors', 'Blynk'],
+            'projects' => ['solartracker'],
+        ],
+        [
+            'period'   => '2026',
+            'title'    => 'Backend engineering',
+            'body'     => 'Spring Boot services with JWT, role-based access, JPA, Liquibase migrations and '
+                . 'Docker — the work I want to keep doing.',
+            'tech'     => ['Java', 'Spring Boot', 'Spring Security', 'PostgreSQL', 'Docker'],
+            'projects' => ['student-management', 'timeless'],
+        ],
+        [
+            'period'   => '2026',
+            'title'    => 'Systems and AI',
+            'body'     => 'A compiler written from scratch, and a multi-agent AI environment built to compare '
+                . 'strategies fairly.',
+            'tech'     => ['C', 'Flex', 'Bison', 'GDScript', 'Game AI'],
+            'projects' => ['socialstory', 'prison-break'],
+        ],
+        [
+            'period'   => '2026',
+            'title'    => 'Shipping',
+            'body'     => 'Deploying something people can actually use, and keeping its data honest.',
+            'tech'     => ['React', 'Node.js', 'Vercel'],
+            'projects' => ['amar-ration'],
+        ],
+    ],
+
+    /* ----------------------------------------------------------- core graph */
+
+    /**
+     * Nodes for the hero System Core. Project counts and connections are
+     * computed from project stacks at render time, never typed in by hand.
+     * `match` lists the stack names a node stands for.
+     */
+    'core_nodes' => [
+        ['id' => 'java',       'label' => 'Java',        'group' => 'backend',  'match' => ['Java']],
+        ['id' => 'spring',     'label' => 'Spring Boot', 'group' => 'backend',  'match' => ['Spring Boot', 'Spring Boot 3', 'Spring Security']],
+        ['id' => 'php',        'label' => 'PHP',         'group' => 'backend',  'match' => ['PHP']],
+        ['id' => 'laravel',    'label' => 'Laravel',     'group' => 'backend',  'match' => ['Laravel', 'Blade', 'Eloquent ORM']],
+        ['id' => 'rest',       'label' => 'REST APIs',   'group' => 'backend',  'match' => ['REST APIs', 'JWT', 'Swagger']],
+        ['id' => 'postgres',   'label' => 'PostgreSQL',  'group' => 'data',     'match' => ['PostgreSQL']],
+        ['id' => 'mysql',      'label' => 'MySQL',       'group' => 'data',     'match' => ['MySQL']],
+        ['id' => 'flutter',    'label' => 'Flutter',     'group' => 'mobile',   'match' => ['Flutter', 'Dart']],
+        ['id' => 'android',    'label' => 'Android',     'group' => 'mobile',   'match' => ['Android']],
+        ['id' => 'react',      'label' => 'React',       'group' => 'frontend', 'match' => ['React', 'React Native']],
+        ['id' => 'cpp',        'label' => 'C / C++',     'group' => 'systems',  'match' => ['C', 'C++']],
+        ['id' => 'ai',         'label' => 'AI',          'group' => 'systems',  'match' => ['Game AI', 'Multi-Agent Systems', 'Pathfinding']],
+        ['id' => 'docker',     'label' => 'Docker',      'group' => 'tooling',  'match' => ['Docker']],
+        ['id' => 'git',        'label' => 'Git',         'group' => 'tooling',  'match' => [], 'all_repos' => true],
+    ],
+
+    /* --------------------------------------------------------------- status */
+
+    'status' => [
+        'focus'    => 'Backend engineering',
+        'mode'     => 'Building',
+        'timezone' => 'Asia/Dhaka',
+        'version'  => '2.0',
     ],
 
     /* --------------------------------------------------------------------- seo */

@@ -173,6 +173,12 @@ CREATE TABLE IF NOT EXISTS projects (
     challenges    TEXT         DEFAULT NULL COMMENT 'Hardest part',
     outcome       TEXT         DEFAULT NULL,
     learned       TEXT         DEFAULT NULL,
+    goal          TEXT         DEFAULT NULL COMMENT 'What the project set out to achieve',
+    decisions     TEXT         DEFAULT NULL COMMENT 'Engineering decisions, blank line between each',
+    security_notes TEXT        DEFAULT NULL COMMENT 'Security and validation approach',
+    future_improvements TEXT   DEFAULT NULL COMMENT 'What would be improved next',
+    architecture  TEXT         DEFAULT NULL COMMENT 'JSON list of {layer, tech, role}',
+    demo_request  VARCHAR(190) DEFAULT NULL COMMENT 'Example request animated in Under the Hood',
     skills_used   VARCHAR(500) DEFAULT NULL COMMENT 'Comma-separated technology list',
     role          VARCHAR(190) DEFAULT NULL,
     year          VARCHAR(16)  DEFAULT NULL,
@@ -344,4 +350,45 @@ CREATE TABLE IF NOT EXISTS current_work (
     progress     TINYINT UNSIGNED NOT NULL DEFAULT 50,
     order_no     INT          NOT NULL DEFAULT 0,
     created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+
+-- ----------------------------------------------------------- principles ---
+-- "How I think". evidence is a comma-separated list of project slugs.
+
+CREATE TABLE IF NOT EXISTS principles (
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    title    VARCHAR(190) NOT NULL,
+    body     TEXT         DEFAULT NULL,
+    evidence VARCHAR(500) DEFAULT NULL COMMENT 'Comma-separated project slugs',
+    order_no INT          NOT NULL DEFAULT 0,
+    KEY idx_principles_order (order_no)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+
+-- ------------------------------------------------------ blueprint_stages ---
+-- The annotated request lifecycle beside the principles.
+
+CREATE TABLE IF NOT EXISTS blueprint_stages (
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    stage    VARCHAR(120) NOT NULL,
+    body     VARCHAR(500) DEFAULT NULL,
+    tech     VARCHAR(500) DEFAULT NULL COMMENT 'Comma-separated technologies',
+    order_no INT          NOT NULL DEFAULT 0,
+    KEY idx_blueprint_order (order_no)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+
+-- -------------------------------------------------------------- journey ---
+-- Growth milestones. projects is a comma-separated list of project slugs.
+
+CREATE TABLE IF NOT EXISTS journey (
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    period   VARCHAR(60)  DEFAULT NULL,
+    title    VARCHAR(190) NOT NULL,
+    body     TEXT         DEFAULT NULL,
+    tech     VARCHAR(500) DEFAULT NULL COMMENT 'Comma-separated technologies',
+    projects VARCHAR(500) DEFAULT NULL COMMENT 'Comma-separated project slugs',
+    order_no INT          NOT NULL DEFAULT 0,
+    KEY idx_journey_order (order_no)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

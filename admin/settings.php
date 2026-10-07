@@ -20,6 +20,7 @@ $groupLabels = [
     'about'    => ['About', 'Your story. A blank line starts a new paragraph.'],
     'contact'  => ['Contact', 'The heading and lead above the contact form.'],
     'seo'      => ['Search & social', 'What search engines and link previews show.'],
+    'status'   => ['System status', 'The live status panel in the contact section and footer.'],
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

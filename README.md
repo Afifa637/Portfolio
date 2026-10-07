@@ -1,151 +1,170 @@
 # Afifa Sultana — Portfolio
 
-A production-ready personal portfolio built with PHP 8.2, no framework and no
-front-end build step. Server-rendered, dependency-light, and deployable to
-anything that runs PHP — including hosting with no database at all.
+An interactive engineering workspace rather than a list of links. Visitors can
+move through the technology graph, ask questions answered from a local knowledge
+base, run a request through a project's architecture, query a toy SQL engine, and
+open any project as a full case study.
 
-**Live:** set `APP_URL` in `.env` · **Admin:** `/admin`
+PHP 8.2, no framework, no front-end build step. Server-rendered first, enhanced
+with native ES modules. Deployable to anything that runs PHP — including hosting
+with no database at all.
+
+**Admin:** `/admin` · **Case studies:** `/projects/<slug>` · **Printable résumé:** `/resume.php`
 
 ---
 
-## What this is
+## Run it locally
 
-A full content-managed portfolio. Everything the public site shows — your name,
-pitch, every project case study, skills, education, services, contact details,
-SEO metadata — is edited at `/admin` and goes live immediately. No code change,
-no redeploy.
+```bash
+git clone https://github.com/Afifa637/Portfolio.git
+cd Portfolio
+composer install
+cp .env.example .env              # set APP_ENV=local while developing
 
-**It still renders without a database.** `config/profile.php` is a complete
-fallback, so a database outage degrades to the last-known content instead of a
-white screen. A circuit breaker suppresses reconnection for 60 seconds after a
-failure, so an outage costs one slow request rather than two seconds on every page.
+php -S 127.0.0.1:8899 router.php  # http://127.0.0.1:8899
+```
 
-**GitHub data never blocks a page load.** The activity section comes from the
-GitHub API, cached to disk and refreshed by the browser *after* load via
-`api/github.php`. A bundled snapshot means a first deploy shows real data before
-any API call succeeds.
+Use `router.php`. The PHP dev server ignores `.htaccess`, and the router gives it
+the same behaviour: pretty `/projects/<slug>` URLs, `/sitemap.xml`, the custom
+404, and refusing to serve `src/`, `config/`, `.env` and other internals.
 
-**Contact messages reach you two ways.** Every enquiry is written to the database
-*and* emailed. Either alone is enough to report success, so a mail outage never
-loses an opportunity. `/admin/email.php` reports exactly how delivery is
-configured and sends a real test message.
+That is a complete site, driven by `config/profile.php`. For the admin panel, set
+up the database below. With Docker instead: `docker compose up -d` →
+<http://localhost:8080>.
 
-**No CDN JavaScript.** ScrollReveal, MixItUp and Typed.js — three third-party
-libraries from three origins — are replaced by vanilla JS using
-`IntersectionObserver` and plain DOM filtering.
+---
 
-**Images are 91% smaller.** Screenshots were committed at capture resolution, one
-of them a 2.5 MB PNG for a 640 px card. `tools/optimize-images.php` resizes and
-emits WebP with a JPEG fallback: 7.9 MB → 675 KB delivered.
+## What is on the page
+
+| Section | What it does |
+|---|---|
+| **System core** | SVG graph of every technology used. Node size and every link are computed from project stacks — a link means two technologies shipped in the same project. Hover or tab to a node for its projects. |
+| **How I think** | Engineering principles, each tied to the projects that evidence it, beside an annotated request lifecycle. |
+| **Stack** | Skills as an ecosystem: pick one to see where it was used and what it was used alongside. No percentage bars. |
+| **Featured builds** | The first four featured projects (admin order) as full showcases. |
+| **Under the hood** | Choose a system, run its example request through each architecture layer, or run it without permission and watch the security layer reject it with a 403. Timings are labelled illustrative. **Build mode** lets a visitor pick technologies and see which real projects match. |
+| **Archive** | Every project: filter, sort, search, live count, empty state. |
+| **Lab** | Working experiments: JWT decoder, a small SQL engine (tokenizer → parser → plan → executor), sorting visualiser with comparison counts. |
+| **Activity** | GitHub data from the API, cached server-side. Nothing is invented when the API is unavailable — the section says so. |
+| **Journey / Career** | Growth stages, education, activities, and a résumé with download, print and open. |
+| **Contact** | Validated form with enquiry type; saved to the database *and* emailed. |
+
+Across the site:
+
+- **Command palette** — `Ctrl/⌘ K` or `/`. Fuzzy search over sections, projects, skills and actions.
+- **Ask Afifa** — answers questions from the site's own content using intent routing and BM25 retrieval, and cites the section each answer came from. No external AI call; if it does not know, it says so.
+- **Terminal** — `~` or `` ` ``. `help` lists commands.
+- **Recruiter mode** — `?view=recruiter`, or from the palette: one condensed screen with education, strongest projects and contact.
+- **Case studies** — `/projects/<slug>`, numbered sections that appear only when they have content, an interactive architecture diagram, and previous/next navigation.
+- Small things for the curious: the console, the Konami code, clicking the logo five times.
+
+Dark ("technical lab") and light ("engineering notebook") themes, the system
+preference by default, switched with a view transition where supported.
+
+---
+
+## Content rules
+
+Every number on the site is derived, not typed. Project counts, technology
+counts, graph edges, "used in N projects" and GitHub figures come from
+`src/Knowledge.php` and the GitHub client. Where data is missing, the section is
+omitted rather than filled with a placeholder claim. Keep it that way when
+editing: a case-study field left blank hides its section.
 
 ---
 
 ## The admin panel
 
-Sign in at `/admin`. Everything below is editable, reorderable by drag, and live
-on save.
+Sign in at `/admin`. Everything is editable, reorderable by drag, and live on save.
 
-| Screen | What it controls |
+| Screen | Controls |
 |---|---|
-| **Site & SEO** | Name, job title, hero pitch, about text, contact copy, meta description, social share image |
-| **Projects** | Full case studies — problem, features, hardest part, outcome, lessons, stack, screenshot, featured and published flags |
-| **Skill groups / Skills** | The Stack section, grouped by domain |
-| **Education / Experience** | Timeline entries |
-| **Activities / Services** | Clubs and competitions; what you can build |
-| **About facts** | The label/value list beside your portrait |
-| **Hero roles** | The rotating job titles in the typing effect |
-| **Social links / Contact info** | Everywhere your links appear |
-| **Enquiry types** | Options in the contact form dropdown |
-| **Categories** | The project filter buttons |
-| **Messages** | Contact inbox, read/unread, reply |
+| **Site & SEO** | Name, title, pitch, about, contact copy, meta tags, share image, system status (focus, mode, time zone) |
+| **Projects** | Case studies: summary, goal, problem, hardest part, engineering decisions, security notes, outcome, lessons, future improvements, features, stack, **architecture layers**, **example request**, screenshot, featured/published |
+| **How I think** | Principles and the projects that evidence them |
+| **Request blueprint** | Stages of the annotated request lifecycle |
+| **Journey** | Growth stages, tools and resulting projects |
+| **Skill groups / Skills** | The Stack section |
+| **Education / Experience / Activities / Services** | Career and résumé |
+| **Hero roles / Social links / Contact info / Enquiry types / Categories** | Smaller lists used across the site |
+| **Messages** | Contact inbox |
 | **Email setup** | Delivery status and a real test send |
-| **Media** | Upload screenshots — resized and converted automatically |
+| **Media** | Uploads, resized and converted to WebP |
 
-Adding a new editable section means describing it in `admin/_resources.php`;
-`admin/resource.php` generates the whole CRUD screen from that description.
+A project with architecture layers gets a diagram on its case study and on its
+showcase card. Add an example request (`POST /api/auth/login`) and it also
+appears in **Under the hood**.
 
----
-
-## Requirements
-
-| | Minimum | Notes |
-|---|---|---|
-| PHP | 8.1 | 8.2+ recommended |
-| Extensions | `mbstring`, `json` | Always required |
-| | `mysqli` | Only for `/admin` and storing messages |
-| | `curl` *or* `allow_url_fopen` | Only for live GitHub data |
-| | `gd` | Only to re-run the image tools locally |
-| MySQL / MariaDB | 5.7 / 10.3 | Optional |
-| Composer | 2.x | To install dependencies |
+New list-type content is added by describing it in `admin/_resources.php`;
+`admin/resource.php` generates the CRUD screen.
 
 ---
 
-## Quick start
+## Architecture
 
-```bash
-git clone https://github.com/Afifa637/Portfolio.git
-cd Portfolio
-
-composer install
-cp .env.example .env          # then edit it
-
-php -S localhost:8000         # http://localhost:8000
+```
+Request ─► index.php / project.php / resume.php
+             │
+             ├─ includes/bootstrap.php   env, session, error handling, autoload
+             ├─ src/Content.php          config/profile.php, overridden by DB rows
+             ├─ src/Knowledge.php        derived graph, metrics, JSON payload
+             └─ views/                   server-rendered HTML (works without JS)
+                    │
+                    └─ <script type="application/json" id="portfolio-data">
+                       read by the modules below
 ```
 
-That is enough for a fully working site driven by `config/profile.php`.
-To manage content through the admin panel instead, set up the database below.
+**No bundler.** `import_map()` in `src/helpers.php` writes an import map with
+every module's modification time in its URL, so each file is cache-busted
+individually and can be cached as immutable.
 
-### With Docker
-
-```bash
-docker compose up -d          # site on http://localhost:8080
+```
+assets/js/main.js           entry: core behaviours, then lazy sections
+assets/js/core/             theme, nav, reveal, pointer, overlays, palette, keys, fuzzy
+assets/js/modules/          one per feature, imported when its section nears the viewport
 ```
 
-Compose starts MariaDB, applies `database/schema.sql` on first boot, and mounts the source for live editing.
+Section modules load through `IntersectionObserver` + dynamic `import()`, so the
+first paint ships only the core. Everything degrades: without JavaScript the
+graph, projects, case studies, résumé and contact form all still work.
+
+**Database is optional.** A circuit breaker stops reconnect attempts for 60
+seconds after a failure, so an outage costs one slow request, not every request.
+
+**GitHub never blocks a render.** Cached to disk, refreshed after load via
+`api/github.php`, with a bundled snapshot for a first deploy.
+
+```
+config/profile.php     Default content — the fallback and the migration source
+src/                   Content, Knowledge, Database, GitHub, ContactHandler, Mailer, helpers
+views/layout/          head (SEO, JSON-LD), header, footer + overlays
+views/sections/        hero, think, stack, featured, hood, archive, lab, activity, journey, career, contact
+assets/css/            app.css (design system), sections.css
+project.php            Case-study page          resume.php   Printable A4 résumé
+router.php             Dev-server router        sitemap.php  Home, résumé, every case study
+admin/                 Content management       database/    schema.sql, migrate.php, create_admin.php
+```
 
 ---
 
-## Optional setup
-
-### Database (for the admin panel)
+## Database (for the admin panel)
 
 ```bash
 mysql -u root -p -e "CREATE DATABASE portfolio_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u root -p portfolio_db < database/schema.sql
-php database/migrate.php                            # schema + imports your content
-php database/create_admin.php                       # prompts for a password
+php database/migrate.php        # creates/upgrades tables, imports profile.php content
+php database/create_admin.php   # prompts for a password
 ```
 
-`database/migrate.php` is the one command that matters. It is additive and
-idempotent — safe to run on an existing database with real content — and it:
+`migrate.php` is additive and idempotent: it adds new columns and tables,
+reconciles column types against `schema.sql`, imports content into empty tables,
+and fills only blank fields. It never overwrites edits made in the admin.
+`--reimport` forces content back to `config/profile.php`.
 
-- creates or upgrades every table, including correcting `projects.category`,
-  which the original schema declared as `ENUM('web','app','terminal')` and
-  silently discarded any newer value written into it;
-- **imports everything from `config/profile.php` into the database**, so the
-  admin panel opens fully populated rather than showing empty forms;
-- backfills `repo_name` from each project's GitHub URL;
-- merges duplicate projects that the two sources named differently;
-- corrects image filename casing, which resolves on Windows and 404s on Linux.
+On hosting without a shell, use the browser installer described in
+[DEPLOY.md](DEPLOY.md).
 
-Run it again any time; it only fills gaps and never overwrites your edits.
-`--reimport` forces content back to the `config/profile.php` version.
-
-### GitHub API token
-
-Unauthenticated requests are capped at 60/hour per IP, which a shared host can
-exhaust. A token raises that to 5,000/hour.
-
-1. Create one at <https://github.com/settings/tokens?type=beta> — **no scopes
-   are needed**, only public data is read.
-2. Set `GITHUB_TOKEN=` in `.env`.
-
-The token is used server-side only and is never sent to the browser.
-
-### Contact form email
-
-Messages are stored in the database *and* emailed. Either alone is enough for
-the form to report success, so a mail outage never loses a message.
+### Email
 
 ```dotenv
 MAIL_HOST=smtp.gmail.com
@@ -157,145 +176,25 @@ MAIL_FROM_ADDRESS=you@gmail.com
 MAIL_TO=you@gmail.com
 ```
 
-For Gmail, create an [App Password](https://myaccount.google.com/apppasswords)
-(needs 2-Step Verification). Never use your account password. Leave `MAIL_HOST`
-blank to fall back to PHP's `mail()`.
+Gmail needs an [App Password](https://myaccount.google.com/apppasswords). Either
+the database or email alone is enough for the form to report success.
 
----
+### GitHub token
 
-## Editing content
-
-Most edits are one file: [`config/profile.php`](config/profile.php) — identity,
-about, skills, education, services, and every project case study.
-
-```php
-'projects' => [
-    [
-        'slug'     => 'my-project',
-        'repo'     => 'my-repo-name',   // merges live GitHub stats
-        'title'    => 'My Project',
-        'category' => 'backend',        // backend|fullstack|mobile|systems|ai|frontend
-        'featured' => true,
-        'stack'    => ['PHP', 'MySQL'],
-        'problem'  => 'What needed solving…',
-        'features' => ['…'],
-        // …
-    ],
-],
-```
-
-With a database connected, matching rows override these values, so `/admin`
-keeps working. Matching is by repository name first and title second, which
-avoids duplicate cards when a title differs slightly between the two sources.
-
-After adding screenshots to `assets/images/`:
-
-```bash
-php -d extension=gd tools/optimize-images.php   # resize + WebP
-php -d extension=gd tools/make-images.php       # regenerate the social card
-```
+Optional. Raises the API limit from 60 to 5,000 requests an hour. Create one at
+<https://github.com/settings/tokens?type=beta> with **no scopes** and set
+`GITHUB_TOKEN=`. It is used server-side only.
 
 ---
 
 ## Deployment
 
-### Shared hosting (cPanel and similar)
+See [DEPLOY.md](DEPLOY.md) for free hosting, Railway, cPanel and Docker.
 
-1. Upload everything **except** `.env`, `vendor/`, and `database/backups/`.
-2. Run `composer install --no-dev --optimize-autoloader`, or upload a locally
-   built `vendor/` if the host has no Composer.
-3. Create `.env` from `.env.example` and set `APP_ENV=production` and `APP_URL`.
-4. Make `storage/cache/` writable: `chmod -R 775 storage`.
-5. Confirm `.htaccess` is being read — if `/sitemap.xml` 404s, `AllowOverride`
-   is off and you need `mod_rewrite` enabled.
-6. Uncomment the HTTPS redirect block in `.htaccess` once your certificate is
-   installed.
-
-### Nginx
-
-`.htaccess` is Apache-only. Equivalent server block:
-
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name your-domain.com;
-    root /var/www/portfolio;
-    index index.php;
-
-    add_header X-Content-Type-Options    "nosniff"                        always;
-    add_header X-Frame-Options           "SAMEORIGIN"                     always;
-    add_header Referrer-Policy           "strict-origin-when-cross-origin" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-
-    location = /sitemap.xml { try_files $uri /sitemap.php; }
-    error_page 404 /404.php;
-
-    # Application internals are never served directly.
-    location ~ ^/(includes|src|config|storage|database|vendor|tools)/ { deny all; }
-    location ~ /\.                                                    { deny all; }
-    location ~ \.(sql|md|lock|json)$                                  { deny all; }
-
-    location ~ \.php$ {
-        include fastcgi_params;
-        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    }
-
-    # Assets carry a ?v=<mtime> fingerprint, so immutable is safe.
-    location ~* \.(css|js|png|jpe?g|webp|svg|woff2?)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        access_log off;
-    }
-
-    location / { try_files $uri $uri/ /index.php?$query_string; }
-}
-```
-
-### Docker / VPS
-
-```bash
-docker build -t portfolio .
-docker run -d -p 80:80 --env-file .env --name portfolio portfolio
-```
-
-The image is multi-stage: Composer runs in a build stage and never ships.
-
-### Production checklist
-
-- [ ] `APP_ENV=production` — errors are logged, never displayed
-- [ ] `APP_URL` set to the real domain (canonical tags, Open Graph, sitemap)
-- [ ] `.env` is **not** web-reachable — visit `/.env` and confirm 403/404
-- [ ] HTTPS enforced; HSTS header uncommented in `.htaccess`
-- [ ] `storage/cache/` writable by the web server
-- [ ] A real admin password set via `php database/create_admin.php`
-- [ ] Submit `sitemap.xml` to [Google Search Console](https://search.google.com/search-console)
-- [ ] Preview the social card with the
-      [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
-
----
-
-## Project layout
-
-```
-config/profile.php     All site content — the single source of truth
-src/
-  Content.php          Merges profile.php with optional database overrides
-  Database.php         Optional MySQL, circuit breaker, prepared statements
-  GitHub.php           Cached API client with layered fallbacks
-  ContactHandler.php   CSRF, rate limit, honeypot, validation, delivery
-  Mailer.php           SMTP via PHPMailer, falling back to mail()
-  helpers.php          Escaping, inline SVG icons, <picture>, asset fingerprints
-views/
-  layout/              head (SEO, JSON-LD), header, footer
-  sections/            hero, about, skills, projects, github, resume, contact
-assets/css/app.css     Design system: tokens, components, sections
-assets/js/app.js       Theme, nav, reveals, filtering, modal, form
-api/github.php         Off-render-path GitHub refresh
-database/              schema.sql, migrate.php, create_admin.php
-tools/                 Image optimisation and social-card generation
-admin/                 Content management screens
-```
+Case studies use `/projects/<slug>`. Apache (`.htaccess`) and the Docker image
+handle that out of the box; Nginx needs the rewrite in DEPLOY.md. On a host that
+cannot rewrite at all, set `PRETTY_URLS=false` and links switch to
+`project.php?slug=…`.
 
 ---
 
@@ -303,70 +202,55 @@ admin/                 Content management screens
 
 | Concern | Handling |
 |---|---|
-| XSS | `e()` escapes every interpolation; no `innerHTML` from user data |
-| SQL injection | Prepared statements throughout `Database` |
-| CSRF | Token on every POST, `hash_equals` comparison, rotated after success |
-| Spam | Honeypot field, submission-timing check, session rate limit |
-| Header injection | Control characters stripped from all mail header values |
-| Session | `HttpOnly`, `SameSite=Lax`, `Secure` on HTTPS, ID regenerated on login |
+| XSS | `e()` on every interpolation; client modules escape before inserting HTML |
+| SQL injection | Prepared statements throughout |
+| CSRF | Token on every POST, `hash_equals`, rotated after success |
+| Spam | Honeypot, submission timing, session rate limit, enquiry type whitelisted server-side |
+| Header injection | Control characters stripped from mail headers |
+| Sessions | `HttpOnly`, `SameSite=Lax`, `Secure` on HTTPS, ID regenerated on login |
 | Brute force | Five failed logins locks the form for five minutes |
-| Secrets | `.env` git-ignored and denied by `.htaccess`; token stays server-side |
+| Secrets | `.env` git-ignored and denied; internals denied by `.htaccess` and `router.php` |
 | Headers | CSP, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, HSTS |
-| File exposure | `.htaccess` guards in `includes/`, `src/`, `config/`, `storage/`, `database/` |
 
-Admin passwords are bcrypt hashes. No default credentials ship with the project.
-
----
-
-## Performance
-
-| | Before | After |
-|---|---|---|
-| Images delivered | 7.9 MB | 675 KB (WebP) |
-| Third-party JS | 3 CDN libraries | none |
-| Icon delivery | Font Awesome CSS + webfont | inline SVG |
-| TTFB, database down | ~2.1 s | ~0.06 s |
-| Blocking API calls on render | GitHub, synchronous | none |
-
-Other measures: `?v=<mtime>` asset fingerprinting with immutable caching,
-`font-display: swap` with preconnect, lazy loading below the fold,
-`fetchpriority="high"` on the hero portrait, `content-visibility`-friendly
-section structure, and `prefers-reduced-motion` honoured throughout.
+No default credentials ship with the project.
 
 ---
 
-## Accessibility
+## Performance and accessibility
 
-Semantic landmarks, a skip link, visible focus rings, `aria-current` on the
-active nav item, a focus-trapped modal that restores focus on close, labelled
-form fields with `aria-invalid` and inline error text, `aria-live` status
-messages, decorative imagery marked `aria-hidden`, and full keyboard operation.
-Colour pairings meet WCAG AA in both themes.
+- No third-party JavaScript. Fonts from Google Fonts with `display=swap`.
+- Per-module fingerprinting via the import map; feature code loads on approach.
+- Images resized and served as WebP with fallbacks (`tools/optimize-images.php`).
+- Scroll-driven animation only where `animation-timeline` is supported;
+  `prefers-reduced-motion` turns motion off everywhere, including the graph, the
+  request animation and view transitions.
+- Custom cursor on fine pointers only; never replaces focus indication.
+- Skip link, landmarks, numbered nav with `aria-current`, focus-trapped overlays
+  that restore focus, labelled fields with inline errors, `aria-live` results,
+  every interactive graph node reachable by keyboard.
+- Checked from 1920 px down to 360 px with no horizontal scroll.
 
 ---
 
 ## Troubleshooting
 
-**Site loads but projects show no GitHub stats.** The API is rate limited or
-unreachable. Set `GITHUB_TOKEN` in `.env`. Cached data is served meanwhile —
-check `storage/cache/` is writable.
+**`/projects/…` returns 404.** The host is not rewriting. Enable `mod_rewrite`
+with `AllowOverride All`, add the Nginx rule, or set `PRETTY_URLS=false`.
 
-**"Database unavailable" on `/admin`.** The public site is unaffected by design.
-Check `.env`, confirm MySQL is running, and that `database/schema.sql` has been
-applied.
+**Locally, pages work but `/projects/…` 404s.** Start the server with
+`php -S 127.0.0.1:8899 router.php` — the router argument matters.
 
-**Contact form reports an error.** With neither a database nor SMTP configured
-there is nowhere to put the message. Configure one.
+**Projects show no GitHub stats.** Rate limited or unreachable. Set `GITHUB_TOKEN`
+and make sure `storage/cache/` is writable.
 
-**`/sitemap.xml` 404s on Apache.** `mod_rewrite` is off or `AllowOverride` is
-not `All`. `/sitemap.php` works regardless.
+**"Database unavailable" on `/admin`.** The public site is unaffected. Check
+`.env` and that `schema.sql` has been applied.
 
-**Styles look wrong after an update.** Assets are fingerprinted by modification
-time; a hard refresh (Ctrl+Shift+R) clears a stale proxy cache.
+**Styles look stale after an update.** Hard refresh (Ctrl+Shift+R).
 
 ---
 
 ## License
 
-Source code MIT. Written content, CV, and project imagery remain the property of
+Source code MIT. Written content, CV and project imagery remain the property of
 Afifa Sultana.

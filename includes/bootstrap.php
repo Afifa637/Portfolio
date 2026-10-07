@@ -93,6 +93,7 @@ require_once APP_ROOT . '/src/helpers.php';
 require_once APP_ROOT . '/src/Database.php';
 require_once APP_ROOT . '/src/Content.php';
 require_once APP_ROOT . '/src/GitHub.php';
+require_once APP_ROOT . '/src/Knowledge.php';
 require_once APP_ROOT . '/src/Mailer.php';
 require_once APP_ROOT . '/src/ContactHandler.php';
 

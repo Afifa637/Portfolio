@@ -177,6 +177,32 @@
         });
     });
 
+    /* ------------------------------------------------ architecture rows ---- */
+
+    // Each row is three inputs (layer, technology, responsibility). Adding a
+    // row clones the last one with its values cleared.
+    const archRows = $('#arch-rows');
+    const archAdd  = $('#arch-add');
+
+    if (archRows && archAdd) {
+        archAdd.addEventListener('click', () => {
+            const last = archRows.lastElementChild;
+            if (!last) return;
+            const row = last.cloneNode(true);
+            $$('input', row).forEach((input) => { input.value = ''; });
+            archRows.appendChild(row);
+            $('input', row).focus();
+        });
+
+        archRows.addEventListener('click', (e) => {
+            if (!e.target.closest('[data-arch-remove]')) return;
+            const row = e.target.closest('.arch-row');
+            // Keep one row so there is always something to type into.
+            if (archRows.children.length > 1) row.remove();
+            else $$('input', row).forEach((input) => { input.value = ''; });
+        });
+    }
+
     /* ------------------------------------------------- mobile table labels -- */
 
     // Pairs each cell with its column heading so the stacked phone layout

@@ -1,17 +1,22 @@
 <?php
 
 /**
- * Contact: the conversion section.
+ * 10 — Contact.
  *
- * The form posts to the same URL. JavaScript intercepts and submits via fetch
- * for an inline response; without JavaScript the ordinary POST still works and
- * the result arrives as a flash message after redirect.
+ * The form posts to the same URL. JavaScript submits it with fetch for an
+ * inline success state; without JavaScript the ordinary POST works and the
+ * result arrives as a flash message. Messages are stored and emailed — see
+ * ContactHandler — so a mail outage cannot lose one.
  */
 
 declare(strict_types=1);
 
 $contact  = Content::get('contact', []);
 $identity = Content::get('identity', []);
+$services = Content::get('services', []);
+$socials  = Content::get('socials', []);
+$status   = Content::get('status', []);
+$metrics  = Knowledge::metrics();
 
 $success = flash('contact_success');
 $error   = flash('contact_error');
@@ -20,125 +25,141 @@ $old     = $_SESSION['_flash']['contact_old'] ?? [];
 
 unset($_SESSION['_flash']['contact_errors'], $_SESSION['_flash']['contact_old']);
 
-/** Render one field's stored value after a failed non-JS submission. */
-$oldValue = static fn(string $key): string => e((string) ($old[$key] ?? ''));
-$fieldErr = static fn(string $key): string => (string) ($errors[$key] ?? '');
+$value = static fn(string $k): string => e((string) ($old[$k] ?? ''));
+$err   = static fn(string $k): string => (string) ($errors[$k] ?? '');
+
+$byIcon = [];
+foreach ($socials as $s) {
+    $byIcon[$s['icon']] = $s;
+}
 
 ?>
-<section class="section" id="contact">
+<section class="section contact" id="contact" data-section="contact" data-label="10 / Contact">
     <div class="container">
-        <header class="section-head" data-reveal>
-            <p class="eyebrow"><?= icon('send', 13) ?> Contact</p>
-            <h2 class="section-title"><?= e($contact['heading']) ?></h2>
-            <p class="section-lead"><?= e($contact['lead']) ?></p>
-        </header>
+        <p class="label" style="margin-bottom:1.5rem"><b style="color:var(--amber);font-weight:500">10</b> / Contact</p>
+
+        <h2 class="contact-title" data-reveal="lines">
+            <span class="ln" style="--i:0"><span>Have something</span></span>
+            <span class="ln" style="--i:1"><span><span class="serif">worth building?</span></span></span>
+        </h2>
 
         <div class="contact-grid">
             <div data-reveal>
-                <div class="channel-list">
-                    <?php foreach ($contact['channels'] as $channel): ?>
-                        <?php $tag = $channel['href'] !== '' ? 'a' : 'div'; ?>
-                        <<?= $tag ?> class="channel"
-                            <?php if ($channel['href'] !== ''): ?>
-                                href="<?= e($channel['href']) ?>"
-                                <?= str_starts_with($channel['href'], 'mailto:') ? '' : 'target="_blank" rel="noopener noreferrer"' ?>
-                            <?php endif; ?>>
-                            <span class="ico"><?= icon($channel['icon'], 18) ?></span>
-                            <span>
-                                <span class="label"><?= e($channel['label']) ?></span>
-                                <span class="value"><?= e($channel['value']) ?></span>
-                            </span>
-                        </<?= $tag ?>>
+                <div class="panel status-card">
+                    <div class="panel-head">
+                        <strong>AFIFA.DEV</strong>
+                        <span class="label"><span class="live"></span> live</span>
+                    </div>
+                    <dl class="kv">
+                        <div><dt>Status</dt><dd><?= !empty($identity['available']) ? 'Available' : 'Busy' ?></dd></div>
+                        <div><dt>Focus</dt><dd><?= e((string) ($status['focus'] ?? '')) ?></dd></div>
+                        <div><dt>Mode</dt><dd><?= e((string) ($status['mode'] ?? '')) ?></dd></div>
+                        <div><dt>Local time</dt>
+                            <dd><time data-clock data-tz="<?= e((string) ($status['timezone'] ?? 'Asia/Dhaka')) ?>" data-seconds>—</time>
+                                <span class="t-3"><?= e((string) ($status['timezone'] ?? '')) ?></span></dd></div>
+                        <?php if ($metrics['repos'] !== null): ?>
+                            <div><dt>Repos</dt><dd><?= (int) $metrics['repos'] ?> public</dd></div>
+                        <?php endif; ?>
+                        <div><dt>Theme</dt><dd data-theme-label>dark</dd></div>
+                    </dl>
+                </div>
+
+                <div class="channels">
+                    <div class="channel">
+                        <span class="k">Email</span>
+                        <a class="v ulink" href="mailto:<?= e($identity['email']) ?>"><?= e($identity['email']) ?></a>
+                        <button class="copy-btn" type="button" data-copy="<?= e($identity['email']) ?>" aria-label="Copy email address">
+                            <span class="ic-copy"><?= icon('copy', 15) ?></span>
+                            <span class="ic-check"><?= icon('check', 15) ?></span>
+                        </button>
+                    </div>
+                    <?php foreach (['github' => 'GitHub', 'linkedin' => 'LinkedIn'] as $iconKey => $label): ?>
+                        <?php if (isset($byIcon[$iconKey])): ?>
+                            <div class="channel">
+                                <span class="k"><?= e($label) ?></span>
+                                <a class="v ulink" href="<?= e($byIcon[$iconKey]['url']) ?>" target="_blank" rel="noopener noreferrer"
+                                   data-cursor="external" <?= $iconKey === 'github' ? 'data-track="github"' : '' ?>>
+                                    <?= e(preg_replace('#^https?://(www\.)?#', '', rtrim($byIcon[$iconKey]['url'], '/'))) ?>
+                                </a>
+                                <?= icon('arrow-up-right', 15, 't-3') ?>
+                            </div>
+                        <?php endif; ?>
                     <?php endforeach; ?>
+                    <div class="channel">
+                        <span class="k">Résumé</span>
+                        <a class="v ulink" href="<?= e(url(ltrim((string) $identity['resume'], '/'))) ?>" data-track="resume">Download PDF</a>
+                        <?= icon('download', 15, 't-3') ?>
+                    </div>
                 </div>
 
-                <div class="hero-actions" style="margin-top:var(--sp-4)">
-                    <button class="btn btn-sm btn-ghost" type="button"
-                            data-copy="<?= e($identity['email']) ?>">
-                        <?= icon('copy', 15) ?> <span data-copy-label>Copy email</span>
-                    </button>
-                    <a class="btn btn-sm btn-ghost" href="<?= e($identity['resume']) ?>">
-                        <?= icon('download', 15) ?> CV
-                    </a>
-                </div>
-
-                <p class="form-note" style="margin-top:var(--sp-5)">
-                    <?= icon('check', 15) ?>
-                    <span>Usually replies within a day or two. Based in <?= e($identity['location']) ?>, open to remote work.</span>
-                </p>
+                <?php if ($services !== []): ?>
+                    <p class="label" style="margin-top:1.8rem">What I can help with</p>
+                    <ul class="services-mini" role="list">
+                        <?php foreach ($services as $service): ?>
+                            <li><?= e($service['title']) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
             </div>
 
-            <form class="form" id="contact-form" method="post" action="<?= e(url('#contact')) ?>" novalidate data-reveal>
-                <?php if ($success !== null): ?>
-                    <p class="alert alert-ok" role="status"><?= icon('check', 18) ?> <span><?= e($success) ?></span></p>
-                <?php elseif ($error !== null): ?>
-                    <p class="alert alert-err" role="alert"><?= icon('x', 18) ?> <span><?= e($error) ?></span></p>
-                <?php endif; ?>
+            <div class="card contact-form" data-reveal>
+                <form class="form" id="contact-form" method="post" action="<?= e(url()) ?>#contact" novalidate>
+                    <?php if ($success !== null): ?>
+                        <p class="alert alert-ok" role="status"><?= icon('check', 18) ?><span><?= e($success) ?></span></p>
+                    <?php elseif ($error !== null): ?>
+                        <p class="alert alert-err" role="alert"><?= icon('x', 18) ?><span><?= e($error) ?></span></p>
+                    <?php endif; ?>
 
-                <p class="alert" id="form-status" hidden></p>
+                    <p class="alert" id="form-status" hidden></p>
 
-                <?= csrf_field() ?>
-                <input type="hidden" name="rendered_at" value="<?= e((string) time()) ?>">
-
-                <div class="hp" aria-hidden="true">
-                    <label for="website">Leave this field empty</label>
-                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-                </div>
-
-                <div class="form-row">
-                    <div class="field" data-invalid="<?= $fieldErr('name') !== '' ? 'true' : 'false' ?>">
-                        <label for="name">Name <span class="req" aria-hidden="true">*</span></label>
-                        <input type="text" id="name" name="name" required autocomplete="name"
-                               maxlength="120" placeholder="Your name" value="<?= $oldValue('name') ?>">
-                        <span class="field-error"><?= e($fieldErr('name')) ?></span>
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="rendered_at" value="<?= time() ?>">
+                    <div class="hp" aria-hidden="true">
+                        <label for="website">Leave this field empty</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                     </div>
 
-                    <div class="field" data-invalid="<?= $fieldErr('email') !== '' ? 'true' : 'false' ?>">
-                        <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
-                        <input type="email" id="email" name="email" required autocomplete="email"
-                               maxlength="200" placeholder="you@company.com" value="<?= $oldValue('email') ?>">
-                        <span class="field-error"><?= e($fieldErr('email')) ?></span>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="purpose">What is this about?</label>
-                    <select id="purpose" name="purpose">
-                        <option value="">Select one…</option>
-                        <?php foreach ($contact['purposes'] as $purpose): ?>
-                            <option value="<?= e($purpose) ?>" <?= ($old['purpose'] ?? '') === $purpose ? 'selected' : '' ?>>
-                                <?= e($purpose) ?>
-                            </option>
+                    <fieldset class="choices field" data-invalid="<?= $err('purpose') !== '' ? 'true' : 'false' ?>">
+                        <legend class="field-label">Reason for contact</legend>
+                        <?php foreach ($contact['purposes'] as $i => $purpose): ?>
+                            <label class="choice">
+                                <input type="radio" name="purpose" value="<?= e($purpose) ?>"
+                                    <?= (($old['purpose'] ?? '') === $purpose || (($old['purpose'] ?? '') === '' && $i === 0)) ? 'checked' : '' ?>>
+                                <span><?= e($purpose) ?></span>
+                            </label>
                         <?php endforeach; ?>
-                    </select>
-                    <span class="field-error"></span>
-                </div>
+                    </fieldset>
 
-                <div class="field" data-invalid="<?= $fieldErr('subject') !== '' ? 'true' : 'false' ?>">
-                    <label for="subject">Subject <span class="req" aria-hidden="true">*</span></label>
-                    <input type="text" id="subject" name="subject" required maxlength="200"
-                           placeholder="Backend internship — Acme Ltd" value="<?= $oldValue('subject') ?>">
-                    <span class="field-error"><?= e($fieldErr('subject')) ?></span>
-                </div>
+                    <div class="form-row">
+                        <div class="field" data-invalid="<?= $err('name') !== '' ? 'true' : 'false' ?>">
+                            <label for="name">Name <span class="req" aria-hidden="true">*</span></label>
+                            <input type="text" id="name" name="name" required maxlength="120" autocomplete="name"
+                                   placeholder="Your name" value="<?= $value('name') ?>" aria-describedby="name-err">
+                            <span class="field-error" id="name-err"><?= e($err('name')) ?></span>
+                        </div>
+                        <div class="field" data-invalid="<?= $err('email') !== '' ? 'true' : 'false' ?>">
+                            <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+                            <input type="email" id="email" name="email" required maxlength="190" autocomplete="email"
+                                   placeholder="you@company.com" value="<?= $value('email') ?>" aria-describedby="email-err">
+                            <span class="field-error" id="email-err"><?= e($err('email')) ?></span>
+                        </div>
+                    </div>
 
-                <div class="field" data-invalid="<?= $fieldErr('message') !== '' ? 'true' : 'false' ?>">
-                    <label for="message">Message <span class="req" aria-hidden="true">*</span></label>
-                    <textarea id="message" name="message" required maxlength="5000"
-                              placeholder="Tell me about the role or project…"><?= $oldValue('message') ?></textarea>
-                    <span class="field-error"><?= e($fieldErr('message')) ?></span>
-                </div>
+                    <div class="field" data-invalid="<?= $err('message') !== '' ? 'true' : 'false' ?>">
+                        <label for="message">Message <span class="req" aria-hidden="true">*</span></label>
+                        <textarea id="message" name="message" required maxlength="5000" aria-describedby="message-err"
+                                  placeholder="Tell me about the role, the team, or the thing you want built."><?= $value('message') ?></textarea>
+                        <span class="field-error" id="message-err"><?= e($err('message')) ?></span>
+                    </div>
 
-                <div class="hero-actions" style="margin:0">
-                    <button class="btn btn-primary" type="submit">
-                        <?= icon('send', 17) ?> Send message
-                    </button>
-                </div>
-
-                <p class="form-note">
-                    <?= icon('check', 15) ?>
-                    <span>Your details are used only to reply. No newsletter, no third parties.</span>
-                </p>
-            </form>
+                    <div class="hero-actions" style="align-items:center">
+                        <button class="btn btn-primary" type="submit" data-magnetic>
+                            <?= icon('send', 16) ?> Send message
+                        </button>
+                        <span class="field-hint">Saved and delivered to my inbox. I reply within a day or two.</span>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </section>

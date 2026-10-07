@@ -21,6 +21,34 @@ foreach (Database::all('SELECT slug, label FROM project_categories ORDER BY orde
     $categories[(string) $row['slug']] = (string) $row['label'];
 }
 
+/**
+ * Architecture layers arrive as three parallel arrays (layer, tech, role).
+ * Rows without a layer name are dropped; the result is stored as JSON.
+ */
+function admin_architecture_from_post(): string
+{
+    $names = (array) ($_POST['arch_layer'] ?? []);
+    $techs = (array) ($_POST['arch_tech'] ?? []);
+    $roles = (array) ($_POST['arch_role'] ?? []);
+    $rows  = [];
+
+    foreach ($names as $i => $name) {
+        $name = trim((string) $name);
+
+        if ($name === '') {
+            continue;
+        }
+
+        $rows[] = [
+            'layer' => $name,
+            'tech'  => trim((string) ($techs[$i] ?? '')),
+            'role'  => trim((string) ($roles[$i] ?? '')),
+        ];
+    }
+
+    return $rows === [] ? '' : (string) json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
 /* ------------------------------------------------------------- actions ---- */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -80,23 +108,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     )));
 
     $data = [
-        'title'        => $title,
-        'slug'         => Content::slugify((string) ($_POST['slug'] ?? '') ?: $title),
-        'subtitle'     => trim((string) ($_POST['subtitle'] ?? '')),
-        'category'     => trim((string) ($_POST['category'] ?? 'fullstack')),
-        'image'        => $image,
-        'summary'      => trim((string) ($_POST['summary'] ?? '')),
-        'problem'      => trim((string) ($_POST['problem'] ?? '')),
-        'challenges'   => trim((string) ($_POST['challenges'] ?? '')),
-        'outcome'      => trim((string) ($_POST['outcome'] ?? '')),
-        'learned'      => trim((string) ($_POST['learned'] ?? '')),
-        'skills_used'  => $stack,
-        'role'         => trim((string) ($_POST['role'] ?? '')),
-        'year'         => trim((string) ($_POST['year'] ?? '')),
-        'view_link'    => trim((string) ($_POST['view_link'] ?? '')),
-        'repo_name'    => trim((string) ($_POST['repo_name'] ?? '')),
-        'featured'     => isset($_POST['featured']) ? 1 : 0,
-        'is_published' => isset($_POST['is_published']) ? 1 : 0,
+        'title'                => $title,
+        'slug'                 => Content::slugify((string) ($_POST['slug'] ?? '') ?: $title),
+        'subtitle'             => trim((string) ($_POST['subtitle'] ?? '')),
+        'category'             => trim((string) ($_POST['category'] ?? 'fullstack')),
+        'image'                => $image,
+        'summary'              => trim((string) ($_POST['summary'] ?? '')),
+        'problem'              => trim((string) ($_POST['problem'] ?? '')),
+        'challenges'           => trim((string) ($_POST['challenges'] ?? '')),
+        'outcome'              => trim((string) ($_POST['outcome'] ?? '')),
+        'learned'              => trim((string) ($_POST['learned'] ?? '')),
+        'goal'                 => trim((string) ($_POST['goal'] ?? '')),
+        'decisions'            => trim((string) ($_POST['decisions'] ?? '')),
+        'security_notes'       => trim((string) ($_POST['security_notes'] ?? '')),
+        'future_improvements'  => trim((string) ($_POST['future_improvements'] ?? '')),
+        'demo_request'         => trim((string) ($_POST['demo_request'] ?? '')),
+        'architecture'         => admin_architecture_from_post(),
+        'skills_used'          => $stack,
+        'role'                 => trim((string) ($_POST['role'] ?? '')),
+        'year'                 => trim((string) ($_POST['year'] ?? '')),
+        'view_link'            => trim((string) ($_POST['view_link'] ?? '')),
+        'repo_name'            => trim((string) ($_POST['repo_name'] ?? '')),
+        'featured'             => isset($_POST['featured']) ? 1 : 0,
+        'is_published'         => isset($_POST['is_published']) ? 1 : 0,
     ];
 
     if ($id > 0) {
@@ -229,6 +263,55 @@ admin_head($project ? 'Edit project' : ($creating ? 'New project' : 'Projects'))
                 ?>
             </div>
 
+            <div class="admin-form-grid">
+                <?php
+                admin_field(['name' => 'goal', 'label' => 'Goal', 'type' => 'textarea', 'rows' => 3,
+                             'hint' => 'What it set out to achieve. Left blank, the section is hidden.'], $project['goal'] ?? '');
+                admin_field(['name' => 'decisions', 'label' => 'Engineering decisions', 'type' => 'textarea', 'rows' => 5,
+                             'hint' => 'One decision per paragraph — a blank line between each.'], $project['decisions'] ?? '');
+                admin_field(['name' => 'security_notes', 'label' => 'Security & validation', 'type' => 'textarea', 'rows' => 3],
+                            $project['security_notes'] ?? '');
+                admin_field(['name' => 'future_improvements', 'label' => 'What you would improve', 'type' => 'textarea', 'rows' => 3],
+                            $project['future_improvements'] ?? '');
+                ?>
+            </div>
+        </section>
+
+        <section class="card" style="display:grid;gap:var(--sp-4)">
+            <div>
+                <h2 style="font-size:var(--fs-lg);border:0;padding:0">Architecture</h2>
+                <p class="field-hint" style="margin-top:4px">
+                    Layers from client to database. They drive the diagram on the case study, the visual on the
+                    featured card, and — with an example request — the "Under the hood" simulator.
+                </p>
+            </div>
+
+            <?php
+            admin_field(['name' => 'demo_request', 'label' => 'Example request', 'maxlength' => 190,
+                         'placeholder' => 'POST /api/auth/login',
+                         'hint' => 'Method and path. Projects with one appear in "Under the hood".'], $project['demo_request'] ?? '');
+
+            $layers = json_decode((string) ($project['architecture'] ?? ''), true);
+            $layers = is_array($layers) && $layers !== [] ? $layers : [['layer' => '', 'tech' => '', 'role' => '']];
+            ?>
+
+            <div class="field">
+                <label>Layers <span class="field-hint" style="text-transform:none;letter-spacing:0">— layer · technology · responsibility</span></label>
+                <div class="repeater-list" id="arch-rows">
+                    <?php foreach ($layers as $layer): ?>
+                        <div class="repeater-row arch-row">
+                            <input type="text" name="arch_layer[]" value="<?= e((string) ($layer['layer'] ?? '')) ?>" placeholder="Security filter chain">
+                            <input type="text" name="arch_tech[]" value="<?= e((string) ($layer['tech'] ?? '')) ?>" placeholder="Spring Security, JWT">
+                            <input type="text" name="arch_role[]" value="<?= e((string) ($layer['role'] ?? '')) ?>" placeholder="What this layer is responsible for">
+                            <button type="button" class="btn btn-sm btn-danger" data-arch-remove aria-label="Remove layer">&times;</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <button type="button" class="btn btn-sm btn-ghost" id="arch-add" style="justify-self:start">Add layer</button>
+            </div>
+        </section>
+
+        <section class="card" style="display:grid;gap:var(--sp-4)">
             <div class="field" data-repeater="features">
                 <label>What it does</label>
                 <p class="field-hint">The bullet list inside the case study. One capability per row.</p>
@@ -253,7 +336,7 @@ admin_head($project ? 'Edit project' : ($creating ? 'New project' : 'Projects'))
             <button class="btn btn-primary" type="submit"><?= icon('check', 16) ?> Save project</button>
             <a class="btn btn-ghost" href="projects.php">Cancel</a>
             <?php if ($project): ?>
-                <a class="btn btn-ghost" href="../index.php#project-<?= e((string) $project['slug']) ?>"
+                <a class="btn btn-ghost" href="<?= e(project_url((string) $project['slug'])) ?>"
                    target="_blank" rel="noopener"><?= icon('external', 16) ?> Preview</a>
             <?php endif; ?>
         </div>

@@ -25,6 +25,9 @@ function admin_nav(): array
         'resource.php?r=activities'   => ['label' => 'Activities',   'icon' => 'award',      'group' => 'Content'],
         'resource.php?r=services'     => ['label' => 'Services',     'icon' => 'zap',        'group' => 'Content'],
         'resource.php?r=about_facts'  => ['label' => 'About facts',  'icon' => 'book',       'group' => 'Content'],
+        'resource.php?r=principles'   => ['label' => 'How I think',  'icon' => 'route',      'group' => 'Content'],
+        'resource.php?r=blueprint_stages' => ['label' => 'Request blueprint', 'icon' => 'server', 'group' => 'Content'],
+        'resource.php?r=journey'      => ['label' => 'Journey',      'icon' => 'calendar',   'group' => 'Content'],
 
         'resource.php?r=home_roles'       => ['label' => 'Hero roles',  'icon' => 'terminal', 'group' => 'Details'],
         'resource.php?r=home_socials'     => ['label' => 'Social links', 'icon' => 'github',  'group' => 'Details'],
@@ -56,10 +59,10 @@ function admin_head(string $title): void
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($title) ?> — Portfolio admin</title>
     <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="../<?= e(asset('assets/css/app.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/app.css')) ?>">
     <?php /* Paths are prefixed with ../ because asset() returns a path relative
              to the project root, while these pages are served from /admin/. */ ?>
-    <link rel="stylesheet" href="../<?= e(asset('admin/css/admin.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('admin/css/admin.css')) ?>">
     <script>
         (function () {
             try {
@@ -68,6 +71,7 @@ function admin_head(string $title): void
             } catch (e) { document.documentElement.dataset.theme = 'dark'; }
         })();
     </script>
+    <?= import_map() ?>
 </head>
 <body class="admin">
 <a class="skip-link" href="#admin-main">Skip to content</a>
@@ -122,9 +126,9 @@ function admin_head(string $title): void
         </button>
         <h1><?= e($title) ?></h1>
         <div class="admin-topbar-actions">
-            <button class="btn btn-icon" id="theme-toggle" type="button" aria-label="Switch theme">
-                <span data-theme-icon="sun"><?= icon('sun', 18) ?></span>
-                <span data-theme-icon="moon" hidden><?= icon('moon', 18) ?></span>
+            <button class="btn btn-icon theme-btn" type="button" data-action="theme" aria-label="Switch theme">
+                <span class="sun"><?= icon('sun', 17) ?></span>
+                <span class="moon"><?= icon('moon', 17) ?></span>
             </button>
         </div>
     </header>
@@ -141,8 +145,8 @@ function admin_foot(): void
 </div>
 
 <div class="admin-overlay" id="admin-overlay" hidden></div>
-<script src="../<?= e(asset('assets/js/app.js')) ?>" defer></script>
-<script src="../<?= e(asset('admin/js/admin.js')) ?>" defer></script>
+<script type="module">import { initTheme } from '@/core/theme.js'; initTheme();</script>
+<script src="<?= e(asset('admin/js/admin.js')) ?>" defer></script>
 </body>
 </html>
     <?php
@@ -238,7 +242,7 @@ function admin_field(array $field, mixed $value = null): void
                 '<div class="image-preview"%s>%s</div>',
                 $value ? '' : ' data-empty="true"',
                 $value
-                    ? '<img src="../' . e(asset((string) $value)) . '" alt="">'
+                    ? '<img src="' . e(asset((string) $value)) . '" alt="">'
                     : '<span>No image</span>'
             );
             echo '<div class="image-field-controls">';

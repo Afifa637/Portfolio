@@ -133,7 +133,55 @@ docker compose exec web php database/migrate.php
 docker compose exec web php database/create_admin.php
 ```
 
-Put Nginx or Caddy in front for TLS. The README has a ready Nginx server block.
+Put Nginx or Caddy in front for TLS.
+
+---
+
+## Nginx without Apache
+
+`.htaccess` is Apache-only. The equivalent server block — note the
+`/projects/<slug>` rewrite, which case-study links depend on:
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+    root /var/www/portfolio;
+    index index.php;
+
+    add_header X-Content-Type-Options    "nosniff"                         always;
+    add_header X-Frame-Options           "SAMEORIGIN"                      always;
+    add_header Referrer-Policy           "strict-origin-when-cross-origin" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    rewrite ^/projects/([a-z0-9-]+)/?$ /project.php?slug=$1 last;
+    location = /sitemap.xml { try_files $uri /sitemap.php; }
+    error_page 404 /404.php;
+
+    # Application internals are never served directly.
+    location ~ ^/(includes|src|config|storage|database|vendor|tools)/ { deny all; }
+    location ~ /\.                                                    { deny all; }
+    location ~ \.(sql|md|lock|json)$                                  { deny all; }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    # Assets carry a ?v=<mtime> fingerprint, so immutable is safe.
+    location ~* \.(css|js|png|jpe?g|webp|svg|woff2?)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    location / { try_files $uri $uri/ /index.php?$query_string; }
+}
+```
+
+If you cannot add the rewrite, set `PRETTY_URLS=false` in `.env` and project
+links use `project.php?slug=…` instead.
 
 ---
 
@@ -190,6 +238,7 @@ Put Nginx or Caddy in front for TLS. The README has a ready Nginx server block.
 - [ ] Admin password is strong and not the one from any setup guide
 - [ ] Contact form test email received
 - [ ] `/admin` loads over HTTPS only
+- [ ] A case study opens at `/projects/<slug>`
 
 ---
 
@@ -203,6 +252,9 @@ the `.env` credentials; on shared hosting `DB_HOST` is rarely `localhost`.
 
 **Styles missing.** `.htaccess` is being ignored, or `mod_rewrite` is off. The
 site still works; ask support to enable `AllowOverride All`.
+
+**Case-study pages (`/projects/…`) return 404.** Same cause: rewrites are off.
+Enable them, or set `PRETTY_URLS=false` in `.env`.
 
 **Contact form says something went wrong.** Neither the database nor SMTP is
 configured, so there is nowhere to put the message. Set up one of them.

@@ -163,6 +163,12 @@ $additions = [
         'learned'      => 'TEXT DEFAULT NULL',
         'year'         => 'VARCHAR(16) DEFAULT NULL',
         'repo_name'    => 'VARCHAR(190) DEFAULT NULL',
+        'goal'                => 'TEXT DEFAULT NULL',
+        'decisions'           => 'TEXT DEFAULT NULL',
+        'security_notes'      => 'TEXT DEFAULT NULL',
+        'future_improvements' => 'TEXT DEFAULT NULL',
+        'architecture'        => 'TEXT DEFAULT NULL',
+        'demo_request'        => 'VARCHAR(190) DEFAULT NULL',
         'featured'     => 'TINYINT(1) NOT NULL DEFAULT 0',
         'is_published' => 'TINYINT(1) NOT NULL DEFAULT 1',
         'order_no'     => 'INT NOT NULL DEFAULT 0',
@@ -553,9 +559,47 @@ $settings = [
     ['seo',      'seo_description', $seo['description'],     'Meta description',       'textarea', 'Around 155 characters'],
     ['seo',      'seo_keywords',  $seo['keywords'],          'Keywords',               'text',     'Comma separated'],
     ['seo',      'seo_image',     $seo['image'],             'Social share image',     'image',    '1200×630 works best'],
+    ['status',   'focus',         $profile['status']['focus'],    'Current focus',    'text', 'Shown in the system status panel'],
+    ['status',   'current_mode',  $profile['status']['mode'],     'Current mode',     'text', 'Building, Learning, Shipping…'],
+    ['status',   'timezone',      $profile['status']['timezone'], 'Time zone',        'text', 'IANA name, e.g. Asia/Dhaka — drives the live clock'],
 ];
 
-importInto('site_settings', array_map(
+$settingRows = array_map(
+    static fn(array $s, int $i): array => [
+        'group_key'   => $s[0],
+        'setting_key' => $s[1],
+        'value'       => (string) $s[2],
+        'label'       => $s[3],
+        'input_type'  => $s[4],
+        'hint'        => $s[5],
+        'order_no'    => $i,
+    ],
+    $settings,
+    array_keys($settings)
+);
+
+$existingKeys = array_column(Database::all('SELECT setting_key FROM site_settings'), 'setting_key');
+
+if ($existingKeys !== [] && !$reimport) {
+    // Existing install: add only the keys that are new in this release.
+    $newKeys = 0;
+
+    foreach ($settingRows as $row) {
+        if (in_array($row['setting_key'], $existingKeys, true)) {
+            continue;
+        }
+
+        if (Database::execute(
+            'INSERT INTO site_settings (group_key, setting_key, value, label, input_type, hint, order_no)
+             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            array_values($row)
+        )) {
+            $newKeys++;
+        }
+    }
+
+    printf("    · %-20s %d existing, %d new key%s added\n", 'site_settings', count($existingKeys), $newKeys, $newKeys === 1 ? '' : 's');
+} else importInto('site_settings', array_map(
     static fn(array $s, int $i): array => [
         'group_key'   => $s[0],
         'setting_key' => $s[1],
@@ -679,6 +723,43 @@ foreach ($profile['skills'] as $gi => $group) {
 }
 
 printf("    ✓ %-20s %d added, %d linked to groups\n", 'skills', $addedSkills, $linkedSkills);
+
+/* --- principles, blueprint, journey ------------------------------------- */
+
+importInto('principles', array_map(
+    static fn(array $p, int $i): array => [
+        'title'    => $p['title'],
+        'body'     => $p['body'],
+        'evidence' => implode(', ', $p['evidence']),
+        'order_no' => $i,
+    ],
+    $profile['principles'],
+    array_keys($profile['principles'])
+), $reimport, 'principles');
+
+importInto('blueprint_stages', array_map(
+    static fn(array $b, int $i): array => [
+        'stage'    => $b['stage'],
+        'body'     => $b['body'],
+        'tech'     => implode(', ', $b['tech']),
+        'order_no' => $i,
+    ],
+    $profile['blueprint'],
+    array_keys($profile['blueprint'])
+), $reimport, 'blueprint_stages');
+
+importInto('journey', array_map(
+    static fn(array $j, int $i): array => [
+        'period'   => $j['period'],
+        'title'    => $j['title'],
+        'body'     => $j['body'],
+        'tech'     => implode(', ', $j['tech']),
+        'projects' => implode(', ', $j['projects']),
+        'order_no' => $i,
+    ],
+    $profile['journey'],
+    array_keys($profile['journey'])
+), $reimport, 'journey');
 
 /* --- education --------------------------------------------------------- */
 
@@ -873,5 +954,53 @@ if ($projectCount === 0 || $reimport) {
         printf("    ✓ %-20s %d new project%s added from profile.php\n", '', $new, $new === 1 ? '' : 's');
     }
 }
+
+/*
+ * Fill the case-study fields added in this release on projects that already
+ * exist. Only blank fields are written, so anything edited in the admin is
+ * left exactly as it is.
+ */
+$byRepo = [];
+$bySlug = [];
+
+foreach ($profile['projects'] as $project) {
+    if (!empty($project['repo'])) {
+        $byRepo[strtolower($project['repo'])] = $project;
+    }
+    $bySlug[strtolower($project['slug'])] = $project;
+}
+
+$filled = 0;
+
+foreach (Database::all('SELECT id, slug, repo_name, goal, decisions, security_notes, future_improvements, architecture, demo_request FROM projects') as $row) {
+    $match = $byRepo[strtolower((string) $row['repo_name'])] ?? $bySlug[strtolower((string) $row['slug'])] ?? null;
+
+    if (!$match) {
+        continue;
+    }
+
+    $fields = [
+        'goal'                => (string) ($match['goal'] ?? ''),
+        'decisions'           => (string) ($match['decisions'] ?? ''),
+        'security_notes'      => (string) ($match['security'] ?? ''),
+        'future_improvements' => (string) ($match['future'] ?? ''),
+        'architecture'        => !empty($match['architecture'])
+            ? (string) json_encode($match['architecture'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            : '',
+        'demo_request'        => (string) ($match['demo_request'] ?? ''),
+    ];
+
+    foreach ($fields as $column => $value) {
+        if ($value === '' || trim((string) ($row[$column] ?? '')) !== '') {
+            continue;
+        }
+
+        if (Database::execute("UPDATE projects SET `{$column}` = ? WHERE id = ?", [$value, (int) $row['id']])) {
+            $filled++;
+        }
+    }
+}
+
+printf("    ✓ %-20s %d new case-study field%s filled\n", 'projects', $filled, $filled === 1 ? '' : 's');
 
 echo "\n  Done. Everything above is now editable at /admin.\n\n";

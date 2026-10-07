@@ -1,11 +1,10 @@
 <?php
 
 /**
- * Front controller.
+ * Front controller for the home page.
  *
- * Handles the contact POST, then renders the single-page portfolio. Every
- * section is self-contained and reads from Content, so a section can be
- * reordered or removed here without touching anything else.
+ * Handles the contact POST, then renders the sections. Each section reads its
+ * own content, so reordering or removing one is a one-line change here.
  */
 
 declare(strict_types=1);
@@ -17,34 +16,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-$navItems = [
-    'about'    => 'About',
-    'skills'   => 'Skills',
-    'projects' => 'Projects',
-    'github'   => 'Activity',
-    'resume'   => 'Resume',
-    'contact'  => 'Contact',
-];
+$isHome = true;
 
 ?>
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="no-js" data-theme="dark">
 <head>
     <?php view('layout/head'); ?>
 </head>
-<body>
-    <?php view('layout/header', compact('navItems')); ?>
+<body data-home="<?= e(base_path()) ?>/">
+    <?php view('layout/header', compact('isHome')); ?>
 
-    <main id="main">
-        <?php view('sections/hero'); ?>
-        <?php view('sections/about'); ?>
-        <?php view('sections/skills'); ?>
-        <?php view('sections/projects'); ?>
-        <?php view('sections/github'); ?>
-        <?php view('sections/resume'); ?>
-        <?php view('sections/contact'); ?>
+    <main class="site" id="main">
+        <?php
+        foreach (['hero', 'think', 'stack', 'featured', 'hood', 'archive', 'lab', 'activity', 'journey', 'career', 'contact'] as $section) {
+            view('sections/' . $section);
+        }
+        ?>
     </main>
 
-    <?php view('layout/footer', compact('navItems')); ?>
+    <?php view('layout/footer', compact('isHome')); ?>
 </body>
 </html>

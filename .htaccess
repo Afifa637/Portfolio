@@ -29,10 +29,13 @@ DirectoryIndex index.php index.html
     # --- Generated sitemap -------------------------------------------------
     RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
+    # --- Case-study pages: /projects/<slug> ---------------------------------
+    RewriteRule ^projects/([a-z0-9-]+)/?$ project.php?slug=$1 [L,QSA]
+
     # --- Block direct access to application internals ----------------------
     # Defence in depth: the deny blocks below cover this too, but a rewrite
     # returns a clean 404 rather than a 403 that advertises the path exists.
-    RewriteRule ^(includes|src|config|storage|database|migrations|vendor)/ - [R=404,L]
+    RewriteRule ^(includes|src|config|storage|database|migrations|vendor|tools)/ - [R=404,L]
 
     # --- Hide dotfiles -----------------------------------------------------
     RewriteRule (^|/)\. - [F]

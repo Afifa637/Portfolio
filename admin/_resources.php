@@ -169,6 +169,49 @@ function admin_resources(): array
             ],
         ],
 
+        'principles' => [
+            'title'    => 'How I think',
+            'singular' => 'principle',
+            'blurb'    => 'The numbered principles in the first section. Name the projects that evidence each one.',
+            'order'    => 'order_no, id',
+            'columns'  => ['title' => 'Principle', 'evidence' => 'Evidence'],
+            'fields'   => [
+                ['name' => 'title',    'label' => 'Principle', 'required' => true, 'maxlength' => 190],
+                ['name' => 'body',     'label' => 'Explanation', 'type' => 'textarea', 'rows' => 3],
+                ['name' => 'evidence', 'label' => 'Evidence (project slugs)', 'maxlength' => 500,
+                 'hint' => 'Comma-separated project slugs, e.g. timeless, amar-ration'],
+            ],
+        ],
+
+        'blueprint_stages' => [
+            'title'    => 'Request blueprint',
+            'singular' => 'stage',
+            'blurb'    => 'The annotated request lifecycle beside the principles.',
+            'order'    => 'order_no, id',
+            'columns'  => ['stage' => 'Stage', 'tech' => 'Technologies'],
+            'fields'   => [
+                ['name' => 'stage', 'label' => 'Stage', 'required' => true, 'maxlength' => 120],
+                ['name' => 'body',  'label' => 'What happens', 'maxlength' => 500],
+                ['name' => 'tech',  'label' => 'Technologies', 'type' => 'list', 'hint' => 'One per line'],
+            ],
+        ],
+
+        'journey' => [
+            'title'    => 'Journey',
+            'singular' => 'milestone',
+            'blurb'    => 'Growth stages: what each taught, the tools, and the projects that came out of it.',
+            'order'    => 'order_no, id',
+            'columns'  => ['period' => 'Period', 'title' => 'Stage'],
+            'fields'   => [
+                ['name' => 'period',   'label' => 'Period', 'maxlength' => 60, 'placeholder' => '2025'],
+                ['name' => 'title',    'label' => 'Stage', 'required' => true, 'maxlength' => 190],
+                ['name' => 'body',     'label' => 'What it taught', 'type' => 'textarea', 'rows' => 3],
+                ['name' => 'tech',     'label' => 'Technologies', 'type' => 'list', 'hint' => 'One per line'],
+                ['name' => 'projects', 'label' => 'Projects (slugs)', 'maxlength' => 500,
+                 'hint' => 'Comma-separated project slugs, e.g. timeless, amar-ration'],
+            ],
+        ],
+
         'home_roles' => [
             'title'    => 'Hero roles',
             'singular' => 'role',

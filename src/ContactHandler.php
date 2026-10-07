@@ -75,10 +75,21 @@ final class ContactHandler
             $errors['email'] = 'That email address does not look valid.';
         }
 
+        // Only accept a reason the form actually offered.
+        $allowedPurposes = Content::get('contact.purposes', []);
+
+        if ($purpose !== '' && $allowedPurposes !== [] && !in_array($purpose, $allowedPurposes, true)) {
+            $purpose = '';
+        }
+
+        // The form asks for a reason rather than a free-text subject, so build a
+        // readable one for the inbox and the email when none was sent.
         if ($subject === '') {
-            $errors['subject'] = 'Please enter a subject.';
-        } elseif (mb_strlen($subject) > self::MAX_SUBJECT) {
-            $errors['subject'] = 'That subject is too long.';
+            $subject = ($purpose !== '' ? $purpose : 'Portfolio enquiry') . ' — ' . ($name !== '' ? $name : 'website visitor');
+        }
+
+        if (mb_strlen($subject) > self::MAX_SUBJECT) {
+            $subject = mb_substr($subject, 0, self::MAX_SUBJECT);
         }
 
         if ($message === '') {

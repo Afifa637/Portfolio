@@ -3,8 +3,8 @@
 /**
  * XML sitemap.
  *
- * Generated rather than static so project deep links stay in step with
- * config/profile.php. Served at /sitemap.xml via the .htaccess rewrite.
+ * Generated rather than static so case-study links stay in step with the
+ * projects in the admin (or config/profile.php without a database). Served at /sitemap.xml via the .htaccess rewrite.
  */
 
 declare(strict_types=1);
@@ -20,19 +20,16 @@ if (PHP_SAPI !== 'cli' && !headers_sent()) {
 
 $today = date('Y-m-d');
 
+// Only real documents: search engines ignore #fragments, so the home page
+// sections are not listed separately.
 $urls = [
-    ['loc' => url(),                  'priority' => '1.0', 'freq' => 'weekly'],
-    ['loc' => url('#about'),          'priority' => '0.8', 'freq' => 'monthly'],
-    ['loc' => url('#skills'),         'priority' => '0.7', 'freq' => 'monthly'],
-    ['loc' => url('#projects'),       'priority' => '0.9', 'freq' => 'weekly'],
-    ['loc' => url('#github'),         'priority' => '0.6', 'freq' => 'daily'],
-    ['loc' => url('#resume'),         'priority' => '0.8', 'freq' => 'monthly'],
-    ['loc' => url('#contact'),        'priority' => '0.7', 'freq' => 'monthly'],
+    ['loc' => url(),              'priority' => '1.0', 'freq' => 'weekly'],
+    ['loc' => url('resume.php'),  'priority' => '0.8', 'freq' => 'monthly'],
 ];
 
 foreach (Content::get('projects', []) as $project) {
     $urls[] = [
-        'loc'      => url('#project-' . $project['slug']),
+        'loc'      => origin() . project_url((string) $project['slug']),
         'priority' => !empty($project['featured']) ? '0.8' : '0.6',
         'freq'     => 'monthly',
     ];

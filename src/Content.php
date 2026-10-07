@@ -379,6 +379,52 @@ final class Content
             }
         }
 
+        /* ------------------------------------------------- principles ---- */
+
+        if (Database::hasTable('principles')) {
+            $rows = Database::all('SELECT * FROM principles ORDER BY order_no, id');
+
+            if ($rows !== []) {
+                $base['principles'] = array_map(static fn(array $r): array => [
+                    'title'    => (string) $r['title'],
+                    'body'     => (string) ($r['body'] ?? ''),
+                    'evidence' => self::splitList((string) ($r['evidence'] ?? '')),
+                ], $rows);
+            }
+        }
+
+        if (Database::hasTable('blueprint_stages')) {
+            $rows = Database::all('SELECT * FROM blueprint_stages ORDER BY order_no, id');
+
+            if ($rows !== []) {
+                $base['blueprint'] = array_map(static fn(array $r): array => [
+                    'stage' => (string) $r['stage'],
+                    'body'  => (string) ($r['body'] ?? ''),
+                    'tech'  => self::splitList((string) ($r['tech'] ?? '')),
+                ], $rows);
+            }
+        }
+
+        if (Database::hasTable('journey')) {
+            $rows = Database::all('SELECT * FROM journey ORDER BY order_no, id');
+
+            if ($rows !== []) {
+                $base['journey'] = array_map(static fn(array $r): array => [
+                    'period'   => (string) ($r['period'] ?? ''),
+                    'title'    => (string) $r['title'],
+                    'body'     => (string) ($r['body'] ?? ''),
+                    'tech'     => self::splitList((string) ($r['tech'] ?? '')),
+                    'projects' => self::splitList((string) ($r['projects'] ?? '')),
+                ], $rows);
+            }
+        }
+
+        foreach (['focus' => 'focus', 'current_mode' => 'mode', 'timezone' => 'timezone'] as $settingKey => $key) {
+            if (isset($settings[$settingKey]) && trim($settings[$settingKey]) !== '') {
+                $base['status'][$key] = $settings[$settingKey];
+            }
+        }
+
         /* ---------------------------------------------------- projects ---- */
 
         if (Database::hasTable('projects')) {
@@ -451,6 +497,12 @@ final class Content
                 'outcome'    => (string) ($row['outcome'] ?? ''),
                 'learned'    => (string) ($row['learned'] ?? ''),
                 'demo'       => (string) ($row['view_link'] ?? ''),
+                'goal'         => (string) ($row['goal'] ?? ''),
+                'decisions'    => (string) ($row['decisions'] ?? ''),
+                'security'     => (string) ($row['security_notes'] ?? ''),
+                'future'       => (string) ($row['future_improvements'] ?? ''),
+                'architecture' => self::decodeArchitecture((string) ($row['architecture'] ?? '')),
+                'demo_request' => (string) ($row['demo_request'] ?? ''),
             ];
         }
 
@@ -463,6 +515,41 @@ final class Content
         $rows = Database::all('SHOW COLUMNS FROM `' . str_replace('`', '', $table) . '`');
 
         return array_column($rows, 'Field');
+    }
+
+    /**
+     * Decode a stored architecture list, discarding anything malformed rather
+     * than letting one bad admin edit break the project page.
+     *
+     * @return list<array{layer: string, tech: string, role: string}>
+     */
+    private static function decodeArchitecture(string $json): array
+    {
+        if (trim($json) === '') {
+            return [];
+        }
+
+        $decoded = json_decode($json, true);
+
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $layers = [];
+
+        foreach ($decoded as $layer) {
+            if (!is_array($layer) || trim((string) ($layer['layer'] ?? '')) === '') {
+                continue;
+            }
+
+            $layers[] = [
+                'layer' => trim((string) $layer['layer']),
+                'tech'  => trim((string) ($layer['tech'] ?? '')),
+                'role'  => trim((string) ($layer['role'] ?? '')),
+            ];
+        }
+
+        return $layers;
     }
 
     /** @return list<string> */

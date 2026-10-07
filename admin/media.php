@@ -117,7 +117,7 @@ admin_head('Media');
             $isUsed = in_array($path, $used, true);
             ?>
             <figure class="media-item">
-                <img src="../<?= e(asset($path)) ?>" alt="<?= e($name) ?>" loading="lazy">
+                <img src="<?= e(asset($path)) ?>" alt="<?= e($name) ?>" loading="lazy">
                 <figcaption class="media-meta">
                     <code><?= e($path) ?></code>
                     <span class="size">

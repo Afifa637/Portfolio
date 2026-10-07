@@ -28,9 +28,133 @@ if (!function_exists('asset')) {
         // Encode path segments so filenames containing spaces stay valid URLs.
         $encoded = implode('/', array_map('rawurlencode', explode('/', $path)));
 
-        return is_file($file)
-            ? $encoded . '?v=' . filemtime($file)
-            : $encoded;
+        // Root-relative, so the same markup works from /, /admin/ and
+        // /projects/timeless alike.
+        $url = base_path() . '/' . $encoded;
+
+        return is_file($file) ? $url . '?v=' . filemtime($file) : $url;
+    }
+}
+
+if (!function_exists('base_path')) {
+    /**
+     * URL path of the application root, without a trailing slash: '' when the
+     * site is served from the domain root, '/portfolio' from a subdirectory.
+     *
+     * Derived from the filesystem rather than the current script, because
+     * /admin/index.php and /projects/timeless would otherwise each produce a
+     * different, wrong base.
+     */
+    function base_path(): string
+    {
+        static $base = null;
+
+        if ($base !== null) {
+            return $base;
+        }
+
+        if (APP_URL !== '') {
+            return $base = rtrim((string) parse_url(APP_URL, PHP_URL_PATH), '/');
+        }
+
+        $docRoot = realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''));
+        $appRoot = realpath(APP_ROOT);
+
+        if ($docRoot && $appRoot && str_starts_with(strtolower($appRoot), strtolower($docRoot))) {
+            $relative = str_replace('\\', '/', substr($appRoot, strlen($docRoot)));
+
+            return $base = rtrim($relative, '/');
+        }
+
+        return $base = '';
+    }
+}
+
+if (!function_exists('origin')) {
+    /** Scheme and host, e.g. https://example.com — no path. */
+    function origin(): string
+    {
+        if (APP_URL !== '') {
+            $parts = parse_url(APP_URL);
+
+            return ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '')
+                . (isset($parts['port']) ? ':' . $parts['port'] : '');
+        }
+
+        return (APP_HTTPS ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+    }
+}
+
+if (!function_exists('asset_url')) {
+    /** Absolute, fingerprinted URL for an asset — for Open Graph and JSON-LD. */
+    function asset_url(string $path): string
+    {
+        return origin() . asset($path);
+    }
+}
+
+if (!function_exists('project_url')) {
+    /**
+     * Link to a project's case-study page.
+     *
+     * Pretty /projects/<slug> URLs need a rewrite rule (.htaccess on Apache,
+     * router.php on the PHP dev server, a location block on Nginx). Set
+     * PRETTY_URLS=false on a host that cannot rewrite and the query-string form
+     * is used instead, which works everywhere.
+     */
+    function project_url(string $slug): string
+    {
+        $slug = rawurlencode($slug);
+
+        return env('PRETTY_URLS', true) === false
+            ? base_path() . '/project.php?slug=' . $slug
+            : base_path() . '/projects/' . $slug;
+    }
+}
+
+if (!function_exists('home_url')) {
+    /** A link back to a section of the home page, from any page. */
+    function home_url(string $fragment = ''): string
+    {
+        return base_path() . '/' . ($fragment !== '' ? '#' . ltrim($fragment, '#') : '');
+    }
+}
+
+if (!function_exists('import_map')) {
+    /**
+     * An import map with a fingerprinted URL for every ES module.
+     *
+     * Modules import each other by name ('@/core/util.js'). Without a map,
+     * those nested imports carry no version, and .htaccess caches scripts for a
+     * year — so a deploy would leave visitors running stale code. Mapping each
+     * name to a ?v=<mtime> URL gives a bundler's cache busting without a build
+     * step.
+     */
+    function import_map(): string
+    {
+        $root    = APP_ROOT . '/assets/js';
+        $imports = [];
+
+        if (is_dir($root)) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->getExtension() !== 'js') {
+                    continue;
+                }
+
+                $relative = str_replace('\\', '/', substr($file->getPathname(), strlen($root) + 1));
+                $imports['@/' . $relative] = asset('assets/js/' . $relative);
+            }
+        }
+
+        ksort($imports);
+
+        return '<script type="importmap">'
+            . json_encode(['imports' => $imports], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG)
+            . '</script>';
     }
 }
 
@@ -79,10 +203,11 @@ if (!function_exists('url')) {
         $base = APP_URL;
 
         if ($base === '') {
+            // From the app root, not the current script's directory — otherwise
+            // url('admin/login.php') called from /admin/ became /admin/admin/.
             $scheme = APP_HTTPS ? 'https' : 'http';
             $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $dir    = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
-            $base   = $scheme . '://' . $host . $dir;
+            $base   = $scheme . '://' . $host . base_path();
         }
 
         return $base . '/' . ltrim($path, '/');
@@ -135,6 +260,23 @@ if (!function_exists('icon')) {
             'activity'   => '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
             'book'       => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
             'zap'        => '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+            'play'       => '<polygon points="6 4 20 12 6 20 6 4"/>',
+            'shield'     => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+            'lock'       => '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+            'sparkle'    => '<path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/><path d="M19 17l.7 1.8 1.8.7-1.8.7L19 22l-.7-1.8-1.8-.7 1.8-.7z"/>',
+            'grid'       => '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+            'branch'     => '<line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+            'printer'    => '<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+            'file'       => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+            'clock'      => '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+            'command'    => '<path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>',
+            'shuffle'    => '<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/>',
+            'eye'        => '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+            'user'       => '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+            'message'    => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+            'flask'      => '<path d="M9 3h6"/><path d="M10 3v6.5L4.5 19a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9.5V3"/><line x1="7" y1="15" x2="17" y2="15"/>',
+            'route'      => '<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
+            'chevron'    => '<polyline points="9 18 15 12 9 6"/>',
             'facebook'   => '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
             'skype'      => '<circle cx="12" cy="12" r="9"/><path d="M8.7 14.6c.5 1 1.7 1.6 3.3 1.6 1.8 0 2.9-.8 2.9-1.9 0-1.2-1-1.6-2.9-2-2.2-.5-3.4-1.1-3.4-2.7 0-1.4 1.3-2.4 3.2-2.4 1.6 0 2.7.6 3.2 1.5"/>',
             'twitter'    => '<path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84 0 0 0 .497-3.753c0-.249 1.51-2.772 1.818-4.013z"/>',
