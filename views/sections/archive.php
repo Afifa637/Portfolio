@@ -84,40 +84,29 @@ $filters = array_filter(
                              data-tech="<?= e(strtolower((string) ($project['stack'][0] ?? ''))) ?>"
                              data-name="<?= e(strtolower($project['title'])) ?>" data-search="<?= e($search) ?>">
                         <div class="arc-media">
-                            <span class="arc-cat"><?= e($categories[$project['category']] ?? $project['category']) ?></span>
                             <?php if ($hasShot): ?>
-                                <?= picture($image, '', ['width' => 640, 'height' => 360]) ?>
+                                <?= picture($image, '', ['width' => 640, 'height' => 400]) ?>
                             <?php else: ?>
-                                <div class="cover" style="--lang: <?= e(lang_color($lang)) ?>" aria-hidden="true">
-                                    <b><?= e($project['title']) ?></b>
-                                    <code><?= e(implode(' · ', array_slice($project['stack'], 0, 3))) ?></code>
-                                </div>
+                                <?= project_cover($project, $lang) ?>
                             <?php endif; ?>
+                            <span class="arc-cat"><?= e($categories[$project['category']] ?? $project['category']) ?></span>
+                            <p class="arc-peek"><span><?= e(str_excerpt($project['summary'], 140)) ?></span></p>
                         </div>
 
                         <div class="arc-body">
-                            <p class="arc-meta"><span><?= e($project['year']) ?></span><span><?= e((string) $lang) ?></span></p>
-                            <h3><a href="<?= e(project_url($slug)) ?>" data-cursor="view"><?= e($project['title']) ?></a></h3>
-                            <p><?= e(str_excerpt($project['summary'], 120)) ?></p>
-
-                            <div class="arc-detail">
-                                <div>
-                                    <div class="tags" style="padding-top:0.3rem">
-                                        <?php foreach (array_slice($project['stack'], 0, 4) as $tech): ?>
-                                            <span class="tag"><?= e($tech) ?></span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
+                            <div class="arc-row">
+                                <h3><a href="<?= e(project_url($slug)) ?>" data-cursor="view"><?= e($project['title']) ?></a></h3>
+                                <span class="arc-year"><?= e($project['year']) ?></span>
                             </div>
 
-                            <div class="arc-actions">
-                                <a class="btn btn-sm btn-ghost" href="<?= e(project_url($slug)) ?>">
-                                    Case study <?= icon('arrow-right', 13, 'i-shift') ?>
-                                </a>
+                            <div class="arc-foot">
+                                <div class="tlogos" aria-label="Built with">
+                                    <?php foreach (array_slice(tech_unique($project['stack']), 0, 5) as $tech): ?><?= tech_mark($tech, 20) ?><?php endforeach; ?>
+                                </div>
                                 <?php if ($repoUrl !== ''): ?>
-                                    <a class="btn btn-sm btn-quiet" href="<?= e($repoUrl) ?>" target="_blank" rel="noopener noreferrer"
+                                    <a class="arc-gh" href="<?= e($repoUrl) ?>" target="_blank" rel="noopener noreferrer"
                                        aria-label="<?= e($project['title']) ?> source on GitHub" data-cursor="external" data-track="github">
-                                        <?= icon('github', 15) ?>
+                                        <?= icon('github', 16) ?>
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -131,13 +120,6 @@ $filters = array_filter(
                 </div>
             </div>
 
-            <aside class="panel arc-insp" id="arc-insp" aria-live="polite">
-                <div class="panel-head">
-                    <span class="label">tech.inspector</span>
-                    <span class="label t-3">hover a build</span>
-                </div>
-                <p class="arc-insp-empty">Hover or focus a build to inspect how it is put together.</p>
-            </aside>
         </div>
     </div>
 </section>

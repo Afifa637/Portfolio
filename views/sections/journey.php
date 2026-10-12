@@ -3,9 +3,11 @@
 /**
  * 08 — Journey: how I got here.
  *
- * Growth rather than chronology. Each stage names what it taught, the tools,
- * and the projects that came out of it. The line draws as you scroll and each
- * stage lights when it is reached.
+ * Growth rather than chronology. A track of stages — period, title and the
+ * tools as logos — over a panel for the selected stage with what it taught and
+ * pictures of the projects that came out of it. Without JavaScript every
+ * panel is shown; with it, the track works as tabs. The track fills as you
+ * scroll through the section.
  */
 
 declare(strict_types=1);
@@ -29,30 +31,67 @@ if ($journey === []) {
             <p class="lead" data-reveal>From C on a console to services with authentication, migrations and a deploy pipeline.</p>
         </header>
 
-        <ol class="jr" id="journey-line" role="list">
-            <?php foreach ($journey as $step): ?>
-                <li class="jr-step">
-                    <time><?= e($step['period']) ?></time>
-                    <h3><?= e($step['title']) ?></h3>
-                    <p><?= e($step['body']) ?></p>
+        <div class="jr">
+            <ol class="jr-track" id="journey-line" role="tablist" aria-label="Stages">
+                <?php foreach ($journey as $i => $step): ?>
+                    <li class="jr-stop" role="presentation">
+                        <button class="jr-btn" type="button" role="tab" id="jr-tab-<?= $i ?>" aria-controls="jr-panel-<?= $i ?>"
+                                aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" tabindex="<?= $i === 0 ? '0' : '-1' ?>">
+                            <span class="jr-dot" aria-hidden="true"></span>
+                            <time><?= e($step['period']) ?></time>
+                            <strong><?= e($step['title']) ?></strong>
+                            <?php if ($step['tech'] !== []): ?>
+                                <span class="jr-logos" aria-hidden="true">
+                                    <?php foreach (array_slice(tech_unique($step['tech']), 0, 4) as $tech): ?><?= tech_icon($tech, 18) ?><?php endforeach; ?>
+                                </span>
+                            <?php endif; ?>
+                        </button>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
 
-                    <?php if ($step['tech'] !== []): ?>
-                        <div class="tags">
-                            <?php foreach ($step['tech'] as $tech): ?><span class="tag"><?= e($tech) ?></span><?php endforeach; ?>
+            <div class="jr-panels">
+                <?php foreach ($journey as $i => $step):
+                    $linked = array_values(array_filter($step['projects'], static fn(string $s): bool => isset($bySlug[$s])));
+                ?>
+                    <article class="jr-panel<?= $i === 0 ? ' is-on' : '' ?>" role="tabpanel" id="jr-panel-<?= $i ?>"
+                             aria-labelledby="jr-tab-<?= $i ?>">
+                        <div class="jr-text">
+                            <p class="label"><b><?= sprintf('%02d', $i + 1) ?></b> / <?= e($step['period']) ?></p>
+                            <h3><?= e($step['title']) ?></h3>
+                            <p><?= e($step['body']) ?></p>
+                            <?php if ($step['tech'] !== []): ?>
+                                <div class="tchips">
+                                    <?php foreach ($step['tech'] as $tech): ?><?= tech_mark($tech, 18, true) ?><?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
 
-                    <?php $linked = array_values(array_filter($step['projects'], static fn(string $s): bool => isset($bySlug[$s]))); ?>
-                    <?php if ($linked !== []): ?>
-                        <p class="jr-proj">
-                            <span>Built</span>
-                            <?php foreach ($linked as $slug): ?>
-                                <a class="ulink" href="<?= e(project_url($slug)) ?>"><?= e($bySlug[$slug]['title']) ?></a>
-                            <?php endforeach; ?>
-                        </p>
-                    <?php endif; ?>
-                </li>
-            <?php endforeach; ?>
-        </ol>
+                        <?php if ($linked !== []): ?>
+                            <div class="jr-builds" aria-label="Built in this stage">
+                                <?php foreach (array_slice($linked, 0, 4) as $slug): $proj = $bySlug[$slug];
+                                    $shot = ltrim((string) ($proj['image'] ?? ''), '/');
+                                ?>
+                                    <a class="jr-build" href="<?= e(project_url($slug)) ?>" data-cursor="view">
+                                        <span class="jr-build-media">
+                                            <?php if ($shot !== '' && is_file(APP_ROOT . '/' . $shot)): ?>
+                                                <?= picture($shot, '', ['width' => 480, 'height' => 300]) ?>
+                                            <?php else: ?>
+                                                <?= project_cover($proj) ?>
+                                            <?php endif; ?>
+                                        </span>
+                                        <span class="jr-build-name"><?= e($proj['title']) ?> <?= icon('arrow-up-right', 14) ?></span>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php elseif ($step['tech'] !== []): ?>
+                            <div class="jr-art">
+                                <?= project_cover(['stack' => $step['tech']]) ?>
+                            </div>
+                        <?php endif; ?>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
     </div>
 </section>

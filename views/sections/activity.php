@@ -62,7 +62,7 @@ $peak = max(1, ...array_values($months ?: [0]));
                         <li>
                             <time datetime="<?= e($repo['pushed_at']) ?>"><?= e(date('M j, Y', strtotime($repo['pushed_at']))) ?></time>
                             <a href="<?= e($repo['url']) ?>" target="_blank" rel="noopener noreferrer" data-cursor="external" data-track="github">
-                                <?= e($repo['name']) ?>
+                                <?= $repo['language'] ? tech_icon($repo['language'], 18) : icon('git-fork', 16) ?><?= e($repo['name']) ?>
                             </a>
                             <?php if ($repo['language']): ?>
                                 <span class="lang" style="--lc: <?= e(lang_color($repo['language'])) ?>"><?= e($repo['language']) ?></span>
@@ -70,7 +70,7 @@ $peak = max(1, ...array_values($months ?: [0]));
                                 <span></span>
                             <?php endif; ?>
                             <?php if ($repo['description'] !== ''): ?>
-                                <p><?= e(str_excerpt($repo['description'], 120)) ?></p>
+                                <p title="<?= e($repo['description']) ?>"><?= e($repo['description']) ?></p>
                             <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
@@ -82,7 +82,7 @@ $peak = max(1, ...array_values($months ?: [0]));
                     <?php foreach (array_slice($dated, 0, 6) as $project): ?>
                         <li>
                             <time><?= e($project['year']) ?></time>
-                            <a href="<?= e(project_url($project['slug'])) ?>"><?= e($project['title']) ?></a>
+                            <a href="<?= e(project_url($project['slug'])) ?>"><?= tech_icon($project['stack'][0] ?? $project['title'], 18) ?><?= e($project['title']) ?></a>
                             <span class="lang"><?= e($project['stack'][0] ?? '') ?></span>
                             <p><?= e(str_excerpt($project['summary'], 110)) ?></p>
                         </li>
@@ -104,7 +104,7 @@ $peak = max(1, ...array_values($months ?: [0]));
                         foreach ($langs as $i => $lang):
                         ?>
                             <div class="lang-row">
-                                <span><?= e($lang['name']) ?></span>
+                                <span><?= tech_icon($lang['name'], 16) ?><?= e($lang['name']) ?></span>
                                 <span class="lang-track">
                                     <span class="lang-fill" style="--lc: <?= e($lang['color']) ?>; --w: <?= round($lang['count'] / $max, 3) ?>; --delay: <?= $i * 60 ?>ms"></span>
                                 </span>

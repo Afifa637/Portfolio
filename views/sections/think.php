@@ -36,23 +36,37 @@ $bySlug     = Knowledge::projectsBySlug();
                 </div>
 
                 <ol class="principles" role="list">
-                    <?php foreach ($principles as $i => $principle): ?>
-                        <li class="principle" data-reveal>
-                            <span class="num"><?= sprintf('%02d', $i + 1) ?></span>
+                    <?php foreach ($principles as $i => $principle):
+                        // An icon chosen from what the principle is about, so it
+                        // still fits after the principles are edited or reordered.
+                        // The title decides; the body is only a fallback.
+                        $pick = static fn(string $topic): ?string => match (true) {
+                            str_contains($topic, 'secur') || str_contains($topic, 'auth') => 'shield',
+                            str_contains($topic, 'data') || str_contains($topic, 'schema') => 'database',
+                            str_contains($topic, 'ship') || str_contains($topic, 'deploy') || str_contains($topic, 'measure') => 'zap',
+                            str_contains($topic, 'system') || str_contains($topic, 'architect') => 'layers',
+                            str_contains($topic, 'test') => 'check',
+                            default => null,
+                        };
+                        $glyph = $pick(strtolower($principle['title'])) ?? $pick(strtolower($principle['body'])) ?? 'sparkle';
+                        $evidence = array_values(array_filter(
+                            $principle['evidence'],
+                            static fn(string $slug): bool => isset($bySlug[$slug])
+                        ));
+                    ?>
+                        <li class="principle spot" data-reveal style="--delay:<?= $i * 70 ?>ms">
+                            <div class="principle-top">
+                                <span class="principle-glyph" aria-hidden="true"><?= icon($glyph, 22) ?></span>
+                                <span class="num"><?= sprintf('%02d', $i + 1) ?></span>
+                            </div>
                             <h3><?= e($principle['title']) ?></h3>
                             <p><?= e($principle['body']) ?></p>
 
-                            <?php
-                            $evidence = array_values(array_filter(
-                                $principle['evidence'],
-                                static fn(string $slug): bool => isset($bySlug[$slug])
-                            ));
-                            ?>
                             <?php if ($evidence !== []): ?>
-                                <div class="tags" aria-label="Seen in">
+                                <div class="principle-proof" aria-label="Seen in">
                                     <?php foreach ($evidence as $slug): ?>
-                                        <a class="tag" href="<?= e(project_url($slug)) ?>">
-                                            <?= e($bySlug[$slug]['title']) ?>
+                                        <a class="pchip" href="<?= e(project_url($slug)) ?>">
+                                            <?= project_thumb($bySlug[$slug], 24) ?><?= e($bySlug[$slug]['title']) ?>
                                         </a>
                                     <?php endforeach; ?>
                                 </div>
@@ -80,9 +94,9 @@ $bySlug     = Knowledge::projectsBySlug();
                                 <div class="bp-body" id="bp-<?= $i ?>">
                                     <div>
                                         <p><?= e($stage['body']) ?></p>
-                                        <div class="tags">
+                                        <div class="tchips">
                                             <?php foreach ($stage['tech'] as $tech): ?>
-                                                <span class="tag"><?= e($tech) ?></span>
+                                                <?= tech_mark($tech, 16, true) ?>
                                             <?php endforeach; ?>
                                         </div>
                                     </div>

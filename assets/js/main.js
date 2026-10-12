@@ -32,6 +32,7 @@ lazy('#stack', () => import('@/modules/stack.js'));
 lazy('#hood', () => import('@/modules/hood.js'));
 lazy('#archive', () => import('@/modules/archive.js'));
 lazy('#lab', () => import('@/modules/lab.js'));
+lazy('#journey', () => import('@/modules/journey.js'));
 lazy('#contact-form', () => import('@/modules/contact.js'));
 lazy('#cs-page', () => import('@/modules/case-study.js'));
 

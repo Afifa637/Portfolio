@@ -70,9 +70,9 @@ $totalTech = array_sum(array_map(static fn(array $g): int => count($g['items']),
                                 <?php $selected = $default && $item['key'] === $default['item']['key']; ?>
                                 <li>
                                     <button class="skill" type="button" data-skill="<?= e($item['key']) ?>"
-                                            data-count="<?= count($item['projects']) ?>"
+                                            data-uses="<?= count($item['projects']) ?>"
                                             aria-pressed="<?= $selected ? 'true' : 'false' ?>" aria-controls="stack-insp">
-                                        <?= e($item['name']) ?>
+                                        <?= tech_icon($item['name'], 17) ?><?= e($item['name']) ?>
                                         <span class="c" aria-label="<?= count($item['projects']) ?> projects"><?= count($item['projects']) ?></span>
                                     </button>
                                 </li>
@@ -90,7 +90,7 @@ $totalTech = array_sum(array_map(static fn(array $g): int => count($g['items']),
 
                 <div class="insp-body" id="stack-insp-body">
                     <?php if ($default): $item = $default['item']; ?>
-                        <h3 class="insp-title"><?= e($item['name']) ?></h3>
+                        <div class="insp-hero"><?= tech_icon($item['name'], 52) ?><h3 class="insp-title"><?= e($item['name']) ?></h3></div>
 
                         <p class="insp-used">
                             <b><?= count($item['projects']) ?></b>
@@ -102,7 +102,7 @@ $totalTech = array_sum(array_map(static fn(array $g): int => count($g['items']),
                                 <?php foreach ($item['projects'] as $slug): if (!isset($bySlug[$slug])) { continue; } ?>
                                     <li>
                                         <a href="<?= e(project_url($slug)) ?>">
-                                            <?= e($bySlug[$slug]['title']) ?>
+                                            <?= project_thumb($bySlug[$slug], 34) ?><?= e($bySlug[$slug]['title']) ?>
                                             <span><?= e($bySlug[$slug]['year'] ?? '') ?></span>
                                         </a>
                                     </li>
@@ -113,9 +113,9 @@ $totalTech = array_sum(array_map(static fn(array $g): int => count($g['items']),
                         <?php if ($item['related'] !== []): ?>
                             <div>
                                 <p class="label" style="margin-bottom:0.6rem">Used alongside</p>
-                                <div class="tags">
+                                <div class="tchips">
                                     <?php foreach ($item['related'] as $related): ?>
-                                        <span class="tag"><?= e($related) ?></span>
+                                        <?= tech_mark($related, 16, true) ?>
                                     <?php endforeach; ?>
                                 </div>
                             </div>

@@ -75,7 +75,7 @@ export function initReveal() {
 
     /* Lines that draw with reading progress: the journey and the career map. */
     const journey = $('#journey-line');
-    const steps   = journey ? $$('.jr-step', journey) : [];
+    const steps   = journey ? $$('.jr-stop', journey) : [];
     const cmap    = $('#cmap');
 
     if (!journey && !cmap) return;
@@ -91,8 +91,9 @@ export function initReveal() {
             const p = reducedMotion.matches ? 1 : progressThrough(journey);
             journey.style.setProperty('--jp', p.toFixed(3));
 
-            steps.forEach((step) => {
-                const reached = step.getBoundingClientRect().top < window.innerHeight * 0.66;
+            // The track is horizontal: stops light in order as the fill passes them.
+            steps.forEach((step, i) => {
+                const reached = i / Math.max(1, steps.length - 1) <= p + 0.001;
                 step.classList.toggle('is-reached', reduced(reached));
             });
         }

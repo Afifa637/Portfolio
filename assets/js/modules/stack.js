@@ -4,7 +4,7 @@
  * computed payload, never from typed-in claims.
  */
 
-import { $, $$, data, esc } from '@/core/util.js';
+import { $, $$, data, esc, techIcon } from '@/core/util.js';
 
 export function init(root) {
     const d = data();
@@ -14,6 +14,11 @@ export function init(root) {
 
     const index = {};
     d.skills.forEach((g) => g.items.forEach((item) => { index[item.key] = { ...item, group: g.group }; }));
+
+    // Screenshot when the project has one, otherwise its lead technology's logo.
+    const thumb = (p) => (p.image
+        ? `<span class="pthumb" style="--pt:34px"><img src="${esc(p.image)}" alt="" loading="lazy" decoding="async"></span>`
+        : `<span class="pthumb pthumb-logo" style="--pt:34px">${techIcon(p.stack[0] ?? p.title, 21)}</span>`);
 
     const select = (key, { scroll = false } = {}) => {
         const item = index[key];
@@ -26,15 +31,15 @@ export function init(root) {
         const n = projects.length;
 
         body.innerHTML =
-            `<h3 class="insp-title">${esc(item.name)}</h3>`
+            `<div class="insp-hero">${techIcon(item.name, 52)}<h3 class="insp-title">${esc(item.name)}</h3></div>`
             + `<p class="insp-used"><b>${n}</b><span>${n === 1 ? 'project uses it' : 'projects use it'}</span></p>`
             + (n
                 ? `<ul class="insp-projects" role="list">${projects.map((p) =>
-                    `<li><a href="${esc(p.url)}">${esc(p.title)}<span>${esc(p.year)}</span></a></li>`).join('')}</ul>`
+                    `<li><a href="${esc(p.url)}">${thumb(p)}${esc(p.title)}<span>${esc(p.year)}</span></a></li>`).join('')}</ul>`
                 : '<p class="insp-empty">Part of my toolkit from coursework and smaller builds — not yet in a featured project here.</p>')
             + (item.related.length
-                ? `<div><p class="label" style="margin-bottom:.6rem">Used alongside</p><div class="tags">${item.related.map((r) =>
-                    `<button type="button" class="tag" data-jump="${esc(r.toLowerCase())}">${esc(r)}</button>`).join('')}</div></div>`
+                ? `<div><p class="label" style="margin-bottom:.6rem">Used alongside</p><div class="tchips">${item.related.map((r) =>
+                    `<button type="button" class="tchip" data-jump="${esc(r.toLowerCase())}">${techIcon(r, 16)}<span>${esc(r)}</span></button>`).join('')}</div></div>`
                 : '');
 
         if (scroll) root.querySelector(`.skill[data-skill="${CSS.escape(key)}"]`)?.scrollIntoView({ block: 'nearest' });

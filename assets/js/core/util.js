@@ -33,6 +33,28 @@ export function esc(value) {
     }[c]));
 }
 
+/**
+ * A technology's logo as HTML — the client twin of tech_mark() in PHP, fed by
+ * the logo table in the page payload. Unknown names get a lettered tile.
+ */
+export function techIcon(name, size = 18) {
+    const logos = data().logos ?? {};
+    const l = logos[String(name).toLowerCase().trim()]
+        ?? { src: null, mono: false, abbr: String(name).slice(0, 2), hue: 30 };
+
+    return l.src
+        ? `<span class="tm" style="--tm:${size}px" aria-hidden="true"><img src="${esc(l.src)}" alt="" width="${size}" height="${size}" loading="lazy" decoding="async"${l.mono ? ' class="mono"' : ''}></span>`
+        : `<span class="tm tm-txt" style="--tm:${size}px;--h:${l.hue}" aria-hidden="true">${esc(l.abbr)}</span>`;
+}
+
+export function techMark(name, size = 18, label = false) {
+    const mark = techIcon(name, size);
+
+    return label
+        ? `<span class="tchip">${mark}<span>${esc(name)}</span></span>`
+        : `<span class="tmark" title="${esc(name)}">${mark}<span class="visually-hidden">${esc(name)}</span></span>`;
+}
+
 /** localStorage that never throws — private mode and blocked storage are common. */
 export const store = {
     get(key, fallback = null) {

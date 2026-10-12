@@ -111,8 +111,8 @@ $isHome = false;
                     <div><dt>Last commit</dt><dd><?= !empty($repo['pushed_at']) ? e(time_ago($repo['pushed_at'])) : '—' ?></dd></div>
                 </dl>
 
-                <div class="tags" style="margin-top:1.4rem">
-                    <?php foreach ($project['stack'] as $tech): ?><span class="tag"><?= e($tech) ?></span><?php endforeach; ?>
+                <div class="tchips" style="margin-top:1.4rem">
+                    <?php foreach ($project['stack'] as $tech): ?><?= tech_mark($tech, 18, true) ?><?php endforeach; ?>
                 </div>
 
                 <div class="hero-actions" style="margin-top:1.6rem">
@@ -133,6 +133,8 @@ $isHome = false;
                     <figure class="cs-visual" style="view-transition-name: shot-<?= e($project['slug']) ?>">
                         <?= picture($image, 'Screenshot of ' . $project['title'], ['width' => 1280, 'height' => 800, 'loading' => 'eager', 'fetchpriority' => 'high']) ?>
                     </figure>
+                <?php else: ?>
+                    <div class="cs-visual cs-cover"><?= project_cover($project) ?></div>
                 <?php endif; ?>
             </header>
 
@@ -181,7 +183,7 @@ $isHome = false;
                                                 <li class="arch-layer<?= $li === 0 ? ' is-on' : '' ?>">
                                                     <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
                                                     <button class="arch-node" type="button" data-layer="<?= $li ?>" data-cursor="explore">
-                                                        <strong><?= e($layer['layer']) ?></strong><span><?= e($layer['tech']) ?></span>
+                                                        <strong><?= e($layer['layer']) ?></strong><span class="arch-tech-row"><?php foreach (tech_logos_only(tech_split($layer['tech'])) as $tech): ?><?= tech_icon($tech, 15) ?><?php endforeach; ?><?= e($layer['tech']) ?></span>
                                                         <?php if ($layer['role'] !== ''): ?><span class="visually-hidden"> — <?= e($layer['role']) ?></span><?php endif; ?>
                                                     </button>
                                                 </li>

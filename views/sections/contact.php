@@ -96,7 +96,7 @@ foreach ($socials as $s) {
                     <p class="label" style="margin-top:1.8rem">What I can help with</p>
                     <ul class="services-mini" role="list">
                         <?php foreach ($services as $service): ?>
-                            <li><?= e($service['title']) ?></li>
+                            <li><span class="svc-glyph" aria-hidden="true"><?= icon((string) ($service['icon'] ?? 'code') ?: 'code', 18) ?></span><?= e($service['title']) ?></li>
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>

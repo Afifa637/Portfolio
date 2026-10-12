@@ -1,20 +1,17 @@
 /**
- * Archive: category filter, sort, instant fuzzy search, a live count, and the
- * tech inspector that reads the hovered or focused build's architecture.
+ * Archive: category filter, sort, instant fuzzy search and a live count.
  */
 
-import { $, $$, data, esc, reducedMotion, finePointer } from '@/core/util.js';
+import { $, $$, reducedMotion } from '@/core/util.js';
 import { fuzzy } from '@/core/fuzzy.js';
 
 export function init(root) {
-    const d = data();
     const grid = $('#arc-grid', root);
     const cards = $$('.arc-card', grid);
     const count = $('#arc-count', root);
     const empty = $('#arc-empty', root);
     const search = $('#arc-q', root);
     const sort = $('#arc-sort', root);
-    const insp = $('#arc-insp', root);
 
     let category = 'all';
     let query = '';
@@ -92,35 +89,4 @@ export function init(root) {
     });
 
     sort?.addEventListener('change', apply);
-
-    /* --- inspector --------------------------------------------------- */
-
-    if (!insp) return;
-
-    const inspect = (card) => {
-        const p = d.bySlug[card.dataset.slug];
-        if (!p) return;
-
-        const layers = p.architecture.length
-            ? `<dl class="kv">${p.architecture.map((l) => `<div><dt>${esc(l.layer)}</dt><dd>${esc(l.tech)}</dd></div>`).join('')}</dl>`
-            : `<div class="tags">${p.stack.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>`;
-
-        insp.innerHTML =
-            '<div class="panel-head"><span class="label">tech.inspector</span>'
-            + `<span class="label t-3">${esc(p.year)}</span></div>`
-            + '<div class="insp-body">'
-            + `<div><p class="label" style="color:var(--amber)">${esc(d.categories?.[p.category] ?? p.category)}</p>`
-            + `<h3 style="margin-top:.4rem">${esc(p.title)}</h3>`
-            + (p.subtitle ? `<p class="t-2" style="font-size:.875rem;margin-top:.3rem">${esc(p.subtitle)}</p>` : '')
-            + '</div>'
-            + `<div><p class="label" style="margin-bottom:.4rem">${p.architecture.length ? 'Architecture' : 'Stack'}</p>${layers}</div>`
-            + (p.role ? `<dl class="kv"><div><dt>Role</dt><dd>${esc(p.role)}</dd></div></dl>` : '')
-            + `<a class="arrow-link" href="${esc(p.url)}">Open case study <span aria-hidden="true">→</span></a>`
-            + '</div>';
-    };
-
-    cards.forEach((card) => {
-        if (finePointer.matches) card.addEventListener('pointerenter', () => inspect(card));
-        card.addEventListener('focusin', () => inspect(card));
-    });
 }

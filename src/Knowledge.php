@@ -45,6 +45,14 @@ final class Knowledge
         'game ai'            => ['game ai'],
     ];
 
+    /** Build Mode's choices — shared by the page and the logo table the client reads. */
+    public const BUILD_OPTIONS = [
+        'client'   => ['label' => 'Client',         'options' => ['React', 'Flutter', 'Android', 'Thymeleaf', 'Blade']],
+        'backend'  => ['label' => 'Backend',        'options' => ['Spring Boot', 'Laravel', 'Node.js', 'Firebase']],
+        'auth'     => ['label' => 'Authentication', 'options' => ['JWT', 'Spring Security', 'Laravel middleware', 'Firebase Auth']],
+        'database' => ['label' => 'Database',       'options' => ['PostgreSQL', 'MySQL', 'Cloud Firestore']],
+    ];
+
     /* ------------------------------------------------------------ keys --- */
 
     /** Canonical key for a technology name. */
@@ -334,6 +342,9 @@ final class Knowledge
                 'demo'         => (string) ($p['demo'] ?? ''),
                 'repo'         => (string) ($p['repo'] ?? ''),
                 'url'          => project_url((string) $p['slug']),
+                'image'        => !empty($p['image']) && is_file(APP_ROOT . '/' . ltrim((string) $p['image'], '/'))
+                    ? asset(project_image_variant((string) $p['image']))
+                    : '',
                 'github'       => !empty($p['repo'])
                     ? 'https://github.com/' . ($identity['github_user'] ?? '') . '/' . $p['repo']
                     : '',
@@ -348,6 +359,37 @@ final class Knowledge
                 'languages' => $gh['languages'],
             ] : null,
         ];
+
+        /* Logos for every technology name the client might draw, keyed by
+           the lowercased name exactly as written in the content. */
+        $names = [];
+        foreach ($skills as $group) {
+            foreach ($group['items'] as $item) {
+                $names[] = $item['name'];
+                array_push($names, ...$item['related']);
+            }
+        }
+        foreach ($projects as $p) {
+            array_push($names, ...array_values($p['stack'] ?? []));
+            foreach ($p['architecture'] ?? [] as $layer) {
+                array_push($names, ...tech_split((string) ($layer['tech'] ?? '')));
+            }
+        }
+        foreach (Content::get('journey', []) as $step) {
+            array_push($names, ...array_values($step['tech'] ?? []));
+        }
+        foreach ($nodes as $node) {
+            $names[] = (string) $node['label'];
+        }
+        foreach (self::BUILD_OPTIONS as $dimension) {
+            array_push($names, ...$dimension['options']);
+        }
+
+        $logos = [];
+        foreach ($names as $name) {
+            $logos[strtolower(trim((string) $name))] ??= tech_logo((string) $name);
+        }
+        $payload['logos'] = $logos;
 
         return self::$cache = [
             'techIndex' => $techIndex,

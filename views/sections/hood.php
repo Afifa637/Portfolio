@@ -22,12 +22,7 @@ $systems   = array_values(array_filter(
 
 $first = $systems[0] ?? null;
 
-$build = [
-    'client'   => ['label' => 'Client',         'options' => ['React', 'Flutter', 'Android', 'Thymeleaf', 'Blade']],
-    'backend'  => ['label' => 'Backend',        'options' => ['Spring Boot', 'Laravel', 'Node.js', 'Firebase']],
-    'auth'     => ['label' => 'Authentication', 'options' => ['JWT', 'Spring Security', 'Laravel middleware', 'Firebase Auth']],
-    'database' => ['label' => 'Database',       'options' => ['PostgreSQL', 'MySQL', 'Cloud Firestore']],
-];
+$build = Knowledge::BUILD_OPTIONS;
 
 $defaults = ['client' => 'Thymeleaf', 'backend' => 'Spring Boot', 'auth' => 'JWT', 'database' => 'PostgreSQL'];
 
@@ -55,9 +50,11 @@ foreach ($matchedBy as $slug => $choices) {
 arsort($scores);
 $bestSlug = array_key_first($scores);
 
+// Same layer naming as the client-side generator in hood.js.
+$serverRendered = in_array($defaults['client'], ['Thymeleaf', 'Blade'], true);
 $defaultLayers = [
-    ['Client', $defaults['client']],
-    ['REST API', 'HTTP · JSON'],
+    [$serverRendered ? 'Server-rendered pages' : 'Client', $defaults['client']],
+    [$serverRendered ? 'HTTP routes' : 'REST API', 'HTTP · JSON'],
     ['Backend', $defaults['backend']],
     ['Authentication', $defaults['auth']],
     ['Database', $defaults['database']],
@@ -106,7 +103,7 @@ $defaultLayers = [
                                     <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
                                     <button class="arch-node" type="button" data-layer="<?= $li ?>" data-cursor="explore">
                                         <strong><?= e($layer['layer']) ?></strong>
-                                        <span><?= e($layer['tech']) ?></span>
+                                        <span class="arch-tech-row"><?php foreach (tech_logos_only(tech_split($layer['tech'])) as $t): ?><?= tech_icon($t, 15) ?><?php endforeach; ?><?= e($layer['tech']) ?></span>
                                     </button>
                                 </li>
                             <?php endforeach; ?>
@@ -129,9 +126,9 @@ $defaultLayers = [
                         <p class="label">Layer 01</p>
                         <h3><?= e($first['architecture'][0]['layer']) ?></h3>
                         <p><?= e($first['architecture'][0]['role']) ?></p>
-                        <div class="tags">
-                            <?php foreach (array_map('trim', explode(',', $first['architecture'][0]['tech'])) as $tech): ?>
-                                <span class="tag"><?= e($tech) ?></span>
+                        <div class="tchips">
+                            <?php foreach (tech_split($first['architecture'][0]['tech']) as $tech): ?>
+                                <?= tech_mark($tech, 16, true) ?>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -162,7 +159,7 @@ $defaultLayers = [
                                 <label class="choice">
                                     <input type="radio" name="<?= e($key) ?>" value="<?= e($option) ?>"
                                         <?= $defaults[$key] === $option ? 'checked' : '' ?>>
-                                    <span><?= e($option) ?></span>
+                                    <span><?= tech_icon($option, 16) ?><?= e($option) ?></span>
                                 </label>
                             <?php endforeach; ?>
                         </fieldset>
@@ -176,7 +173,7 @@ $defaultLayers = [
                     <?php foreach ($defaultLayers as $li => [$layer, $tech]): ?>
                         <li class="arch-layer">
                             <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
-                            <div class="arch-node"><strong><?= e($layer) ?></strong><span><?= e($tech) ?></span></div>
+                            <div class="arch-node"><strong><?= e($layer) ?></strong><span class="arch-tech-row"><?php foreach (tech_logos_only(tech_split($tech)) as $t): ?><?= tech_icon($t, 15) ?><?php endforeach; ?><?= e($tech) ?></span></div>
                         </li>
                     <?php endforeach; ?>
                 </ol>

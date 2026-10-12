@@ -44,7 +44,7 @@ if (!function_exists('require_admin')) {
     function require_admin(): void
     {
         if (empty($_SESSION['admin'])) {
-            header('Location: login.php');
+            header('Location: ' . base_path() . '/admin/login.php');
             exit;
         }
 
@@ -54,7 +54,7 @@ if (!function_exists('require_admin')) {
         if (isset($_SESSION['admin_last_seen']) && (time() - $_SESSION['admin_last_seen']) > $idleLimit) {
             $_SESSION = [];
             session_destroy();
-            header('Location: login.php?expired=1');
+            header('Location: ' . base_path() . '/admin/login.php?expired=1');
             exit;
         }
 

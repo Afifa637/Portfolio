@@ -423,3 +423,190 @@ if (!function_exists('lang_color')) {
         return $colors[$language ?? ''] ?? '#8b949e';
     }
 }
+
+if (!function_exists('tech_logo')) {
+    /**
+     * How to draw a technology: a bundled Devicon logo (MIT) when one exists,
+     * otherwise a lettered tile whose hue is derived from the name, so the
+     * same technology always looks the same everywhere it appears.
+     *
+     * @return array{src: ?string, mono: bool, abbr: string, hue: int}
+     */
+    function tech_logo(string $name): array
+    {
+        static $files = [
+            'android' => 'android', 'arduino' => 'arduino', 'blade' => 'laravel', 'bootstrap' => 'bootstrap',
+            'c' => 'c', 'c++' => 'cplusplus', 'c / c++' => 'cplusplus', 'css' => 'css3', 'css3' => 'css3',
+            'dart' => 'dart', 'docker' => 'docker', 'docker compose' => 'docker', 'firebase' => 'firebase',
+            'firebase auth' => 'firebase', 'firestore' => 'firebase', 'flutter' => 'flutter',
+            'flutter & dart' => 'flutter', 'gdscript' => 'godot', 'godot' => 'godot', 'godot engine' => 'godot',
+            'git' => 'git', 'github' => 'github', 'git & github' => 'git', 'html' => 'html5', 'html5' => 'html5',
+            'java' => 'java', 'javascript' => 'javascript', 'jpa' => 'hibernate', 'laravel' => 'laravel',
+            'eloquent orm' => 'laravel', 'linux' => 'linux', 'liquibase' => 'liquibase', 'maven' => 'maven',
+            'mysql' => 'mysql', 'node.js' => 'nodejs', 'nodejs' => 'nodejs', 'php' => 'php',
+            'postgresql' => 'postgresql', 'postman' => 'postman', 'python' => 'python', 'pygame' => 'python',
+            'react' => 'react', 'react native' => 'react', 'react native & expo' => 'react',
+            'spring boot' => 'spring', 'spring' => 'spring', 'spring security' => 'spring',
+            'spring mvc' => 'spring', 'spring services' => 'spring', 'spring data jpa' => 'hibernate',
+            'swagger' => 'swagger', 'swift' => 'swift', 'ios' => 'apple', 'thymeleaf' => 'thymeleaf',
+            'thymeleaf pages' => 'thymeleaf', 'typescript' => 'typescript', 'vercel' => 'vercel', 'xml' => 'xml',
+            'composer' => 'composer', 'kotlin' => 'kotlin',
+        ];
+        // Single-colour black marks; inverted on the dark theme.
+        static $mono = ['github', 'vercel', 'apple', 'linux', 'composer', 'maven'];
+
+        $key = Knowledge::key($name);
+        // "Spring Boot 3", "PHP 8.2": the version does not change the logo.
+        $bare = (string) preg_replace('/\s+v?\d[\d.]*$/', '', $key);
+        $file = $files[$key] ?? $files[$bare] ?? null;
+
+        $words = preg_split('/[\s\/&()-]+/', trim($name), -1, PREG_SPLIT_NO_EMPTY) ?: [$name];
+        $abbr  = match (true) {
+            in_array($bare, ['rest apis', 'rest api'], true) => 'API',
+            mb_strlen(trim($name)) <= 4                    => trim($name),
+            // "JWT Auth", "ESP32": an acronym says more than initials.
+            (bool) preg_match('/^[A-Z]{2,}/', $words[0], $m) => mb_substr($m[0], 0, 3),
+            count($words) === 1                            => mb_substr($words[0], 0, 2),
+            default                                        => implode('', array_map(
+                static fn(string $w): string => mb_substr($w, 0, 1),
+                array_slice($words, 0, 3)
+            )),
+        };
+
+        return [
+            'src'  => $file !== null ? asset('assets/img/tech/' . $file . '.svg') : null,
+            'mono' => $file !== null && in_array($file, $mono, true),
+            'abbr' => $abbr,
+            'hue'  => crc32($bare) % 360,
+        ];
+    }
+}
+
+if (!function_exists('tech_icon')) {
+    /** Just the logo, decorative — for places where the name is already written beside it. */
+    function tech_icon(string $name, int $size = 18): string
+    {
+        $logo = tech_logo($name);
+
+        return $logo['src'] !== null
+            ? sprintf('<span class="tm" style="--tm:%dpx" aria-hidden="true"><img src="%s" alt="" width="%d" height="%d" loading="lazy" decoding="async"%s></span>',
+                $size, e($logo['src']), $size, $size, $logo['mono'] ? ' class="mono"' : '')
+            : sprintf('<span class="tm tm-txt" style="--tm:%dpx;--h:%d" aria-hidden="true">%s</span>',
+                $size, $logo['hue'], e($logo['abbr']));
+    }
+}
+
+if (!function_exists('tech_mark')) {
+    /**
+     * A technology's logo (or lettered tile) as inline HTML. With $label the
+     * name is shown beside it as a chip; otherwise the name is the tooltip and
+     * the accessible text.
+     */
+    function tech_mark(string $name, int $size = 18, bool $label = false): string
+    {
+        $mark = tech_icon($name, $size);
+
+        if ($label) {
+            return '<span class="tchip">' . $mark . '<span>' . e($name) . '</span></span>';
+        }
+
+        return '<span class="tmark" title="' . e($name) . '">' . $mark
+            . '<span class="visually-hidden">' . e($name) . '</span></span>';
+    }
+}
+
+if (!function_exists('tech_unique')) {
+    /**
+     * Technologies that draw differently: "Spring Boot" and "Spring Security"
+     * share a logo, so a row of logos shows it once.
+     */
+    function tech_unique(array $names): array
+    {
+        $seen = [];
+        $out  = [];
+
+        foreach ($names as $name) {
+            $logo = tech_logo((string) $name);
+            $id   = $logo['src'] !== null ? strtok($logo['src'], '?') : 'txt:' . strtolower((string) $name);
+
+            if (!isset($seen[$id])) {
+                $seen[$id] = true;
+                $out[]     = (string) $name;
+            }
+        }
+
+        return $out;
+    }
+}
+
+if (!function_exists('tech_logos_only')) {
+    /** The distinct technologies in a list that have a real logo — for logo rows beside written names. */
+    function tech_logos_only(array $names): array
+    {
+        return array_values(array_filter(tech_unique($names), static fn(string $t): bool => tech_logo($t)['src'] !== null));
+    }
+}
+
+if (!function_exists('tech_split')) {
+    /** "Spring Security, JWT, sessions" -> ['Spring Security', 'JWT', 'sessions'] */
+    function tech_split(string $list): array
+    {
+        return array_values(array_filter(array_map('trim', preg_split('/\s*,\s*/', $list) ?: [])));
+    }
+}
+
+if (!function_exists('project_image_variant')) {
+    /** The WebP sibling of a screenshot when one exists, for client-drawn thumbnails. */
+    function project_image_variant(string $path): string
+    {
+        $path = ltrim($path, '/');
+        $webp = (string) preg_replace('/\.(png|jpe?g)$/i', '.webp', $path);
+
+        return $webp !== $path && is_file(APP_ROOT . '/' . $webp) ? $webp : $path;
+    }
+}
+
+if (!function_exists('project_thumb')) {
+    /**
+     * A small square visual for a project: its screenshot when it has one,
+     * otherwise the logo of its main technology.
+     */
+    function project_thumb(array $project, int $size = 28): string
+    {
+        $image = ltrim((string) ($project['image'] ?? ''), '/');
+
+        if ($image !== '' && is_file(APP_ROOT . '/' . $image)) {
+            return sprintf('<span class="pthumb" style="--pt:%dpx"><img src="%s" alt="" loading="lazy" decoding="async"></span>',
+                $size, e(asset(project_image_variant($image))));
+        }
+
+        $lead = (string) (($project['stack'] ?? [])[0] ?? $project['title'] ?? '');
+
+        return '<span class="pthumb pthumb-logo" style="--pt:' . $size . 'px">' . tech_mark($lead, (int) round($size * 0.62)) . '</span>';
+    }
+}
+
+if (!function_exists('project_cover')) {
+    /**
+     * Generated cover art for a project with no screenshot: its technologies'
+     * logos floating on a field tinted by its main language. Decorative — the
+     * title and stack are always written out next to it.
+     */
+    function project_cover(array $project, ?string $language = null): string
+    {
+        $stack = array_values($project['stack'] ?? []);
+        $color = lang_color($language ?: ($stack[0] ?? null));
+
+        // Prefer technologies with real logos; lettered tiles fill any gap.
+        $withLogo = array_values(array_filter($stack, static fn(string $t): bool => tech_logo($t)['src'] !== null));
+        $picked   = array_slice(tech_unique(array_merge($withLogo, $stack)), 0, 3);
+
+        $tiles = '';
+        foreach ($picked as $i => $tech) {
+            $tiles .= '<span class="pcover-tile" style="--i:' . $i . '">' . tech_icon($tech, 40) . '</span>';
+        }
+
+        return '<div class="pcover" style="--c:' . e($color) . '" aria-hidden="true">'
+            . '<span class="pcover-glow"></span><span class="pcover-tiles">' . $tiles . '</span></div>';
+    }
+}

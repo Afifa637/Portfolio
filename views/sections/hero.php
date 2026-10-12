@@ -38,7 +38,8 @@ foreach ($nodes as $i => $node) {
     $cos = cos($angle);
     $sin = sin($angle);
 
-    $r = 5 + min($node['count'], 4) * 1.7 + ($node['repos'] ? 3 : 0);
+    // Big enough to carry the technology's logo; still scaled by evidence.
+    $r = 13 + min($node['count'], 4) * 1.6 + ($node['repos'] ? 3 : 0);
 
     // Labels sit outside the node: above it at the top of the ring (with the
     // count line still clear of the dot), below it at the bottom, beside it
@@ -172,6 +173,15 @@ $roles = array_values($identity['roles'] ?? []);
                                aria-label="<?= e($node['label'] . ' — ' . $countLabel($node)) ?>">
                                 <circle class="halo" cx="<?= $p['x'] ?>" cy="<?= $p['y'] ?>" r="<?= $p['r'] + 12 ?>"/>
                                 <circle class="dot" cx="<?= $p['x'] ?>" cy="<?= $p['y'] ?>" r="<?= $p['r'] ?>"/>
+                                <?php $logo = tech_logo($node['label']); $ls = round($p['r'] * 1.15, 1); ?>
+                                <?php if ($logo['src'] !== null): ?>
+                                    <image class="logo<?= $logo['mono'] ? ' mono' : '' ?>" href="<?= e($logo['src']) ?>"
+                                           x="<?= round($p['x'] - $ls / 2, 1) ?>" y="<?= round($p['y'] - $ls / 2, 1) ?>"
+                                           width="<?= $ls ?>" height="<?= $ls ?>"/>
+                                <?php else: ?>
+                                    <text class="abbr" x="<?= $p['x'] ?>" y="<?= round($p['y'] + 3.5, 1) ?>" text-anchor="middle"
+                                          style="--h:<?= $logo['hue'] ?>"><?= e($logo['abbr']) ?></text>
+                                <?php endif; ?>
                                 <text x="<?= $p['x'] + $p['lx'] ?>" y="<?= $p['y'] + $p['ly'] ?>" text-anchor="<?= $p['anchor'] ?>"><?= e($node['label']) ?></text>
                                 <text class="count" x="<?= $p['x'] + $p['lx'] ?>" y="<?= $p['y'] + $p['ly'] + 13 ?>" text-anchor="<?= $p['anchor'] ?>"><?= e($countLabel($node)) ?></text>
                             </g>
@@ -181,7 +191,7 @@ $roles = array_values($identity['roles'] ?? []);
 
                 <ul class="core-rail" aria-label="Technologies">
                     <?php foreach ($nodes as $node): ?>
-                        <li><strong><?= e($node['label']) ?></strong><span><?= e($countLabel($node)) ?></span></li>
+                        <li><?= tech_mark($node['label'], 26) ?><strong><?= e($node['label']) ?></strong><span><?= e($countLabel($node)) ?></span></li>
                     <?php endforeach; ?>
                 </ul>
 

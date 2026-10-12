@@ -38,6 +38,14 @@ if ($path !== '/' && is_file($file)) {
     return false; // let the built-in server serve the real file
 }
 
+// A directory without its trailing slash: redirect, as Apache does, so that
+// relative links inside it (admin/ -> login.php) resolve against the directory.
+if ($path !== '/' && is_dir($file) && !str_ends_with($path, '/')) {
+    $query = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY);
+    header('Location: ' . $path . '/' . ($query !== '' ? '?' . $query : ''), true, 301);
+    return true;
+}
+
 if ($path === '/' || is_dir($file)) {
     return false;
 }

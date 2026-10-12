@@ -253,4 +253,5 @@ and make sure `storage/cache/` is writable.
 ## License
 
 Source code MIT. Written content, CV and project imagery remain the property of
-Afifa Sultana.
+Afifa Sultana. Technology logos are from [Devicon](https://devicon.dev) (MIT,
+see `assets/img/tech/LICENSE-devicon.txt`); each is the trademark of its owner.

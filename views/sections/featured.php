@@ -62,20 +62,20 @@ if ($featured === []) {
 
                         <p class="feat-impact"><?= e($project['summary']) ?></p>
 
-                        <dl class="kv feat-meta">
+                        <div class="feat-stack" aria-label="Built with">
+                            <?php foreach (array_slice($project['stack'], 0, 6) as $tech): ?>
+                                <?= tech_mark($tech, 18, true) ?>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="feat-facts">
+                            <span class="feat-status<?= $project['demo'] !== '' ? ' is-live' : '' ?>">
+                                <span class="live" aria-hidden="true"></span><?= e($status) ?>
+                            </span>
                             <?php if ($project['role'] !== ''): ?>
-                                <div><dt>Role</dt><dd><?= e($project['role']) ?></dd></div>
+                                <span class="feat-role"><?= icon('user', 14) ?><?= e($project['role']) ?></span>
                             <?php endif; ?>
-                            <div><dt>Status</dt><dd><?= e($status) ?></dd></div>
-                            <div>
-                                <dt>Stack</dt>
-                                <dd class="tags">
-                                    <?php foreach (array_slice($project['stack'], 0, 6) as $tech): ?>
-                                        <span class="tag"><?= e($tech) ?></span>
-                                    <?php endforeach; ?>
-                                </dd>
-                            </div>
-                        </dl>
+                        </div>
 
                         <div class="hero-actions">
                             <a class="btn btn-primary" href="<?= e(project_url($slug)) ?>" data-cursor="view">
@@ -109,19 +109,20 @@ if ($featured === []) {
                                     <?php foreach ($project['architecture'] as $li => $layer): ?>
                                         <li class="arch-layer">
                                             <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
-                                            <div class="arch-node" tabindex="0">
+                                            <div class="arch-node arch-node-logos" tabindex="0">
                                                 <strong><?= e($layer['layer']) ?></strong>
-                                                <span><?= e($layer['tech']) ?></span>
+                                                <span class="tlogos">
+                                                    <?php foreach (tech_unique(tech_split($layer['tech'])) as $tech): ?><?= tech_logo($tech)['src'] !== null
+                                                        ? tech_mark($tech, 20)
+                                                        : '<span class="arch-tech">' . e($tech) . '</span>' ?><?php endforeach; ?>
+                                                </span>
                                             </div>
                                         </li>
                                     <?php endforeach; ?>
                                 </ol>
                             </div>
                         <?php else: ?>
-                            <div class="cover" style="position:relative;inset:auto;width:100%;min-height:16rem;border-radius:var(--r-2)">
-                                <b><?= e($project['title']) ?></b>
-                                <code><?= e(implode(' · ', array_slice($project['stack'], 0, 3))) ?></code>
-                            </div>
+                            <div class="feat-cover"><?= project_cover($project) ?></div>
                         <?php endif; ?>
                     </div>
                 </article>
