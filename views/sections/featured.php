@@ -21,11 +21,11 @@ if ($featured === []) {
 }
 
 ?>
-<section class="section featured" id="work" data-section="work" data-label="03 / Work">
+<section class="section featured" id="work" data-section="work" data-label="04 / Work">
     <div class="container">
         <header class="sh">
             <span class="ghost-word" aria-hidden="true">BUILD</span>
-            <p class="label"><b>03</b> / Featured builds</p>
+            <p class="label"><b>04</b> / Featured builds</p>
             <h2 data-reveal="lines">
                 <span class="ln" style="--i:0"><span>Work that had to</span></span>
                 <span class="ln" style="--i:1"><span><span class="serif">hold together.</span></span></span>
@@ -64,7 +64,7 @@ if ($featured === []) {
 
                         <div class="feat-stack" aria-label="Built with">
                             <?php foreach (array_slice($project['stack'], 0, 6) as $tech): ?>
-                                <?= tech_mark($tech, 18, true) ?>
+                                <?= tech_tag($tech) ?>
                             <?php endforeach; ?>
                         </div>
 
@@ -109,13 +109,9 @@ if ($featured === []) {
                                     <?php foreach ($project['architecture'] as $li => $layer): ?>
                                         <li class="arch-layer">
                                             <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
-                                            <div class="arch-node arch-node-logos" tabindex="0">
+                                            <div class="arch-node" tabindex="0">
                                                 <strong><?= e($layer['layer']) ?></strong>
-                                                <span class="tlogos">
-                                                    <?php foreach (tech_unique(tech_split($layer['tech'])) as $tech): ?><?= tech_logo($tech)['src'] !== null
-                                                        ? tech_mark($tech, 20)
-                                                        : '<span class="arch-tech">' . e($tech) . '</span>' ?><?php endforeach; ?>
-                                                </span>
+                                                <span><?= e($layer['tech']) ?></span>
                                             </div>
                                         </li>
                                     <?php endforeach; ?>

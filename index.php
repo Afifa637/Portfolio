@@ -29,7 +29,7 @@ $isHome = true;
 
     <main class="site" id="main">
         <?php
-        foreach (['hero', 'think', 'stack', 'featured', 'hood', 'archive', 'lab', 'activity', 'journey', 'career', 'contact'] as $section) {
+        foreach (['hero', 'think', 'stack', 'career', 'featured', 'hood', 'archive', 'lab', 'activity', 'journey', 'contact'] as $section) {
             view('sections/' . $section);
         }
         ?>

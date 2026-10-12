@@ -19,13 +19,13 @@ let active = 0;
 const SECTIONS = [
     ['about', 'How I think', 'route'],
     ['stack', 'Stack explorer', 'layers'],
+    ['resume', 'Roadmap & résumé', 'route'],
     ['work', 'Featured work', 'layers'],
     ['hood', 'Under the hood', 'server'],
     ['archive', 'Project archive', 'search'],
     ['lab', 'Lab', 'flask'],
     ['activity', 'Development activity', 'zap'],
     ['journey', 'Journey', 'route'],
-    ['resume', 'Résumé', 'file'],
     ['contact', 'Contact', 'mail'],
 ];
 

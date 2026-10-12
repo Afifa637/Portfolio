@@ -72,7 +72,7 @@ $totalTech = array_sum(array_map(static fn(array $g): int => count($g['items']),
                                     <button class="skill" type="button" data-skill="<?= e($item['key']) ?>"
                                             data-uses="<?= count($item['projects']) ?>"
                                             aria-pressed="<?= $selected ? 'true' : 'false' ?>" aria-controls="stack-insp">
-                                        <?= tech_icon($item['name'], 17) ?><?= e($item['name']) ?>
+                                        <?= e($item['name']) ?>
                                         <span class="c" aria-label="<?= count($item['projects']) ?> projects"><?= count($item['projects']) ?></span>
                                     </button>
                                 </li>
@@ -115,7 +115,7 @@ $totalTech = array_sum(array_map(static fn(array $g): int => count($g['items']),
                                 <p class="label" style="margin-bottom:0.6rem">Used alongside</p>
                                 <div class="tchips">
                                     <?php foreach ($item['related'] as $related): ?>
-                                        <?= tech_mark($related, 16, true) ?>
+                                        <?= tech_tag($related) ?>
                                     <?php endforeach; ?>
                                 </div>
                             </div>

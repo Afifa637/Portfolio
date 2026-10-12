@@ -21,11 +21,11 @@ $experiments = [
 ];
 
 ?>
-<section class="section lab" id="lab" data-section="lab" data-label="06 / Lab">
+<section class="section lab" id="lab" data-section="lab" data-label="07 / Lab">
     <div class="container">
         <header class="sh">
             <span class="ghost-word" aria-hidden="true">CREATE</span>
-            <p class="label"><b>06</b> / Lab</p>
+            <p class="label"><b>07</b> / Lab</p>
             <h2 data-reveal="lines">
                 <span class="ln" style="--i:0"><span>Things I build</span></span>
                 <span class="ln" style="--i:1"><span><span class="serif">because I’m curious.</span></span></span>

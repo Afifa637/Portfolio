@@ -496,6 +496,14 @@ if (!function_exists('tech_icon')) {
     }
 }
 
+if (!function_exists('tech_tag')) {
+    /** A plain text chip — most places name a technology without drawing it. */
+    function tech_tag(string $name): string
+    {
+        return '<span class="tchip tchip-text">' . e($name) . '</span>';
+    }
+}
+
 if (!function_exists('tech_mark')) {
     /**
      * A technology's logo (or lettered tile) as inline HTML. With $label the

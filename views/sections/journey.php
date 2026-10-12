@@ -20,11 +20,11 @@ if ($journey === []) {
 }
 
 ?>
-<section class="section journey" id="journey" data-section="journey" data-label="08 / Journey">
+<section class="section journey" id="journey" data-section="journey" data-label="09 / Journey">
     <div class="container">
         <header class="sh">
             <span class="ghost-word" aria-hidden="true">ENGINEER</span>
-            <p class="label"><b>08</b> / Journey</p>
+            <p class="label"><b>09</b> / Journey</p>
             <h2 data-reveal="lines">
                 <span class="ln" style="--i:0"><span>How I <span class="serif">got here.</span></span></span>
             </h2>
@@ -40,11 +40,6 @@ if ($journey === []) {
                             <span class="jr-dot" aria-hidden="true"></span>
                             <time><?= e($step['period']) ?></time>
                             <strong><?= e($step['title']) ?></strong>
-                            <?php if ($step['tech'] !== []): ?>
-                                <span class="jr-logos" aria-hidden="true">
-                                    <?php foreach (array_slice(tech_unique($step['tech']), 0, 4) as $tech): ?><?= tech_icon($tech, 18) ?><?php endforeach; ?>
-                                </span>
-                            <?php endif; ?>
                         </button>
                     </li>
                 <?php endforeach; ?>
@@ -62,7 +57,7 @@ if ($journey === []) {
                             <p><?= e($step['body']) ?></p>
                             <?php if ($step['tech'] !== []): ?>
                                 <div class="tchips">
-                                    <?php foreach ($step['tech'] as $tech): ?><?= tech_mark($tech, 18, true) ?><?php endforeach; ?>
+                                    <?php foreach ($step['tech'] as $tech): ?><?= tech_tag($tech) ?><?php endforeach; ?>
                                 </div>
                             <?php endif; ?>
                         </div>

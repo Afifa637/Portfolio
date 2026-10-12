@@ -148,7 +148,7 @@ return [
             'start'       => '2023',
             'end'         => 'Present',
             'current'     => true,
-            'grade'       => 'CGPA 3.77 / 4.00',
+            'grade'       => 'CGPA 3.80 / 4.00',
             'grade_note'  => 'Computer Science & Engineering',
             'detail'      => 'Coursework across data structures, algorithms, database systems, compiler design, '
                 . 'operating systems, software engineering, and artificial intelligence.',
@@ -180,6 +180,12 @@ return [
     /* -------------------------------------------------------------- activities */
 
     'activities' => [
+        [
+            'role'   => 'Media Coordinator',
+            'org'    => 'IEEE CSE Student Branch, KUET',
+            'detail' => 'Coordinates media for the IEEE CSE Student Branch at KUET.',
+            'icon'   => 'globe',
+        ],
         [
             'role'   => 'Member',
             'org'    => 'SGIPC — Sub-Group of Inter-University Programming Contest',

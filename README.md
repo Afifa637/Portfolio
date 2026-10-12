@@ -46,7 +46,8 @@ up the database below. With Docker instead: `docker compose up -d` →
 | **Archive** | Every project: filter, sort, search, live count, empty state. |
 | **Lab** | Working experiments: JWT decoder, a small SQL engine (tokenizer → parser → plan → executor), sorting visualiser with comparison counts. |
 | **Activity** | GitHub data from the API, cached server-side. Nothing is invented when the API is unavailable — the section says so. |
-| **Journey / Career** | Growth stages, education, activities, and a résumé with download, print and open. |
+| **Roadmap** | Education, experience and activities as stops along a winding road. A marker drives it as you scroll; a route bar jumps to any stop. |
+| **Journey** | Growth stages as a tabbed timeline, with the projects each stage produced. |
 | **Contact** | Validated form with enquiry type; saved to the database *and* emailed. |
 
 Across the site:

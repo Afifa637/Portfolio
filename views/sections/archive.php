@@ -23,10 +23,10 @@ $filters = array_filter(
 );
 
 ?>
-<section class="section archive" id="archive" data-section="archive" data-label="05 / Archive">
+<section class="section archive" id="archive" data-section="archive" data-label="06 / Archive">
     <div class="container">
         <header class="sh">
-            <p class="label"><b>05</b> / Archive</p>
+            <p class="label"><b>06</b> / Archive</p>
             <h2 data-reveal="lines">
                 <span class="ln" style="--i:0"><span>Every build,</span></span>
                 <span class="ln" style="--i:1"><span><span class="serif">searchable.</span></span></span>
@@ -101,7 +101,7 @@ $filters = array_filter(
 
                             <div class="arc-foot">
                                 <div class="tlogos" aria-label="Built with">
-                                    <?php foreach (array_slice(tech_unique($project['stack']), 0, 5) as $tech): ?><?= tech_mark($tech, 20) ?><?php endforeach; ?>
+                                    <?php foreach (array_slice(tech_unique($project['stack']), 0, 3) as $tech): ?><?= tech_mark($tech, 20) ?><?php endforeach; ?>
                                 </div>
                                 <?php if ($repoUrl !== ''): ?>
                                     <a class="arc-gh" href="<?= e($repoUrl) ?>" target="_blank" rel="noopener noreferrer"

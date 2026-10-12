@@ -96,7 +96,7 @@ $bySlug     = Knowledge::projectsBySlug();
                                         <p><?= e($stage['body']) ?></p>
                                         <div class="tchips">
                                             <?php foreach ($stage['tech'] as $tech): ?>
-                                                <?= tech_mark($tech, 16, true) ?>
+                                                <?= tech_tag($tech) ?>
                                             <?php endforeach; ?>
                                         </div>
                                     </div>

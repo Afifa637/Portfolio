@@ -39,7 +39,7 @@ export function init(root) {
                 : '<p class="insp-empty">Part of my toolkit from coursework and smaller builds — not yet in a featured project here.</p>')
             + (item.related.length
                 ? `<div><p class="label" style="margin-bottom:.6rem">Used alongside</p><div class="tchips">${item.related.map((r) =>
-                    `<button type="button" class="tchip" data-jump="${esc(r.toLowerCase())}">${techIcon(r, 16)}<span>${esc(r)}</span></button>`).join('')}</div></div>`
+                    `<button type="button" class="tchip tchip-text" data-jump="${esc(r.toLowerCase())}">${esc(r)}</button>`).join('')}</div></div>`
                 : '');
 
         if (scroll) root.querySelector(`.skill[data-skill="${CSS.escape(key)}"]`)?.scrollIntoView({ block: 'nearest' });

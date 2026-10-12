@@ -1456,28 +1456,144 @@ button.tchip:hover { border-color: var(--amber); color: var(--text); }
 
 /* ========================================================== 10 CAREER MAP */
 
-.cmap { display: grid; gap: 1rem; }
-.cmap-label { margin-top: 1.5rem; }
-.cmap-label:first-child { margin-top: 0; }
+/* The roadmap: stops along a winding road, driven by scroll. */
+.tchip-text { padding: 0.28rem 0.7rem; }
 
-.cmap-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; }
+.road { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
 
-.edu-card, .act-card {
+/* Route bar: jump to any stop. Sticks under the nav while the road is in view. */
+.route {
+    position: sticky;
+    top: calc(var(--nav-h) + 0.75rem);
+    z-index: 5;
     display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem;
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+.route-list { display: flex; flex: 1; gap: 0.25rem; min-width: 0; list-style: none; padding: 0; overflow-x: auto; scrollbar-width: none; }
+.route-list::-webkit-scrollbar { display: none; }
+
+.route-pin {
+    flex: none;
+    padding: 0.42rem 0.85rem;
+    border-radius: var(--r-pill);
+    font-size: 0.8125rem;
+    color: var(--text-3);
+    white-space: nowrap;
+    transition: color var(--d-fast), background-color var(--d-fast);
+}
+.route-pin:hover { color: var(--text); }
+.route-pin[aria-current="step"] { background: var(--amber); color: var(--amber-ink); font-weight: 600; }
+
+.route-step {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--text-2);
+    transition: background-color var(--d-fast), color var(--d-fast);
+}
+.route-step:first-child svg { rotate: 180deg; }
+.route-step:hover { background: var(--surface-2); color: var(--text); }
+
+.road-stage { position: relative; }
+
+.road-svg { position: absolute; inset: 0; pointer-events: none; overflow: visible; display: none; }
+.is-road .road-svg { display: block; }
+
+.road-bed { fill: none; stroke: var(--surface-3); stroke-width: 34; stroke-linecap: round; }
+.road-mid { fill: none; stroke: var(--bg-2); stroke-width: 2; stroke-dasharray: 3 11; stroke-linecap: round; opacity: 0.9; }
+.road-trip { fill: none; stroke: var(--amber); stroke-width: 6; stroke-linecap: round; opacity: 0.9; }
+.road-car .car-ring { fill: var(--amber-a16); stroke: var(--amber-a32); }
+.road-car .car-dot { fill: var(--amber); stroke: var(--bg); stroke-width: 2.5; }
+.road-car .car-arrow { fill: var(--amber-ink); }
+.road-car .car-ring { animation: car-pulse 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+
+@keyframes car-pulse { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+
+.stops { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); list-style: none; padding: 0; }
+.road-stage, .road { min-width: 0; }
+
+/* Fallback road for when there is no script. */
+.road:not(.is-road) .stops::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; translate: -50% 0; border-radius: 2px; background: var(--surface-3); }
+
+.stop {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 4.5rem minmax(0, 1fr);
+    align-items: center;
+    padding: 0.9rem 0;
+}
+
+.stop-pin {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    justify-self: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--line-3);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--text-3);
+    transition: background-color var(--d-normal), border-color var(--d-normal), color var(--d-normal), box-shadow var(--d-normal);
+}
+
+/* The road snakes: pins sit alternately either side of centre. */
+.stop:nth-child(odd) .stop-pin  { translate: -22px 0; }
+.stop:nth-child(even) .stop-pin { translate: 22px 0; }
+
+.stop.is-reached .stop-pin { border-color: var(--amber); background: var(--amber); color: var(--amber-ink); box-shadow: 0 0 0 6px var(--amber-a16); }
+.stop.is-act.is-reached .stop-pin { border-color: var(--violet); background: var(--violet); color: #fff; box-shadow: 0 0 0 6px var(--violet-a12); }
+
+.stop-card {
+    grid-row: 1;
+    display: flex;
+    align-items: center;
     gap: 1.1rem;
-    padding: 1.2rem;
+    padding: 1.1rem 1.2rem;
     border: 1px solid var(--line-2);
     border-radius: var(--r-3);
     background: var(--bg-2);
-    transition: border-color var(--d-fast), translate var(--d-normal) var(--e-out);
+    min-width: 0;
+    outline: none;
+    transition: border-color var(--d-fast), translate var(--d-normal) var(--e-out), opacity var(--d-normal);
 }
-.edu-card:hover, .act-card:hover { border-color: var(--line-3); translate: 0 -3px; }
 
-.edu-when { display: flex; align-items: center; flex-wrap: wrap; font-family: var(--f-mono); font-size: 0.6875rem; color: var(--text-3); }
-.edu-card h4, .act-card h4 { margin: 0.35rem 0 0.2rem; font-size: 1.05rem; letter-spacing: -0.02em; line-height: 1.25; }
-.edu-card .org, .act-card .org { color: var(--amber); font-size: 0.8125rem; font-weight: 500; }
-.edu-note { margin-top: 0.45rem; font-size: 0.75rem; color: var(--text-3); }
-.act-detail { margin-top: 0.4rem; font-size: 0.8125rem; line-height: 1.5; color: var(--text-2); }
+.stop:nth-child(odd) .stop-card { grid-column: 1; margin-right: 1rem; flex-direction: row-reverse; text-align: right; }
+.stop:nth-child(even) .stop-card { grid-column: 3; margin-left: 1rem; }
+.stop-card:hover, .stop-card:focus-visible { border-color: var(--line-3); }
+.stop-card:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* Stops the marker has not reached yet are quieter. */
+.is-road .stop:not(.is-reached) .stop-card { opacity: 0.55; }
+
+.stop-text { min-width: 0; }
+.stop-when { display: flex; align-items: center; gap: 0.5rem; font-family: var(--f-mono); font-size: 0.6875rem; color: var(--text-3); }
+.stop:nth-child(odd) .stop-when { justify-content: flex-end; }
+.stop-card h3 { margin: 0.3rem 0 0.15rem; font-size: 1.1rem; letter-spacing: -0.02em; line-height: 1.25; }
+.stop-card .org { color: var(--amber); font-size: 0.8125rem; font-weight: 500; }
+.stop-note { margin-top: 0.35rem; font-size: 0.75rem; color: var(--text-3); }
+.stop-body { margin-top: 0.4rem; font-size: 0.8125rem; line-height: 1.5; color: var(--text-2); }
+.stop-card .gauge { width: 72px; height: 72px; }
+.stop-card .gauge b { font-size: 1.1rem; }
+
+.stop-dest { border-style: dashed; border-color: var(--amber-a32); background: var(--amber-a08); }
+.stop-dest .btn { margin-top: 0.8rem; }
+.stop.is-end .stop-pin { border-color: var(--amber); color: var(--amber); }
+.stop.is-end.is-reached .stop-pin { color: var(--amber-ink); }
 
 /* A grade as a ring: the arc is the score's share of the maximum. */
 .gauge { position: relative; display: grid; place-items: center; flex: none; width: 84px; height: 84px; }
@@ -1496,18 +1612,6 @@ button.tchip:hover { border-color: var(--amber); color: var(--text); }
 .gauge b { font-family: var(--f-display); font-size: 1.3rem; font-weight: 700; letter-spacing: -0.04em; }
 .gauge small { margin-top: 0.2rem; font-family: var(--f-mono); font-size: 0.5625rem; color: var(--text-3); }
 .gauge-icon { border-radius: 50%; background: var(--amber-a08); color: var(--amber); }
-
-.act-glyph {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    border: 1px solid var(--violet-a24);
-    background: linear-gradient(135deg, var(--violet-a12), var(--amber-a08));
-    color: var(--violet);
-}
 
 .cmap-now { display: inline-flex; align-items: center; gap: 0.4rem; margin-left: 0.5rem; font-family: var(--f-mono); font-size: 0.625rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); }
 
@@ -1709,7 +1813,6 @@ button.tchip:hover { border-color: var(--amber); color: var(--text); }
 
 @media (width <= 1180px) {
     .arc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .cmap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .foot-grid { grid-template-columns: 1fr 1fr; }
 }
 
@@ -1799,7 +1902,6 @@ button.tchip:hover { border-color: var(--amber); color: var(--text); }
 
     .jr-panel { grid-template-columns: minmax(0, 1fr); }
 
-    .cmap-grid { grid-template-columns: minmax(0, 1fr); }
 
     .channel { grid-template-columns: 5rem minmax(0, 1fr) auto; gap: 0.6rem; }
 
@@ -1811,6 +1913,15 @@ button.tchip:hover { border-color: var(--amber); color: var(--text); }
     .cs-meta > div:nth-child(n + 3) { border-top: 1px solid var(--line); }
     .cs-pager { grid-template-columns: minmax(0, 1fr); }
     .cs-pager a:last-child { text-align: left; }
+}
+
+@media (width <= 760px) {
+    .stop { grid-template-columns: 3.25rem minmax(0, 1fr); }
+    .stop-pin { grid-column: 1; width: 38px; height: 38px; translate: 0 0 !important; justify-self: start; margin-left: 2px; }
+    .stop:nth-child(n) .stop-card { grid-column: 2; margin: 0; flex-direction: row; text-align: left; }
+    .stop:nth-child(odd) .stop-when { justify-content: flex-start; }
+    .road:not(.is-road) .stops::before { left: 21px; }
+    .stop-card .gauge { width: 60px; height: 60px; }
 }
 
 @media (width <= 560px) {

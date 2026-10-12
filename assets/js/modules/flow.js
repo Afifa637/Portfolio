@@ -10,7 +10,7 @@
  * illustrative wherever they are shown. They are not measurements.
  */
 
-import { $, $$, esc, sleep, reducedMotion, data, techIcon } from '@/core/util.js';
+import { $, $$, esc, sleep, reducedMotion } from '@/core/util.js';
 
 const SECURITY = /secur|auth|rbac|middleware|rules?\b|jwt|permission/i;
 
@@ -26,18 +26,6 @@ function illustrativeMs(layer) {
     return base + (h % 7);
 }
 
-/** Real logos for a layer's technologies, once each; the names are written beside them. */
-function layerIcons(tech) {
-    const logos = data().logos ?? {};
-    const seen = new Set();
-    return String(tech).split(',').map((t) => t.trim()).filter((t) => {
-        const src = logos[t.toLowerCase()]?.src;
-        if (!src || seen.has(src)) return false;
-        seen.add(src);
-        return true;
-    }).map((t) => techIcon(t, 15)).join('');
-}
-
 export function renderLayers(list, layers, { interactive = true } = {}) {
     list.innerHTML = layers.map((l, i) =>
         `<li class="arch-layer${i === 0 && interactive ? ' is-on' : ''}">`
@@ -45,7 +33,7 @@ export function renderLayers(list, layers, { interactive = true } = {}) {
         + (interactive
             ? `<button class="arch-node" type="button" data-layer="${i}" data-cursor="explore">`
             : '<div class="arch-node">')
-        + `<strong>${esc(l.layer)}</strong><span class="arch-tech-row">${layerIcons(l.tech)}${esc(l.tech)}</span>`
+        + `<strong>${esc(l.layer)}</strong><span>${esc(l.tech)}</span>`
         + (interactive ? '</button>' : '</div>')
         + '</li>').join('');
 }
@@ -67,7 +55,7 @@ export function createFlow({ body, list, packet, log, insp, getLayers, getReques
             `<p class="label">Layer ${String(i + 1).padStart(2, '0')}${SECURITY.test(layer.layer + layer.tech) ? ' · security boundary' : ''}</p>`
             + `<h3>${esc(layer.layer)}</h3>`
             + `<p>${esc(layer.role || 'No notes recorded for this layer yet.')}</p>`
-            + `<div class="tchips">${layer.tech.split(',').map((t) => t.trim()).filter(Boolean).map((t) => `<span class="tchip">${techIcon(t, 16)}<span>${esc(t)}</span></span>`).join('')}</div>`;
+            + `<div class="tchips">${layer.tech.split(',').map((t) => t.trim()).filter(Boolean).map((t) => `<span class="tchip tchip-text">${esc(t)}</span>`).join('')}</div>`;
     };
 
     const movePacket = (i) => {

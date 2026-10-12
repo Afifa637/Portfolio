@@ -61,11 +61,11 @@ $defaultLayers = [
 ];
 
 ?>
-<section class="section hood" id="hood" data-section="hood" data-label="04 / Under the hood">
+<section class="section hood" id="hood" data-section="hood" data-label="05 / Under the hood">
     <div class="container">
         <header class="sh">
             <span class="ghost-word" aria-hidden="true">SHIP</span>
-            <p class="label"><b>04</b> / Under the hood</p>
+            <p class="label"><b>05</b> / Under the hood</p>
             <h2 data-reveal="lines">
                 <span class="ln" style="--i:0"><span>Follow a request</span></span>
                 <span class="ln" style="--i:1"><span><span class="serif">through the system.</span></span></span>
@@ -103,7 +103,7 @@ $defaultLayers = [
                                     <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
                                     <button class="arch-node" type="button" data-layer="<?= $li ?>" data-cursor="explore">
                                         <strong><?= e($layer['layer']) ?></strong>
-                                        <span class="arch-tech-row"><?php foreach (tech_logos_only(tech_split($layer['tech'])) as $t): ?><?= tech_icon($t, 15) ?><?php endforeach; ?><?= e($layer['tech']) ?></span>
+                                        <span><?= e($layer['tech']) ?></span>
                                     </button>
                                 </li>
                             <?php endforeach; ?>
@@ -128,7 +128,7 @@ $defaultLayers = [
                         <p><?= e($first['architecture'][0]['role']) ?></p>
                         <div class="tchips">
                             <?php foreach (tech_split($first['architecture'][0]['tech']) as $tech): ?>
-                                <?= tech_mark($tech, 16, true) ?>
+                                <?= tech_tag($tech) ?>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -159,7 +159,7 @@ $defaultLayers = [
                                 <label class="choice">
                                     <input type="radio" name="<?= e($key) ?>" value="<?= e($option) ?>"
                                         <?= $defaults[$key] === $option ? 'checked' : '' ?>>
-                                    <span><?= tech_icon($option, 16) ?><?= e($option) ?></span>
+                                    <span><?= e($option) ?></span>
                                 </label>
                             <?php endforeach; ?>
                         </fieldset>
@@ -173,7 +173,7 @@ $defaultLayers = [
                     <?php foreach ($defaultLayers as $li => [$layer, $tech]): ?>
                         <li class="arch-layer">
                             <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
-                            <div class="arch-node"><strong><?= e($layer) ?></strong><span class="arch-tech-row"><?php foreach (tech_logos_only(tech_split($tech)) as $t): ?><?= tech_icon($t, 15) ?><?php endforeach; ?><?= e($tech) ?></span></div>
+                            <div class="arch-node"><strong><?= e($layer) ?></strong><span><?= e($tech) ?></span></div>
                         </li>
                     <?php endforeach; ?>
                 </ol>

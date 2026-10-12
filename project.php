@@ -112,7 +112,7 @@ $isHome = false;
                 </dl>
 
                 <div class="tchips" style="margin-top:1.4rem">
-                    <?php foreach ($project['stack'] as $tech): ?><?= tech_mark($tech, 18, true) ?><?php endforeach; ?>
+                    <?php foreach ($project['stack'] as $tech): ?><?= tech_tag($tech) ?><?php endforeach; ?>
                 </div>
 
                 <div class="hero-actions" style="margin-top:1.6rem">
@@ -183,7 +183,7 @@ $isHome = false;
                                                 <li class="arch-layer<?= $li === 0 ? ' is-on' : '' ?>">
                                                     <span class="arch-pin" aria-hidden="true"><?= $li + 1 ?></span>
                                                     <button class="arch-node" type="button" data-layer="<?= $li ?>" data-cursor="explore">
-                                                        <strong><?= e($layer['layer']) ?></strong><span class="arch-tech-row"><?php foreach (tech_logos_only(tech_split($layer['tech'])) as $tech): ?><?= tech_icon($tech, 15) ?><?php endforeach; ?><?= e($layer['tech']) ?></span>
+                                                        <strong><?= e($layer['layer']) ?></strong><span><?= e($layer['tech']) ?></span>
                                                         <?php if ($layer['role'] !== ''): ?><span class="visually-hidden"> — <?= e($layer['role']) ?></span><?php endif; ?>
                                                     </button>
                                                 </li>
